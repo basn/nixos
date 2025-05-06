@@ -12,40 +12,28 @@
 
   outputs = inputs@{ self, flake-parts, nixpkgs, nixpkgs-unstable, home-manager, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-
       systems = [ "x86_64-linux" ];
-
-      # No perSystem for now
-
       flake = let
         system = "x86_64-linux";
-        hostname = builtins.readFile "/etc/hostname"; # Use at runtime
-        unstableOverlay = final: prev: {
-          unstable = import nixpkgs-unstable {
-            inherit system;
-            config.allowUnfree = true;
-          };
+        unstablePkgs = import nixpkgs-unstable {
+          inherit system;
+          config.allowUnfree = true;
         };
-
         pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true;
         };
+
       in {
+        # Use nixpkgs-unstable directly where needed
         nixosConfigurations.bandit = nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = {
             inherit inputs system;
-            unstablePkgs = import nixpkgs-unstable {
-              inherit system;
-              config.allowUnfree = true;
-            };
+            unstablePkgs = unstablePkgs;  # Reference directly instead of using overlay
           };
           modules = [
-            ({ pkgs, ... }: {
-              nixpkgs.overlays = [ unstableOverlay ];
-            })
-
+            # No need to apply an overlay, just use unstablePkgs
             inputs.sops_nix.nixosModules.sops
             inputs.vpn-confinement.nixosModules.default
             inputs.home-manager.nixosModules.home-manager
@@ -57,7 +45,7 @@
           inherit pkgs;
           modules = [
             ./home/home.nix
-	     (if builtins.match "bleh\\n?" hostname != null then ./home/work.nix else ./home/basn.nix)
+            ./home/basn.nix
           ];
           extraSpecialArgs = {
             inherit inputs system;
