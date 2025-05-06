@@ -1,4 +1,4 @@
-{ config, lib, pkgs, unstablePkgs, sops_nix, ... }:
+{ inputs, config, lib, pkgs, unstablePkgs, ... }:
 {
   imports =
     [ 
@@ -13,7 +13,7 @@
       ./rclone/rclone.nix
       ./services/jellyfin.nix
       ./sops.nix
-      sops_nix.nixosModules.sops
+      inputs.sops_nix.nixosModules.sops
     ];
   boot = {
     kernelModules = [ "r8169" ];

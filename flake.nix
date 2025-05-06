@@ -22,16 +22,16 @@
       };
     };
   };
-  outputs = { self, nixpkgs, nixpkgs-unstable, sops_nix, vpn-confinement, home-manager }:
+  outputs = inputs:
   let
     system = "x86_64-linux";
-    unstablePkgs = import nixpkgs-unstable {
+    unstablePkgs = import inputs.nixpkgs-unstable {
       inherit system;
       config = {
         allowUnfree = true;
       };
     };
-    pkgs = import nixpkgs {
+    pkgs = import inputs.nixpkgs {
       inherit system;
       config = { 
         allowUnfree = true;
@@ -40,14 +40,14 @@
   in
   {
     nixosConfigurations = {
-      bandit = nixpkgs.lib.nixosSystem {
+      bandit = inputs.nixpkgs.lib.nixosSystem {
         system = system;
         specialArgs = {
-          inherit system unstablePkgs sops_nix vpn-confinement home-manager;
+          inherit inputs system unstablePkgs;
         };
         modules = [
-	  sops_nix.nixosModules.sops
-	  vpn-confinement.nixosModules.default
+	  inputs.sops_nix.nixosModules.sops
+	  inputs.vpn-confinement.nixosModules.default
           ./bandit/configuration.nix
         ];
       };
