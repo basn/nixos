@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 {
   home = {
-    username = basn;
-    homeDirectory = "/home/basn"
+    username = "basn";
+    homeDirectory = "/home/basn";
   };
 }

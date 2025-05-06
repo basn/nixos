@@ -1,15 +1,8 @@
 { config, pkgs, ... }:
-
 let
-  hostname = builtins.getEnv "HOSTNAME";
-  workmachine = hostname == "bleh";
+  themeFile = ./powerlevel10k_modern.omp.json;
   themePath = "${config.home.homeDirectory}/.config/oh-my-posh/powerlevel10k_modern.omp.json";
-in
-{
-  imports = [
-    (if workmachine then ./work.nix else ./basn.nix)
-  ];
-  home.shell = pkgs.zsh;
+in {
   programs.zsh = {
     enable = true;
     syntaxHighlighting.enable = true;
@@ -33,8 +26,7 @@ in
     oh-my-posh
   ];
 
-  home.file.".config/oh-my-posh/powerlevel10k_modern.omp.json".source =
-    ./powerlevel10k_modern.omp.json;
+  home.file.".config/oh-my-posh/powerlevel10k_modern.omp.json".source = themeFile;
 
   home.stateVersion = "24.11";
 }

@@ -19,7 +19,7 @@
 
       flake = let
         system = "x86_64-linux";
-
+        hostname = builtins.readFile "/etc/hostname"; # Use at runtime
         unstableOverlay = final: prev: {
           unstable = import nixpkgs-unstable {
             inherit system;
@@ -57,6 +57,7 @@
           inherit pkgs;
           modules = [
             ./home/home.nix
+	     (if builtins.match "bleh\\n?" hostname != null then ./home/work.nix else ./home/basn.nix)
           ];
           extraSpecialArgs = {
             inherit inputs system;
