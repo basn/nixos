@@ -14,10 +14,10 @@
       url = "github:Maroka-chan/VPN-Confinement";
     };
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-24.11";
       inputs = {
         nixpkgs = {
-	  follows = "nixpkgs";
+	  follows = "nixpkgs-unstable";
 	};
       };
     };
@@ -54,7 +54,7 @@
     };
     homeConfigurations = {
       "basn" = inputs.home-manager.lib.homeManagerConfiguration {
-       pkgs = pkgs;
+       inherit pkgs;
        modules = [ ./home/home.nix ]; 
      };
     };

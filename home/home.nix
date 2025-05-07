@@ -6,19 +6,26 @@ in {
   programs = { 
     zsh = {
       enable = true;
-      syntaxHighlighting.enable = true;
-      autosuggestion.enable = true;
+      autosuggestion = {
+        enable = true;
+      };
       enableCompletion = true;
-      enableLsColors = true;
-      histSize = 10000;
+      history = {
+        size = 10000;
+	share = true;
+      };
       initExtra = ''
         eval "$(oh-my-posh init zsh --config ${themePath})"
       '';
     };
     fzf = {
       enable = true;
-      keybindings = true;
-      fuzzyCompletion = true;
+      enableZshIntegration = true;
+    };
+    git = {
+      enable = true;
+      userName = "Fredrik Bergström";
+      userEmail = "basn@lan2k.org";
     };
   };
 
@@ -27,6 +34,6 @@ in {
     homeDirectory = "/home/basn";
     file.".config/oh-my-posh/powerlevel10k_modern.omp.json".source = themeFile;
     stateVersion = "24.11";
+    packages = with pkgs; [ oh-my-posh ];
   };
-  home.packages = with pkgs; [ oh-my-posh ];
 }
