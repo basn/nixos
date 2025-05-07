@@ -87,7 +87,6 @@
       };
     };
   };
-  #home-manager.users.basn = import ../home/home.nix;
   security = {
     sudo = {
       wheelNeedsPassword = false;
@@ -119,25 +118,8 @@
     mtr = {
       enable = true;
     };
-    neovim = {
-      enable = true;
-      viAlias = true;
-      vimAlias = true;
-      defaultEditor = true;
-    };
     zsh = {
       enable = true;
-      syntaxHighlighting = {
-        enable = true;
-      };
-      promptInit = "eval \"$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/powerlevel10k_modern.omp.json')\"";
-      histSize = 10000;
-      enableLsColors = true;
-      enableCompletion = true;
-    };
-    fzf = {
-      keybindings = true;
-      fuzzyCompletion = true;
     };
   };
   services = {

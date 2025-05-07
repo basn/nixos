@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 let
   themeFile = ./powerlevel10k_modern.omp.json;
   themePath = "${config.home.homeDirectory}/.config/oh-my-posh/powerlevel10k_modern.omp.json";
@@ -14,7 +14,7 @@ in {
         size = 10000;
 	share = true;
       };
-      initExtra = ''
+      initContent = ''
         eval "$(oh-my-posh init zsh --config ${themePath})"
       '';
     };
@@ -26,6 +26,34 @@ in {
       enable = true;
       userName = "Fredrik Bergström";
       userEmail = "basn@lan2k.org";
+    };
+    nvf = {
+      enable = true;
+      settings = {
+        vim = {
+          theme = {
+            enable = true;
+            name = "onedark";
+            style = "darker";
+          };
+          lsp = {
+            enable = true;
+          };
+          languages = {
+            nix = {
+              enable = true;
+            };
+            yaml = {
+              enable = true;
+            };
+          };
+          statusline = {
+            lualine = {
+              enable = true;
+            };
+          };
+        }; 
+      };
     };
   };
 

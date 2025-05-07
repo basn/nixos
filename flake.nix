@@ -14,12 +14,10 @@
       url = "github:Maroka-chan/VPN-Confinement";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.11";
-      inputs = {
-        nixpkgs = {
-	  follows = "nixpkgs-unstable";
-	};
-      };
+      url = "github:nix-community/home-manager";
+    };
+    nvf = {
+      url = "github:notashelf/nvf";
     };
   };
   outputs = inputs:
@@ -33,7 +31,7 @@
     };
     pkgs = import inputs.nixpkgs {
       inherit system;
-      config = { 
+      config = {
         allowUnfree = true;
       };
     };
@@ -46,16 +44,19 @@
           inherit inputs system unstablePkgs;
         };
         modules = [
-	  inputs.sops_nix.nixosModules.sops
-	  inputs.vpn-confinement.nixosModules.default
+          inputs.sops_nix.nixosModules.sops
+          inputs.vpn-confinement.nixosModules.default
           ./bandit/configuration.nix
         ];
       };
     };
     homeConfigurations = {
       "basn" = inputs.home-manager.lib.homeManagerConfiguration {
-       inherit pkgs;
-       modules = [ ./home/home.nix ]; 
+       pkgs = unstablePkgs;
+       modules = [
+       inputs.nvf.homeManagerModules.default
+       ./home/home.nix
+       ];
      };
     };
   };
