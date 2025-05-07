@@ -14,7 +14,6 @@
       ./services/jellyfin.nix
       ./sops.nix
       inputs.sops_nix.nixosModules.sops
-      inputs.home-manager.nixosModules.home-manager
     ];
   boot = {
     kernelModules = [ "r8169" ];
@@ -88,7 +87,7 @@
       };
     };
   };
-  home-manager.users.basn = import ../home/home.nix;
+  #home-manager.users.basn = import ../home/home.nix;
   security = {
     sudo = {
       wheelNeedsPassword = false;

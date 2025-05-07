@@ -1,7 +1,7 @@
 # configuration.nix
 { pkgs, lib, config, unstablePkgs, ... }:
 let
-  seedport = 57280;
+  seedport = 53090;
 in
 {
   imports = [
