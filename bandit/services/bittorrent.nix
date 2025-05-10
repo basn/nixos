@@ -26,17 +26,14 @@ in
     vpnNamespace = "wg";
   };
   services = {
-    qBittorrent = {
+    qbittorrent = {
       enable = true;
       openFirewall = false;
-      webUIAddress.port = 8080;
+      port = 8080;
       user = "plex";
       group = "plex";
       package = unstablePkgs.qbittorrent-nox;
-      incomingPort = seedport;
-      configDir = "/data2/files/qBittorrent/.config/qBittorrent/";
       dataDir = "/data2/files/qBittorrent/";
-      cacheDir = "/data2/files/qBittorrent/.cache/qBittorrent";
     };
   };
 }

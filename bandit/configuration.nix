@@ -111,7 +111,6 @@
       neofetch
       sops
       git
-      home-manager
     ];
   };
   programs = {

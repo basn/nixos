@@ -1,6 +1,12 @@
 { pkgs, ... }:
 {
+  nix = {
+#    package = pkgs;
+  };
   programs = { 
+    home-manager = {
+      enable = true;
+    };
     zsh = {
       enable = true;
       autosuggestion = {
