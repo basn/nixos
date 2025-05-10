@@ -1,8 +1,5 @@
-{ config, pkgs, inputs, ... }:
-let
-  themeFile = ./powerlevel10k_modern.omp.json;
-  themePath = "${config.home.homeDirectory}/.config/oh-my-posh/powerlevel10k_modern.omp.json";
-in {
+{ pkgs, ... }:
+{
   programs = { 
     zsh = {
       enable = true;
@@ -14,9 +11,6 @@ in {
         size = 10000;
 	share = true;
       };
-      initContent = ''
-        eval "$(oh-my-posh init zsh --config ${themePath})"
-      '';
     };
     fzf = {
       enable = true;
@@ -26,6 +20,11 @@ in {
       enable = true;
       userName = "Fredrik Bergström";
       userEmail = "basn@lan2k.org";
+    };
+    oh-my-posh = {
+      enable = true;
+      enableZshIntegration = true;
+      useTheme = "blue-owl";
     };
     nvf = {
       enable = true;
@@ -52,16 +51,21 @@ in {
               enable = true;
             };
           };
+          autocomplete = {
+            nvim-cmp = {
+              enable = true;
+            };
+          };
         }; 
       };
     };
   };
 
   home = {
+    enableNixpkgsReleaseCheck = false;
     username = "basn";
     homeDirectory = "/home/basn";
-    file.".config/oh-my-posh/powerlevel10k_modern.omp.json".source = themeFile;
     stateVersion = "24.11";
-    packages = with pkgs; [ oh-my-posh ];
+    packages = with pkgs; [ oh-my-posh neofetch ];
   };
 }

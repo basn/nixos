@@ -19,6 +19,9 @@
     nvf = {
       url = "github:notashelf/nvf";
     };
+    nix-search-tv = {
+      url = "github:3timeslazy/nix-search-tv";
+    };
   };
   outputs = inputs:
   let
@@ -47,17 +50,22 @@
           inputs.sops_nix.nixosModules.sops
           inputs.vpn-confinement.nixosModules.default
           ./bandit/configuration.nix
+          inputs.home-manager.nixosModules.home-manager {
+            home-manager = {
+              useGlobalPkgs = false;
+              useUserPackages = true;
+              users.basn = import ./home/home.nix;
+              backupFileExtension = "backup";
+              extraSpecialArgs = {
+                pkgs = unstablePkgs;
+              };
+              sharedModules = [
+                inputs.nvf.homeManagerModules.default
+              ];
+            };
+          }
         ];
       };
-    };
-    homeConfigurations = {
-      "basn" = inputs.home-manager.lib.homeManagerConfiguration {
-       pkgs = unstablePkgs;
-       modules = [
-       inputs.nvf.homeManagerModules.default
-       ./home/home.nix
-       ];
-     };
     };
   };
 }
