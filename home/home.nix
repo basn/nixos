@@ -1,11 +1,16 @@
 { pkgs, ... }:
 {
-  nix = {
-#    package = pkgs;
+  services = {
+    ssh-agent = {
+      enable = true;
+    };
   };
   programs = { 
     home-manager = {
       enable = true;
+    };
+    ssh = {
+      addKeysToAgent = "yes";
     };
     zsh = {
       enable = true;

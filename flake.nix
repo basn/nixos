@@ -23,6 +23,9 @@
     nix-search-tv = {
       url = "github:3timeslazy/nix-search-tv";
     };
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL/main";
+    };
   };
   outputs = inputs:
   let
@@ -67,6 +70,31 @@
           }
         ];
       };
-    };
+      nixos = inputs.nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          inputs.nixos-wsl.nixosModules.default
+          {
+            system.stateVersion = "24.11";
+            wsl.enable = true;
+          }
+	  ./wsl/configuration.nix
+          inputs.home-manager.nixosModules.home-manager {
+            home-manager = {
+              useGlobalPkgs = false;
+              useUserPackages = true;
+              users.basn = import ./home/home.nix;
+              backupFileExtension = "backup";
+              extraSpecialArgs = {
+                pkgs = unstablePkgs;
+              };
+              sharedModules = [
+                inputs.nvf.homeManagerModules.default
+              ];
+            };
+	  }
+        ];
+     };
   };
+};
 }
