@@ -14,7 +14,8 @@
       ./services/nginx.nix
       ./services/kuma.nix
       ./services/pykms.nix
-     # ./services/unifi.nix
+      ./services/vaultwarden.nix
+      ./services/unifi.nix
     ];
 
   boot = {
@@ -106,6 +107,7 @@
     zsh-fzf-history-search
     oh-my-posh
     git
+    sops
   ];
 
   programs = {
@@ -120,7 +122,6 @@
       syntaxHighlighting = {
         enable = true;
       };
-      promptInit = "eval \"$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/powerlevel10k_modern.omp.json')\"";
       histSize = 10000;
       enableLsColors = true;
       enableCompletion = true;
@@ -133,10 +134,10 @@
   services = {
     openssh.enable = true;
     zfs.autoScrub.enable = true;
-    mysql = {
-      enable = true;
-      package = pkgs.mariadb;
-    };
+#    mysql = {
+#      enable = true;
+#      package = pkgs.mariadb;
+#    };
   };
   virtualisation.vmware.guest.enable = true;
   # Other
@@ -153,7 +154,7 @@
   # Open ports in the firewall.
   networking = {
     firewall = {
-      allowedTCPPorts = [ 22 80 443 3000 3306 8080 8686 8772 9080 9443 4000 9090 ];
+      allowedTCPPorts = [ 22 80 443 3000 3306 8080 8686 8772 9080 9443 4000 9090 8222 ];
       allowedTCPPortRanges = [
         { from = 8081; to = 8085; }
 	{ from = 9600; to = 9603; }

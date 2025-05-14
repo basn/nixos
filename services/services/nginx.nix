@@ -74,7 +74,12 @@
       "bitwarden.basn.se" = {
         enableACME = true;
         forceSSL = true;
-        locations."/".proxyPass = "http://10.1.1.8:8686";
+        locations."/".proxyPass = "http://10.1.1.8:8222";
+      };
+      "vaultwarden.basn.se" = {
+        enableACME = true;
+        forceSSL = true;
+        locations."/".proxyPass = "http://10.1.1.8:8222";
       };
       "hass.basn.se" = {
         enableACME = true;

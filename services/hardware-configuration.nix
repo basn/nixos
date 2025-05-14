@@ -19,6 +19,10 @@
     { device = "tank/docker";
       fsType = "zfs";
     };
+  fileSystems."/vaultwarden" =
+    { device = "tank/vaultwarden";
+      fsType = "zfs";
+    };
 
   fileSystems."/boot" =
     { device = "/dev/disk/by-uuid/E86D-4688";
