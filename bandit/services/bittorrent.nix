@@ -21,7 +21,7 @@ in
       protocol = "both";
     }];
   };
-  systemd.services.qBittorrent.vpnConfinement = {
+  systemd.services.qbittorrent.vpnConfinement = {
     enable = true;
     vpnNamespace = "wg";
   };
