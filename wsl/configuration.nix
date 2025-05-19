@@ -9,7 +9,7 @@
 
 {
   imports = [
-   ../common/comon.nix
+   ../common/common.nix
   ];
   environment = {
     systemPackages = with pkgs; [
