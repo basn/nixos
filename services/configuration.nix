@@ -1,13 +1,10 @@
-# Edit this configuration file to define what should be installed on
-# your system. Help is available in the configuration.nix(5) man page, on
-# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-
 { config, lib, pkgs, ... }:
 
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ../common/common.nix
       ./sops.nix
       ./services/podman.nix
       ./services/blocky.nix
@@ -17,7 +14,6 @@
       ./services/vaultwarden.nix
       ./services/unifi.nix
     ];
-
   boot = {
     zfs = {
       extraPools = [ "tank" ];
@@ -40,9 +36,6 @@
        };
     };
   };
-
-  nixpkgs.config.allowUnfree = true;
-  time.timeZone = "Europe/Stockholm";
   networking = {
     interfaces = { 
       eth0.ipv4.addresses = [ 
@@ -59,99 +52,24 @@
     hostName = "services";
     timeServers = [ "ntp1.sp.se" ];
   };
-  i18n = {
-    defaultLocale = "en_US.UTF-8";
-    extraLocaleSettings = {
-      LC_TIME = "sv_SE.UTF-8";
-      LC_MONETARY = "sv_SE.UTF-8";
-    };
-  };
-  console = {
-    font = "Lat2-Terminus16";
-    keyMap = "sv-latin1";
-  };
-
-  users = {
-    defaultUserShell = pkgs.zsh;
-    users = {
-      basn = {
-        isNormalUser = true;
-        extraGroups = [ "wheel" ];
-        openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEHXMJeF4KZ+0ZVJCMyV62Vm4UdbwPj/o68hAYJNFMcx basn@bandit"
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICdxg/zlW4GiU6kRJcTQ6UYEbF07uBJWD5zhcm6gk//T basn@battlestation"
-        ];
-      };
-    };
-  };
-  security.sudo.wheelNeedsPassword = false;
-
   environment.systemPackages = with pkgs; [
-    vim 
-    wget
     open-vm-tools-headless
     podman
-    btop
-    dysk
-    mtr
     blocky
-    neovim
     nginx
-    unzip
-    screen
-    nmap
-    zsh
-    zsh-fzf-tab
-    zsh-fzf-history-search
-    fzf-zsh
-    zsh-fzf-history-search
-    oh-my-posh
-    git
-    sops
   ];
 
-  programs = {
-    mtr.enable = true;
-    neovim = {
-      viAlias = true;
-      vimAlias = true;
-      defaultEditor = true;
-    };
-    zsh = {
+  services = {
+    openssh = {
       enable = true;
-      syntaxHighlighting = {
+    };
+    zfs = {
+      autoScrub = {
         enable = true;
       };
-      histSize = 10000;
-      enableLsColors = true;
-      enableCompletion = true;
     };
-    fzf = {
-      keybindings = true;
-      fuzzyCompletion = true;
-    };
-  };
-  services = {
-    openssh.enable = true;
-    zfs.autoScrub.enable = true;
-#    mysql = {
-#      enable = true;
-#      package = pkgs.mariadb;
-#    };
   };
   virtualisation.vmware.guest.enable = true;
-  # Other
-  nix = {
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 30d";
-    };
-    settings = {
-      experimental-features = [ "nix-command" "flakes" ]; 
-    };
-  };
-  # Open ports in the firewall.
   networking = {
     firewall = {
       allowedTCPPorts = [ 22 80 443 3000 3306 8080 8686 8772 9080 9443 4000 9090 8222 ];
@@ -165,8 +83,6 @@
       ];
     };
   };
-  # Or disable the firewall altogether.
-  #networking.firewall.enable = false;
   system.stateVersion = "23.11"; # Did you read the comment?
 
 }

@@ -67,7 +67,7 @@
     };
     zsh = {
       enable = true;
-      promptInit = "eval \"$(oh-my-posh init zsh --config '${pkgs.oh-my-posh}/share/oh-my-posh/themes/blue-owl.json')\"";
+      promptInit = "eval \"$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/blue-owl.omp.json')\"";
       syntaxHighlighting = {
         enable = true;
       };
