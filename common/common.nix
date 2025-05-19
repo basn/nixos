@@ -52,6 +52,7 @@
       sops
       git
       ipcalc
+      nh
     ];
   };
   programs = {
@@ -66,6 +67,7 @@
     };
     zsh = {
       enable = true;
+      promptInit = "eval \"$(oh-my-posh init zsh --config '${pkgs.oh-my-posh}/share/oh-my-posh/themes/blue-owl.json')\"";
       syntaxHighlighting = {
         enable = true;
       };
