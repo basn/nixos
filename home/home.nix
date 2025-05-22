@@ -77,6 +77,6 @@
     username = "basn";
     homeDirectory = "/home/basn";
     stateVersion = "24.11";
-    packages = with pkgs; [ oh-my-posh neofetch ];
+    packages = with pkgs; [ oh-my-posh fastfetch ];
   };
 }
