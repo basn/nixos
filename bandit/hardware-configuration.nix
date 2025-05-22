@@ -44,6 +44,7 @@
   fileSystems."/home" =
     { device = "osdisk/home";
       fsType = "zfs";
+      neededForBoot = true;
     };
   fileSystems."/data/files" =
     {
