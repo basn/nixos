@@ -13,6 +13,7 @@
       ./services/pykms.nix
       ./services/vaultwarden.nix
       ./services/unifi.nix
+      ./services/ac.nix
     ];
   boot = {
     zfs = {
