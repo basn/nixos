@@ -94,6 +94,30 @@
           }
         ];
       };
+      nixos-sov = inputs.nixpkgs.lib.nixosSystem {
+        system = system;
+        specialArgs = {
+          inherit inputs system unstablePkgs;
+        };
+        modules = [
+          inputs.sops_nix.nixosModules.sops
+          ./cygate/configuration.nix
+          inputs.home-manager.nixosModules.home-manager {
+            home-manager = {
+              useGlobalPkgs = false;
+              useUserPackages = true;
+              users.basn = import ./home/home.nix;
+              backupFileExtension = "backup";
+              extraSpecialArgs = {
+                pkgs = unstablePkgs;
+              };
+              sharedModules = [
+                inputs.nvf.homeManagerModules.default
+              ];
+            };
+          }
+	];
+      };
       nixos = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
