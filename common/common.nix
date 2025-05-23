@@ -56,6 +56,7 @@
       git
       ipcalc
       nh
+      dust
     ];
   };
   programs = {
