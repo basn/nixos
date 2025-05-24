@@ -54,10 +54,6 @@
     firewall = { 
       enable = true;
       allowedTCPPorts = [ 22 80 ];
-      allowedUDPPortRanges = [{ 
-                                from = 2302;
-                                to = 2320;
-			      }];
     };
   };
   environment = {
@@ -104,5 +100,9 @@
   };
   system = {
     stateVersion = "24.05";
+    autoUpgrade = {
+      flake = "github:basn/nixos";
+      enable = true;
+    };
   };
 }
