@@ -185,7 +185,7 @@
          enableACME = true;
          forceSSL = true;
          locations."/" = {
-           proxyPass =  "https://10.1.1.8:9443";
+           proxyPass =  "https://10.1.1.8:8443";
            recommendedProxySettings = false;
            extraConfig =
              "proxy_ssl_verify off;"+
@@ -199,7 +199,7 @@
             ;
          };
          locations."/inform" = {
-           proxyPass = "http://10.1.1.8:9080";
+           proxyPass = "https://10.1.1.8:8443";
 	   recommendedProxySettings = false;
          };
       };
