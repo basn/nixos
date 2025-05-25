@@ -14,7 +14,7 @@
       ./services/jellyfin.nix
       ./sops.nix
       ../common/common.nix
-      ../services/immich.nix
+      ./services/immich.nix
       inputs.sops_nix.nixosModules.sops
     ];
   boot = {
@@ -54,7 +54,7 @@
     };
     firewall = { 
       enable = true;
-      allowedTCPPorts = [ 22 80 ];
+      allowedTCPPorts = [ 22 80 8080 ];
     };
   };
   environment = {

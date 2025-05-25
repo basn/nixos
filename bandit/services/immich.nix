@@ -1,6 +1,4 @@
 let
-  immichPort = 8080;
-  immichHost = "192.168.195.43";
   photosLocation = "/data/files/immich";
 in
 { ... }:
@@ -8,8 +6,7 @@ in
 {
   services.immich = {
     enable = true;
-    port = immichPort;
-    host = immichHost;
+    host = "0.0.0.0";
     user = "immich";
     group = "immich";
     mediaLocation = photosLocation;
