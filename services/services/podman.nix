@@ -25,22 +25,6 @@
           "/docker/redbot/:/data"
         ];
       };
-      unifi = { 
-        image = "jacobalberty/unifi:latest";
-        ports = [ 
-          "9080:8080"
-          "9443:8443"
-          "3478:3478/udp"
-          "10001:10001/udp"
-        ];
-        volumes = [
-          "/docker/unifi:/unifi"
-        ];
-        environment = {
-          TZ = "Europe/Stockholm";
-          RUNAS_UID0 = "true";
-        };
-      };
     };
   };
 }
