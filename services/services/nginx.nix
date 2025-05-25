@@ -252,6 +252,14 @@
              ;
         };
       };
+      "immich.basn.se" = {
+        enableACME = true;
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://192.168.180.10:8080";
+          recommendedProxySettings = true;
+        };
+      };
     };  
   };
 }
