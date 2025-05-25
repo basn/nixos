@@ -52,5 +52,11 @@
     zfs.autoScrub.enable = true;
   };
   virtualisation.vmware.guest.enable = true;
-  system.stateVersion = "24.05";
+  system = {
+    stateVersion = "24.05";
+    autoUpgrade = {
+      flake = "github:basn/nixos";
+      enable = true;
+    };
+  };
 }
