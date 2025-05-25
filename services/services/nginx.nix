@@ -258,6 +258,7 @@
         locations."/" = {
           proxyPass = "http://192.168.180.10:2283";
           recommendedProxySettings = true;
+          proxyWebsockets = true;
         };
       };
     };  
