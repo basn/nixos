@@ -49,12 +49,6 @@
         forceSSL = true;
         locations."/" = {
            proxyPass =  "http://127.0.0.1:9090";
-           extraConfig =
-             "allow 192.168.0.0/16;"+
-             "allow 127.0.0.1/32;"+
-	     "allow 193.108.5.135/32;"+
-             "deny all;"
-             ;
          };
       };
     };
