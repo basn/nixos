@@ -214,11 +214,7 @@
              "proxy_set_header Upgrade $http_upgrade;"+
              "proxy_set_header Connection $connection_upgrade;"+
              "proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;"+
-             "proxy_set_header Host $host;"+
-             "allow 193.108.5.135/32;"+
-             "allow 192.168.195.0/24;"+
-             "allow 127.0.0.1/32;"+
-             "deny all;"
+             "proxy_set_header Host $host;"
              ;
         };
       };
