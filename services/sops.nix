@@ -7,7 +7,7 @@
     };
     secrets = {
       teslamate = {
-        sopsFile = "./secrets/teslamate.env";
+        sopsFile = ./secrets/teslamate.env;
       };
     };
   };
