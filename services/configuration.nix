@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   imports =
@@ -21,21 +21,16 @@
       extraPools = [ "tank" ];
       devNodes = "/dev/disk/by-path";
     };
-    loader.grub = {
-      enable = true;
-      zfsSupport = true;
-      efiSupport = true;
-      efiInstallAsRemovable = true;
-      mirroredBoots = [
-        { devices = [ "nodev"]; path = "/boot"; }
-      ];
-    };
-    kernel = {
-       sysctl = {
-         "net.core.rmem_max" = 2500000;
-         "net.core.wmem_max" = 2500000;
-	 "net.core.wmem_default" = 2000000;
-       };
+    loader = {
+      grub = {
+        enable = true;
+        zfsSupport = true;
+        efiSupport = true;
+        efiInstallAsRemovable = true;
+        mirroredBoots = [
+          { devices = [ "nodev"]; path = "/boot"; }
+        ];
+      };
     };
   };
   networking = {
@@ -55,7 +50,6 @@
     timeServers = [ "ntp1.sp.se" ];
   };
   environment.systemPackages = with pkgs; [
-    open-vm-tools-headless
     podman
     blocky
     nginx
@@ -71,18 +65,18 @@
       };
     };
   };
-  virtualisation.vmware.guest.enable = true;
+  virtualisation = {
+    vmware = {
+      guest = {
+        enable = true;
+        package = pkgs.open-vm-tools-headless;
+      };
+    };
+  };
   networking = {
     firewall = {
-      allowedTCPPorts = [ 22 80 443 3000 3306 8080 8686 8772 9080 9443 4000 9090 8222 ];
-      allowedTCPPortRanges = [
-        { from = 8081; to = 8085; }
-	{ from = 9600; to = 9603; }
-      ];
-      allowedUDPPorts = [ 53 69 3478 10001 ];
-      allowedUDPPortRanges = [ 
-        { from = 9600; to = 9603; }
-      ];
+      allowedTCPPorts = [ 22 80 443 ];
+      allowedUDPPorts = [ 53 ];
     };
   };
   system = {
