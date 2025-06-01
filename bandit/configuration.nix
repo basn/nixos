@@ -49,9 +49,6 @@
     timeServers = [ "ntp1.sp.se" ];
     hostName = "bandit"; 
     hostId = "4c79e250";
-    proxy = {
-      default = "http://100.64.1.1:8080";
-    };
     firewall = { 
       enable = true;
       allowedTCPPorts = [ 22 80 8080 ];
