@@ -26,6 +26,9 @@
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
     };
+    teslamate = {
+      url = "github:teslamate-org/teslamate/main";
+    };
   };
   outputs = inputs:
   let
@@ -78,6 +81,7 @@
         modules = [
           inputs.sops_nix.nixosModules.sops
           ./services/configuration.nix
+          inputs.teslamate.nixosModules.default
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
