@@ -3,7 +3,7 @@
   services = {
     teslamate = {
       enable = true;
-      secretsFile = "/run/secrets/teslamate.env";
+      secretsFile = "/run/secrets/teslamate";
       autoStart = true;
       listenAddress = "127.0.0.1";
       port = 4000;

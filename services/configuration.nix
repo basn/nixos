@@ -14,6 +14,7 @@
       ./services/vaultwarden.nix
       ./services/unifi.nix
       ./services/ac.nix
+      ./services/teslamate.nix
     ];
   boot = {
     zfs = {

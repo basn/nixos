@@ -8,6 +8,7 @@
     secrets = {
       teslamate = {
         sopsFile = ./secrets/teslamate.env;
+        format = "dotenv";
       };
     };
   };
