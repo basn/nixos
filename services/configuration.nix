@@ -2,7 +2,7 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [ 
       ./hardware-configuration.nix
       ../common/common.nix
       ./sops.nix
@@ -49,12 +49,6 @@
     hostName = "services";
     timeServers = [ "ntp1.sp.se" ];
   };
-  environment.systemPackages = with pkgs; [
-    podman
-    blocky
-    nginx
-  ];
-
   services = {
     openssh = {
       enable = true;
@@ -87,4 +81,3 @@
     };
   };
 }
-

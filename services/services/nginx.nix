@@ -1,5 +1,8 @@
-{config, lib, pkgs, ...}:
+{ pkgs, ...}:
 {
+  environment.systemPackages = with pkgs; [
+    nginx
+  ];
   security.acme = {
      acceptTerms = true;
      defaults = {
