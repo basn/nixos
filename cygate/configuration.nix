@@ -34,7 +34,7 @@
       ];
     };
     defaultGateway = "10.140.12.1";
-    nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    nameservers = [ "8.8.8.8" ];
     hostId = "e5dafd0b";
     enableIPv6  = false;
     hostName = "nixos-sov";
