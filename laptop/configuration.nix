@@ -73,6 +73,7 @@
     ghostty
     neovim
     spotify
+    chromium
   ];
   font.packages = with pkgs; [
     meslo-lgs-nf
