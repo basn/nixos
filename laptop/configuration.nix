@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, unstablePkgs, ... }:
 
 {
   imports =
@@ -9,11 +9,13 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
-  networking.hostName = "laptop"; 
-  networking.networkmanager.enable = true;
-  time.timeZone = "Europe/Stockholm";
-
+  networking = {
+    hostName = "laptop"; 
+    networkmanager.enable = true;
+  };
+  time = {
+    timeZone = "Europe/Stockholm";
+  };
   i18n = {
     defaultLocale = "en_US.UTF-8";
     extraLocaleSettings = {
@@ -28,7 +30,6 @@
       LC_TIME = "sv_SE.UTF-8";
     };
   };
-
   services = {
     xserver = {
       enable = true;
@@ -48,38 +49,49 @@
         };
       };
     };
+    xserver = {
+      xkb = {
+        layout = "se";
+        variant = "";
+      };
+    };
+    pulseaudio = {
+      enable = true;
+    };
+    pipewire = {
+      enable = true;
+      alsa = {
+        enable = true;
+        support32Bit = true;
+      };
+      pulse = {
+        enable = true;
+      };
+    };
   };
-
-  services.xserver.xkb = {
-    layout = "se";
-    variant = "";
-  };
-
   console.keyMap = "sv-latin1";
-
-  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
   users.users.basn = {
     isNormalUser = true;
     description = "Fredrik Bergström";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
+    packages = with unstablePkgs; [
+      discord
+      chromium
+      ghostty
+      spotify
     ];
   };
-
-  programs.firefox.enable = true;
-  nixpkgs.config.allowUnfree = true;
+  programs = {
+    firefox = {
+      enable = true;
+    };
+    chromium = {
+      enable = true;
+    };
+  };
   environment.systemPackages = with pkgs; [
-    ghostty
     neovim
-    spotify
-    chromium
   ];
   fonts.packages = with pkgs; [
     meslo-lgs-nf
@@ -87,6 +99,7 @@
   powerManagement = {
     enable = true;
   };
-  system.stateVersion = "25.05";
-
+  system = {
+    stateVersion = "25.05";
+  };
 }
