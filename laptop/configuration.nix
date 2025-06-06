@@ -75,7 +75,7 @@
     spotify
     chromium
   ];
-  font.packages = with pkgs; [
+  fonts.packages = with pkgs; [
     meslo-lgs-nf
   ];
   system.stateVersion = "25.05";
