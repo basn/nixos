@@ -37,13 +37,15 @@
     };
     auto-cpufreq = {
       enable = true;
-      battery = {
-        govenor = "powersave";
-        turbo = "never";
-      };
-      charger = {
-        govenor = "performance";
-        turbo = "auto";
+      settings = {
+        battery = {
+          govenor = "powersave";
+          turbo = "never";
+        };
+        charger = {
+          govenor = "performance";
+          turbo = "auto";
+        };
       };
     };
   };
