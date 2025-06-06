@@ -37,7 +37,7 @@
       desktopManager.pantheon.enable = true;
     };
     auto-cpufreq = {
-      enable = true;
+      enable = false;
       settings = {
         battery = {
           govenor = "powersave";
@@ -56,7 +56,7 @@
       };
     };
     pulseaudio = {
-      enable = true;
+      enable = false;
     };
     pipewire = {
       enable = true;
