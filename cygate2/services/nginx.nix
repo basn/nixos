@@ -44,9 +44,9 @@
     '';
 
     virtualHosts = {
-      "cygate.basn.se" = {
-        enableACME = false;
-        forceSSL = false;
+      "cygate2.basn.se" = {
+        enableACME = true;
+        forceSSL = true;
         locations."/" = {
            proxyPass =  "http://127.0.0.1:9090";
          };
