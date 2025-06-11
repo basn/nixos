@@ -15,7 +15,7 @@
     clientMaxBodySize = "5G";
     # Only allow PFS-enabled ciphers with AES256
     sslCiphers = "AES256+EECDH:AES256+EDH:!aNULL";
-    #sslDhparam = "/etc/ssl/dhparam4096.pem";
+    sslDhparam = "/etc/ssl/dhparam4096.pem";
     appendHttpConfig = ''
       # Add HSTS header with preloading to HTTPS requests.
       # Adding this header to HTTP requests is discouraged
