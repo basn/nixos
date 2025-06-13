@@ -143,6 +143,7 @@
            proxyPass =  "http://10.0.1.11";
            extraConfig =
              "allow 192.168.195.0/24;"+
+             "allow 192.168.196.0/24;"+
              "allow 127.0.0.1/32;"+
              "deny all;"
              ;
