@@ -51,9 +51,10 @@
         enableACME = true;
         forceSSL = true;
 	locations."/" = {
-           proxyPass =  "http://192.168.180.10:8080";
+           proxyPass =  "http://192.168.180.10:80";
            extraConfig =
              "allow 192.168.0.0/16;"+
+             "allow 10.1.1.0/24;"+
              "allow 127.0.0.1/32;"+
              "deny all;"
              ;
@@ -107,6 +108,7 @@
           proxyPass =  "http://192.168.180.10:9696";
           extraConfig =
             "allow 192.168.0.0/16;"+
+            "allow 10.1.1.0/24;"+
             "allow 127.0.0.1/32;"+
             "deny all;"
             ;
@@ -119,6 +121,7 @@
           proxyPass =  "http://192.168.180.10:8989";
           extraConfig =
             "allow 192.168.0.0/16;"+
+            "allow 10.1.1.0/24;"+
             "allow 127.0.0.1/32;"+
             "deny all;"
             ;
@@ -131,6 +134,7 @@
           proxyPass =  "http://192.168.180.10:7878";
           extraConfig =
             "allow 192.168.0.0/16;"+
+            "allow 10.1.1.0/24;"+
             "allow 127.0.0.1/32;"+
             "deny all;"
             ;
@@ -144,6 +148,7 @@
            extraConfig =
              "allow 192.168.195.0/24;"+
              "allow 192.168.196.0/24;"+
+             "allow 10.1.1.0/24;"+
              "allow 127.0.0.1/32;"+
              "deny all;"
              ;
@@ -162,6 +167,7 @@
              "proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;"+
              "proxy_set_header Host $host;"+
              "allow 192.168.195.0/24;"+
+             "allow 10.1.1.0/24;"+
              "allow 127.0.0.1/32;"+
              "deny all;"
              ;
@@ -180,31 +186,10 @@
              "proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;"+
              "proxy_set_header Host $host;"+
              "allow 192.168.195.0/24;"+
+             "allow 10.1.1.0/24;"+
              "allow 127.0.0.1/32;"+
              "deny all;"
              ;
-         };
-      };
-      "controller.basn.se" = {
-         enableACME = true;
-         forceSSL = true;
-         locations."/" = {
-           proxyPass =  "https://10.1.1.8:8443";
-           recommendedProxySettings = false;
-           extraConfig =
-             "proxy_ssl_verify off;"+
-             "proxy_ssl_session_reuse on;"+
-             "proxy_buffering off;"+
-             "proxy_set_header Upgrade $http_upgrade;"+
-             "proxy_set_header Connection 'upgrade';"+
-             "proxy_hide_header Authorization;"+
-             "proxy_set_header Referer '';"+
-             "proxy_set_header Origin '';"
-            ;
-         };
-         locations."/inform" = {
-           proxyPass = "https://10.1.1.8:8443";
-	   recommendedProxySettings = false;
          };
       };
       "uptime.basn.se" = {
@@ -236,7 +221,6 @@
 	     "proxy_set_header X-Forwarded-Host $http_host;"+
 	     "proxy_buffering off;"
              ;
-	 
          };
          locations."/socket" = {
            proxyPass =  "http://192.168.180.10:8096";
