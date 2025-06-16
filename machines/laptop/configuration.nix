@@ -1,10 +1,10 @@
-{ config, pkgs, unstablePkgs, ... }:
+{ config, ... }:
 
 {
   imports =
     [ 
       ./hardware-configuration.nix
-      ../common/common.nix
+      ../../common/common.nix
     ];
 
   boot.loader.systemd-boot.enable = true;

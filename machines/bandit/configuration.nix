@@ -13,7 +13,7 @@
       ./rclone/rclone.nix
       ./services/jellyfin.nix
       ./sops.nix
-      ../common/common.nix
+      ../../common/common.nix
       ./services/immich.nix
       inputs.sops_nix.nixosModules.sops
     ];

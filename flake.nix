@@ -56,7 +56,7 @@
         modules = [
           inputs.sops_nix.nixosModules.sops
           inputs.vpn-confinement.nixosModules.default
-          ./bandit/configuration.nix
+          ./machines/bandit/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
@@ -80,7 +80,7 @@
         };
         modules = [
           inputs.sops_nix.nixosModules.sops
-          ./laptop/configuration.nix
+          ./machines/laptop/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
@@ -104,7 +104,7 @@
         };
         modules = [
           inputs.sops_nix.nixosModules.sops
-          ./services/configuration.nix
+          ./machines/services/configuration.nix
           inputs.teslamate.nixosModules.default
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
@@ -129,7 +129,7 @@
         };
         modules = [
           inputs.sops_nix.nixosModules.sops
-          ./cygate/configuration.nix
+          ./machines/cygate/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
@@ -153,7 +153,7 @@
         };
         modules = [
           inputs.sops_nix.nixosModules.sops
-          ./cygate2/configuration.nix
+          ./machines/cygate2/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
@@ -178,7 +178,7 @@
             system.stateVersion = "24.11";
             wsl.enable = true;
           }
-	  ./wsl/configuration.nix
+	  ./machines/wsl/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
