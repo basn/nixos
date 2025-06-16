@@ -29,6 +29,9 @@
     teslamate = {
       url = "github:teslamate-org/teslamate/main";
     };
+    authentik-nix = {
+      url = "github:nix-community/authentik-nix";
+    };
   };
   outputs = inputs:
   let
