@@ -11,7 +11,7 @@
         format = "dotenv";
       };
       authentik = {
-        sopFile = ./secrets/authentik.env;
+        sopsFile = ./secrets/authentik.env;
         format = "dotenv";
       };
     };

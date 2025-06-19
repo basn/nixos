@@ -109,6 +109,7 @@
           inputs.sops_nix.nixosModules.sops
           ./machines/services/configuration.nix
           inputs.teslamate.nixosModules.default
+          inputs.authentik-nix.nixosModules.default
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
