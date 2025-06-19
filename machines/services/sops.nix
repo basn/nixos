@@ -10,6 +10,10 @@
         sopsFile = ./secrets/teslamate.env;
         format = "dotenv";
       };
+      authentik = {
+        sopFile = ./secrets/authentik.env;
+        format = "dotenv";
+      };
     };
   };
 }
