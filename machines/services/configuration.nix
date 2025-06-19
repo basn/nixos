@@ -15,6 +15,7 @@
       ./services/unifi.nix
       ./services/ac.nix
       ./services/teslamate.nix
+      ./services/authentik.nix
     ];
   boot = {
     zfs = {

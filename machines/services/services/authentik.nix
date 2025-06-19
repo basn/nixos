@@ -2,15 +2,15 @@
 {
   services.authentik = {
     enable = true;
-    environmentFile = "/run/secrets/authentik/authentik-env";
+    environmentFile = "/run/secrets/authentik";
     settings = {
       email = {
-        host = "smtp.example.com";
+        host = "virtmx.lan2k.org";
         port = 587;
-        username = "authentik@example.com";
+        username = "authentik@basn.se";
         use_tls = true;
         use_ssl = false;
-        from = "authentik@example.com";
+        from = "authentik@basn.se";
       };
       disable_startup_analytics = true;
       avatars = "initials";
