@@ -88,9 +88,9 @@
   };
   nix = {
     settings = {
-      trusted-substituters = {
+      trusted-substituters = [
 
-      };
+      ];
     };
   };
 }
