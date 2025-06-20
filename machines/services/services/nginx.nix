@@ -47,6 +47,13 @@
     '';
 
     virtualHosts = {
+      "auth.basn.se" = {
+        enableACME = true;
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "https://localhost:9443";
+        };
+      };
       "rt.basn.se" = {
         enableACME = true;
         forceSSL = true;
