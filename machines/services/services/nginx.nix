@@ -15,7 +15,8 @@ let
     }
   '';
   };
-  authentikAuth = ''
+  authentikAuth = {
+    extraConfig = ''
       auth_request /outpost.goauthentik.io/auth/nginx;
       error_page 401 = @goauthentik_proxy_signin;
       auth_request_set $auth_cookie $upstream_http_set_cookie;
@@ -33,6 +34,7 @@ let
       proxy_set_header X-authentik-name $authentik_name;
       proxy_set_header X-authentik-uid $authentik_uid;
   '';
+  };
 in
 {
   environment.systemPackages = with pkgs; [
