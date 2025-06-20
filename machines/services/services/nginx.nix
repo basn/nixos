@@ -1,22 +1,27 @@
 { pkgs, ...}:
 let
-  authentikConfig = ''
-    auth_request /outpost.goauthentik.io/auth/nginx;
-    error_page 401 = @goauthentik_proxy_signin;
-    auth_request_set $auth_cookie $upstream_http_set_cookie;
-    add_header Set-Cookie $auth_cookie;
-    auth_request_set $authentik_username $upstream_http_x_authentik_username;
-    auth_request_set $authentik_groups $upstream_http_x_authentik_groups;
-    auth_request_set $authentik_entitlements $upstream_http_x_authentik_entitlements;
-    auth_request_set $authentik_email $upstream_http_x_authentik_email;
-    auth_request_set $authentik_name $upstream_http_x_authentik_name;
-    auth_request_set $authentik_uid $upstream_http_x_authentik_uid;
-    proxy_set_header X-authentik-username $authentik_username;
-    proxy_set_header X-authentik-groups $authentik_groups;
-    proxy_set_header X-authentik-entitlements $authentik_entitlements;
-    proxy_set_header X-authentik-email $authentik_email;
-    proxy_set_header X-authentik-name $authentik_name;
-    proxy_set_header X-authentik-uid $authentik_uid;
+  authentikConfig = {
+    extraConfig = ''
+    proxy_buffers 8 16k;
+    proxy_buffer_size 32k;
+    location / {
+      auth_request /outpost.goauthentik.io/auth/nginx;
+      error_page 401 = @goauthentik_proxy_signin;
+      auth_request_set $auth_cookie $upstream_http_set_cookie;
+      add_header Set-Cookie $auth_cookie;
+      auth_request_set $authentik_username $upstream_http_x_authentik_username;
+      auth_request_set $authentik_groups $upstream_http_x_authentik_groups;
+      auth_request_set $authentik_entitlements $upstream_http_x_authentik_entitlements;
+      auth_request_set $authentik_email $upstream_http_x_authentik_email;
+      auth_request_set $authentik_name $upstream_http_x_authentik_name;
+      auth_request_set $authentik_uid $upstream_http_x_authentik_uid;
+      proxy_set_header X-authentik-username $authentik_username;
+      proxy_set_header X-authentik-groups $authentik_groups;
+      proxy_set_header X-authentik-entitlements $authentik_entitlements;
+      proxy_set_header X-authentik-email $authentik_email;
+      proxy_set_header X-authentik-name $authentik_name;
+      proxy_set_header X-authentik-uid $authentik_uid;
+    }
     location /outpost.goauthentik.io {
       proxy_pass              http://localhost:9000/outpost.goauthentik.io;
       proxy_set_header        Host $host;
@@ -27,6 +32,7 @@ let
       proxy_set_header        Content-Length "";
     }
   '';
+  };
 in
 {
   environment.systemPackages = with pkgs; [
