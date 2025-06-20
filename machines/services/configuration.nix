@@ -15,7 +15,7 @@
       ./services/unifi.nix
       ./services/ac.nix
       ./services/teslamate.nix
-      ./services/authentik.nix
+      #./services/authentik.nix
     ];
   boot = {
     zfs = {
@@ -79,6 +79,18 @@
     autoUpgrade = {
       flake = "github:basn/nixos";
       enable = true;
+    };
+  };
+  environment = {
+    systemPackages = with pkgs; [
+      cachix
+    ];
+  };
+  nix = {
+    settings = {
+      trusted-substituters = {
+
+      };
     };
   };
 }
