@@ -189,13 +189,13 @@ in
       "tesla.basn.se" = authentikConfig // {
          enableACME = true;
          forceSSL = true;
-         locations."/" = authentikConfig // {
+         locations."/" = authentikAuth // {
            proxyPass =  "http://127.0.0.1:4000";
 	   recommendedProxySettings = false;
            proxyWebsockets = true; 
          };
       };
-      "grafana.basn.se" = {
+      "grafana.basn.se" = authentikConfig // {
          enableACME = true;
          forceSSL = true;
          locations."/" = authentikAuth // {
