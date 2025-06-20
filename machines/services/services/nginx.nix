@@ -4,7 +4,18 @@ let
     extraConfig = ''
     proxy_buffers 8 16k;
     proxy_buffer_size 32k;
-    location / {
+    location /outpost.goauthentik.io {
+      proxy_pass              http://localhost:9000/outpost.goauthentik.io;
+      proxy_set_header        Host $host;
+      proxy_set_header        X-Original-URL $scheme://$http_host$request_uri;
+      add_header              Set-Cookie $auth_cookie;
+      auth_request_set        $auth_cookie $upstream_http_set_cookie;
+      proxy_pass_request_body off;
+      proxy_set_header        Content-Length "";
+    }
+  '';
+  };
+  authentikAuth = ''
       auth_request /outpost.goauthentik.io/auth/nginx;
       error_page 401 = @goauthentik_proxy_signin;
       auth_request_set $auth_cookie $upstream_http_set_cookie;
@@ -21,18 +32,7 @@ let
       proxy_set_header X-authentik-email $authentik_email;
       proxy_set_header X-authentik-name $authentik_name;
       proxy_set_header X-authentik-uid $authentik_uid;
-    }
-    location /outpost.goauthentik.io {
-      proxy_pass              http://localhost:9000/outpost.goauthentik.io;
-      proxy_set_header        Host $host;
-      proxy_set_header        X-Original-URL $scheme://$http_host$request_uri;
-      add_header              Set-Cookie $auth_cookie;
-      auth_request_set        $auth_cookie $upstream_http_set_cookie;
-      proxy_pass_request_body off;
-      proxy_set_header        Content-Length "";
-    }
   '';
-  };
 in
 {
   environment.systemPackages = with pkgs; [
@@ -147,7 +147,7 @@ in
       "prowlarr.basn.se" = authentikConfig // {
         enableACME = true;
         forceSSL = true;
-        locations."/" = {
+        locations."/" = authentikAuth // {
           proxyPass =  "http://192.168.180.10:9696";
           extraConfig =
             "allow 192.168.0.0/16;"+
