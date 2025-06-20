@@ -13,6 +13,11 @@ let
       proxy_pass_request_body off;
       proxy_set_header        Content-Length "";
     }
+    location @goauthentik_proxy_signin {
+      internal;
+      add_header Set-Cookie $auth_cookie;
+      return 302 /outpost.goauthentik.io/start?rd=$scheme://$http_host$request_uri;
+    }
     '';
   };
   authentikAuth = {
