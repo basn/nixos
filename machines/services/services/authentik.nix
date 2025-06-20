@@ -14,6 +14,11 @@
       };
       disable_startup_analytics = true;
       avatars = "initials";
+      nginx = {
+        enable = true;
+        enableACME = true;
+        host = "auth.basn.se";
+      };
     };
   };
 
