@@ -158,7 +158,7 @@ in
           proxyPass =  "http://192.168.180.10:9696";
         };
       };
-      "sonarr.basn.se" = authentikConfig {
+      "sonarr.basn.se" = authentikConfig // {
         enableACME = true;
         forceSSL = true;
         locations."/" = authentikAuth // {
