@@ -13,7 +13,7 @@ let
       proxy_pass_request_body off;
       proxy_set_header        Content-Length "";
     }
-  '';
+    '';
   };
   authentikAuth = {
     extraConfig = ''
@@ -33,7 +33,7 @@ let
       proxy_set_header X-authentik-email $authentik_email;
       proxy_set_header X-authentik-name $authentik_name;
       proxy_set_header X-authentik-uid $authentik_uid;
-  '';
+    '';
   };
 in
 {
@@ -151,12 +151,12 @@ in
         forceSSL = true;
         locations."/" = authentikAuth // {
           proxyPass =  "http://192.168.180.10:9696";
-          extraConfig =
+          extraConfig = authentikAuth.extraConfig + ''
             "allow 192.168.0.0/16;"+
             "allow 10.1.1.0/24;"+
             "allow 127.0.0.1/32;"+
             "deny all;"
-            ;
+            '';
         };
       };
       "sonarr.basn.se" = {
