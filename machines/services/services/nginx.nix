@@ -158,30 +158,18 @@ in
           proxyPass =  "http://192.168.180.10:9696";
         };
       };
-      "sonarr.basn.se" = {
+      "sonarr.basn.se" = authentikConfig {
         enableACME = true;
         forceSSL = true;
-        locations."/" = {
-          proxyPass =  "http://192.168.180.10:8989";
-          extraConfig =
-            "allow 192.168.0.0/16;"+
-            "allow 10.1.1.0/24;"+
-            "allow 127.0.0.1/32;"+
-            "deny all;"
-            ;
+        locations."/" = authentikAuth // {
+          proxyPass = "http://192.168.180.10:8989";
         };
       };
-      "radarr.basn.se" = {
+      "radarr.basn.se" = authentikConfig // {
         enableACME = true;
         forceSSL = true;
-        locations."/" = {
+        locations."/" = authentikAuth // {
           proxyPass =  "http://192.168.180.10:7878";
-          extraConfig =
-            "allow 192.168.0.0/16;"+
-            "allow 10.1.1.0/24;"+
-            "allow 127.0.0.1/32;"+
-            "deny all;"
-            ;
         };
       };
       "valetudo.basn.se" = {
@@ -198,42 +186,22 @@ in
              ;
          };
       };
-      "tesla.basn.se" = {
+      "tesla.basn.se" = authentikConfig // {
          enableACME = true;
          forceSSL = true;
-         locations."/" = {
+         locations."/" = authentikConfig // {
            proxyPass =  "http://127.0.0.1:4000";
 	   recommendedProxySettings = false;
-           extraConfig =
-             "proxy_http_version 1.1;"+
-             "proxy_set_header Upgrade $http_upgrade;"+
-             "proxy_set_header Connection $connection_upgrade;"+
-             "proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;"+
-             "proxy_set_header Host $host;"+
-             "allow 192.168.195.0/24;"+
-             "allow 10.1.1.0/24;"+
-             "allow 127.0.0.1/32;"+
-             "deny all;"
-             ;
+           proxyWebsockets = true; 
          };
       };
       "grafana.basn.se" = {
          enableACME = true;
          forceSSL = true;
-         locations."/" = {
+         locations."/" = authentikAuth // {
            proxyPass =  "http://127.0.0.1:3000";
            recommendedProxySettings = false;
-           extraConfig =
-             "proxy_http_version 1.1;"+
-             "proxy_set_header Upgrade $http_upgrade;"+
-             "proxy_set_header Connection $connection_upgrade;"+
-             "proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;"+
-             "proxy_set_header Host $host;"+
-             "allow 192.168.195.0/24;"+
-             "allow 10.1.1.0/24;"+
-             "allow 127.0.0.1/32;"+
-             "deny all;"
-             ;
+           proxyWebsockets = true;
          };
       };
       "uptime.basn.se" = {
@@ -241,14 +209,8 @@ in
          forceSSL = true;
          locations."/" = {
            proxyPass =  "http://127.0.0.1:9090";
-           recommendedProxySettings = false;
-           extraConfig =
-             "proxy_http_version 1.1;"+
-             "proxy_set_header Upgrade $http_upgrade;"+
-             "proxy_set_header Connection $connection_upgrade;"+
-             "proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;"+
-             "proxy_set_header Host $host;"
-             ;
+           recommendedProxySettings = true;
+           proxyWebsockets = true;
         };
       };
       "jellyfin.basn.se" = {
