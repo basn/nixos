@@ -138,7 +138,7 @@ in
            ;
         };
       };
-      "prowlarr.basn.se" = authentikConfig {
+      "prowlarr.basn.se" = authentikConfig // {
         enableACME = true;
         forceSSL = true;
         locations."/" = {
