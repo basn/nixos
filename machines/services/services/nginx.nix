@@ -97,17 +97,12 @@ in
           proxyWebsockets = true;
         };
       };
-      "rt.basn.se" = {
+      "rt.basn.se" = authentikConfig // {
         enableACME = true;
         forceSSL = true;
-	locations."/" = {
+	locations."/" = authentikAuth // {
            proxyPass =  "http://192.168.180.10:80";
-           extraConfig =
-             "allow 192.168.0.0/16;"+
-             "allow 10.1.1.0/24;"+
-             "allow 127.0.0.1/32;"+
-             "deny all;"
-             ;
+           proxyWebsockets = true;
          };
       };
       "ac.basn.se" = {
