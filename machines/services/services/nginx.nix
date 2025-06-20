@@ -52,6 +52,7 @@
         forceSSL = true;
         locations."/" = {
           proxyPass = "https://localhost:9443";
+          proxyWebsockets = true;
         };
       };
       "rt.basn.se" = {
