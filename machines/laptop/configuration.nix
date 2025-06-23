@@ -1,14 +1,18 @@
-{ config, ... }:
-
+{ pkgs, ... }:
 {
   imports =
     [ 
       ./hardware-configuration.nix
       ../../common/common.nix
+      ./plasma6.nix
     ];
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot = {
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+    };
+  };
   networking = {
     hostName = "laptop"; 
     networkmanager.enable = true;
@@ -31,24 +35,6 @@
     };
   };
   services = {
-    xserver = {
-      enable = true;
-      displayManager.lightdm.enable = true;
-      desktopManager.pantheon.enable = true;
-    };
-    auto-cpufreq = {
-      enable = false;
-      settings = {
-        battery = {
-          govenor = "powersave";
-          turbo = "never";
-        };
-        charger = {
-          govenor = "performance";
-          turbo = "auto";
-        };
-      };
-    };
     xserver = {
       xkb = {
         layout = "se";
@@ -75,7 +61,7 @@
     isNormalUser = true;
     description = "Fredrik Bergström";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with unstablePkgs; [
+    packages = with pkgs; [
       discord
       chromium
       ghostty

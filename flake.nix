@@ -76,10 +76,10 @@
           }
         ];
       };
-      laptop = inputs.nixpkgs.lib.nixosSystem {
+      laptop = inputs.nixpkgs-unstable.lib.nixosSystem {
         system = system;
         specialArgs = {
-          inherit inputs system unstablePkgs;
+          inherit inputs system;
         };
         modules = [
           inputs.sops_nix.nixosModules.sops
