@@ -1,12 +1,11 @@
-{ unstablePkgs, ... }:
+{ pkgs, ... }:
 {
   programs = {
     hyprland = {
       enable = true;
-      package = unstablePkgs.hyprland;
     };
   };
-  enviroment.systemPackages = with unstablePkgs; [
+  enviroment.systemPackages = with pkgs; [
     waybar
     libnotify
     dunst

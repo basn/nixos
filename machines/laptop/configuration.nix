@@ -9,13 +9,27 @@
 
   boot = {
     loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
+      systemd-boot = {
+        enable = true;
+      };
+      efi = {
+        canTouchEfiVariables = true;
+      };
     };
+    zfs = {
+      requestEncryptionCredentials = true;
+    };
+    initrd = {
+      supportedFilesystems = [ "zfs" ];
+    };
+    supportedFilesystems = [ "zfs" ];
+    kernelPackages = pkgs.linuxPackages_zen;
   };
   networking = {
     hostName = "laptop"; 
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+    };
   };
   time = {
     timeZone = "Europe/Stockholm";
@@ -69,9 +83,6 @@
     ];
   };
   programs = {
-    firefox = {
-      enable = true;
-    };
     chromium = {
       enable = true;
     };
