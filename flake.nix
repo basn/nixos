@@ -42,12 +42,6 @@
         allowUnfree = true;
       };
     };
-    pkgs = import inputs.nixpkgs {
-      inherit system;
-      config = {
-        allowUnfree = true;
-      };
-    };
   in
   {
     nixosConfigurations = {
@@ -199,13 +193,25 @@
 	  }
         ];
      };
-     exampleIso = inputs.nixpkgs.lib.nixosSystem {
+     # nix build .#nixosConfigurations.minimalIso.config.system.build.isoImage
+     minimalIso = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ({ pkgs, modulesPath, ... }: {
             imports = [ (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix") ];
             environment.systemPackages = [ pkgs.neovim ];
           })
+          ./common/users.nix
+        ];
+      };
+     graphicalIso = inputs.nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ({ pkgs, modulesPath, ... }: {
+            imports = [ (modulesPath + "/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix") ];
+            environment.systemPackages = [ pkgs.neovim ];
+          })
+          ./common/common.nix
         ];
       };
     };
