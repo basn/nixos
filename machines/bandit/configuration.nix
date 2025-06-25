@@ -1,7 +1,6 @@
 { inputs, config, lib, pkgs, ... }:
 {
   imports = [ 
-    ./hardware-configuration.nix
     ./services/plex.nix
     ./services/sonarr.nix
     ./services/radarr.nix
