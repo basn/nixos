@@ -1,9 +1,11 @@
 { pkgs, ... }:
-
 {
   imports = [ ./users.nix  ];
   time = {
     timeZone = "Europe/Stockholm";
+  };
+  networking = {
+    timeServers = [ "sth1.ntp.se" "sth2.ntp.se" "gbg1.ntp.se" "gbg2.ntp.se" ];
   };
   i18n = {
     defaultLocale = "en_US.UTF-8";
@@ -70,6 +72,14 @@
     fzf = {
       keybindings = true;
       fuzzyCompletion = true;
+    };
+    nh = {
+      enable = true;
+      clean = {
+        enable = true;
+        extraArgs = "--keep-since 4d --keep 3";
+      };
+      flake = "/home/basn/nixos";
     };
   };
   nix = {
