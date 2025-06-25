@@ -135,6 +135,7 @@
     };
   };
   hardware = {
+    enableRedistributableFirmware = true;
     graphics = {
       enable = true;
       extraPackages = with pkgs; [
