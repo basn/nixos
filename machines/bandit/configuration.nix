@@ -1,28 +1,28 @@
 { inputs, config, lib, pkgs, ... }:
 {
-  imports =
-    [ 
-      ./hardware-configuration.nix
-      ./services/plex.nix
-      ./services/sonarr.nix
-      ./services/radarr.nix
-      ./services/prowlarr.nix
-      ./services/nginx.nix
-      ./services/bittorrent.nix
-      ./services/unpackerr.nix
-      ./rclone/rclone.nix
-      ./services/jellyfin.nix
-      ./sops.nix
-      ../../common/common.nix
-      ./services/immich.nix
-      inputs.sops_nix.nixosModules.sops
-    ];
+  imports = [ 
+    ./hardware-configuration.nix
+    ./services/plex.nix
+    ./services/sonarr.nix
+    ./services/radarr.nix
+    ./services/prowlarr.nix
+    ./services/nginx.nix
+    ./services/bittorrent.nix
+    ./services/unpackerr.nix
+    ./rclone/rclone.nix
+    ./services/jellyfin.nix
+    ./sops.nix
+    ../../common/common.nix
+    ./services/immich.nix
+    inputs.sops_nix.nixosModules.sops
+  ];
   boot = {
-    kernelModules = [ "r8169" ];
+    kernelModules = [ "kvm-intel" "r8169" ];
     kernelParams = [ "ip=dhcp" ];
+    supportedFilesystems = [ "zfs" ];
     initrd = {
       kernelModules = [ "r8169" ];
-      availableKernelModules = [ "r8169" ];
+      availableKernelModules = [ "r8169" "vmd" "xhci_pci" "mpt3sas" "ahci" "usb_storage" "sd_mod" ];
       network = {
         enable = true;
         ssh = {
@@ -36,6 +36,60 @@
           echo "zfs load-key -a; killall zfs" >> /root/.profile
         '';
       };
+    };
+    zfs = {
+      devNodes = "/dev/disk/by-id";
+    };
+    loader = {
+      grub = {
+        enable = true;
+        zfsSupport = true;
+        efiSupport = true;
+        efiInstallAsRemovable = true;
+        mirroredBoots = [
+          { devices = [ "nodev"]; path = "/boot1"; }
+          { devices = [ "nodev"]; path = "/boot2"; }
+        ];
+      };
+    };
+  };
+  fileSystems = {
+    "/" ={
+      device = "osdisk/root";
+      fsType = "zfs";
+    };
+    "/nix" = {
+      device = "osdisk/nix";
+      fsType = "zfs";
+    };
+    "/var" = {
+      device = "osdisk/var";
+      fsType = "zfs";
+    };
+    "/home" = {
+      device = "osdisk/home";
+      fsType = "zfs";
+      neededForBoot = true;
+    };
+    "/data/files" = {
+      device = "data/files";
+      fsType = "zfs";
+      encrypted.keyFile = "/root/zfs-data.key";
+    };
+    "/data2/files" = {
+      device = "data2/files";
+      fsType = "zfs";
+      encrypted.keyFile = "/root/zfs-data2.key";
+    };
+    "/boot1" = {
+      device = "/dev/disk/by-uuid/7821-EDA9";
+      fsType = "vfat";
+      options = [ "fmask=0022" "dmask=0022" ];
+    };
+    "/boot2" = {
+      device = "/dev/disk/by-uuid/7824-6948";
+      fsType = "vfat";
+      options = [ "fmask=0022" "dmask=0022" ];
     };
   };
   networking = {
@@ -51,7 +105,7 @@
     hostId = "4c79e250";
     firewall = { 
       enable = true;
-      allowedTCPPorts = [ 22 80 8080 ];
+      allowedTCPPorts = [ 22 80 ];
     };
   };
   environment = {
