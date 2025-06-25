@@ -27,6 +27,7 @@
   };
   networking = {
     hostName = "laptop"; 
+    hostId = "3e25a9f6";
     networkmanager = {
       enable = true;
     };
