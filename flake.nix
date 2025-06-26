@@ -94,6 +94,30 @@
           }
         ];
       };
+      battlestation = inputs.nixpkgs-unstable.lib.nixosSystem {
+        system = system;
+        specialArgs = {
+          inherit inputs system;
+        };
+        modules = [
+          inputs.sops_nix.nixosModules.sops
+          ./machines/battlestation/configuration.nix
+          inputs.home-manager.nixosModules.home-manager {
+            home-manager = {
+              useGlobalPkgs = false;
+              useUserPackages = true;
+              users.basn = import ./home/home.nix;
+              backupFileExtension = "backup";
+              extraSpecialArgs = {
+                pkgs = unstablePkgs;
+              };
+              sharedModules = [
+                inputs.nvf.homeManagerModules.default
+              ];
+            };
+          }
+        ];
+      };
       services = inputs.nixpkgs.lib.nixosSystem {
         system = system;
         specialArgs = {
