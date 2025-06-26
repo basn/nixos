@@ -121,8 +121,10 @@
     };
     gamemode = {
       enable = true;
-      gpu = {
-        nv_powermizer_mode = 1;
+      settings = {
+        gpu = {
+          nv_powermizer_mode = 1;
+        };
       };
     };
     chromium = {
