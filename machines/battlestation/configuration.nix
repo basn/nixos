@@ -13,9 +13,6 @@
       };
     };
     kernel = {
-      sysctl = {
-        "kernel.split_lock_mitigate" = 0;
-      };
     };
     kernelModules = [ "kvm-intel" ];
     kernelPackages = pkgs.linuxPackages_zen;
@@ -124,6 +121,12 @@
     };
     gamemode = {
       enable = true;
+      gpu = {
+        nv_powermizer_mode = 1;
+      };
+      cpu = {
+        disable_splitlock = 1;
+      };
     };
     chromium = {
       enable = true;
