@@ -87,6 +87,7 @@
     spotify
     protonup
     ghostty
+    google-chrome
   ];
   hardware = {
     enableRedistributableFirmware = true;
