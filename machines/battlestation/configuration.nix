@@ -78,6 +78,7 @@
     discord
     spotify
     protonup
+    ghostty
   ];
   hardware = {
     enableRedistributableFirmware = true;
@@ -111,6 +112,9 @@
       };
     };
     gamemode = {
+      enable = true;
+    };
+    chromium = {
       enable = true;
     };
   };
