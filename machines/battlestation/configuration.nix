@@ -124,9 +124,6 @@
       gpu = {
         nv_powermizer_mode = 1;
       };
-      cpu = {
-        disable_splitlock = 1;
-      };
     };
     chromium = {
       enable = true;
