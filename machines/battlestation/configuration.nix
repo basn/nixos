@@ -114,6 +114,9 @@
       enable = true;
     };
   };
+  fonts.packages = with pkgs; [
+    meslo-lgs-nf
+  ];
   system = {
       autoUpgrade = {
       flake = "github:basn/nixos";
