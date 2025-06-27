@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 {
-  imports = [ ../../common/common.nix ];
+  imports = [ ../../common/common.nix ./hyprland.nix ];
   boot = {
     initrd = {
       availableKernelModules = [ "vmd" "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
@@ -44,6 +44,9 @@
     };
     desktopManager = {
       plasma6 = {
+        enable = true;
+      };
+      cosmic =  {
         enable = true;
       };
     };
