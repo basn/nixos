@@ -88,6 +88,7 @@
     protonup
     ghostty
     google-chrome
+    orca-slicer
   ];
   hardware = {
     enableRedistributableFirmware = true;
