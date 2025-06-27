@@ -15,5 +15,6 @@
     rofi-wayland
     hyprlock
     pavucontrol
+    hypridle
   ];
 }
