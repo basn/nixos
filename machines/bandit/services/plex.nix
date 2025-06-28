@@ -1,4 +1,4 @@
-{ config, lib, pkgs, unstablePkgs, ... }:
+{ unstablePkgs, ... }:
 
 {
   services.plex = {
