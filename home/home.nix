@@ -41,11 +41,11 @@
       enable = true;
       settings = {
         vim = {
-          theme = {
-            enable = true;
-            name = "onedark";
-            style = "darker";
-          };
+#          theme = {
+#            enable = true;
+#            name = "onedark";
+#            style = "darker";
+#          };
           lsp = {
             enable = true;
           };

@@ -32,6 +32,10 @@
     authentik-nix = {
       url = "github:nix-community/authentik-nix";
     };
+    stylix = {
+      url = "github:danth/stylix";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
   };
   outputs = inputs:
   let
@@ -51,6 +55,7 @@
           inherit inputs system unstablePkgs;
         };
         modules = [
+          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
           inputs.vpn-confinement.nixosModules.default
           ./machines/bandit/configuration.nix
@@ -76,6 +81,7 @@
           inherit inputs system;
         };
         modules = [
+          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
           ./machines/laptop/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
@@ -100,6 +106,7 @@
           inherit inputs system;
         };
         modules = [
+          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
           ./machines/battlestation/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
@@ -124,6 +131,7 @@
           inherit inputs system unstablePkgs;
         };
         modules = [
+          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
           ./machines/services/configuration.nix
           inputs.teslamate.nixosModules.default
@@ -150,6 +158,7 @@
           inherit inputs system unstablePkgs;
         };
         modules = [
+          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
           ./machines/cygate/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
@@ -174,6 +183,7 @@
           inherit inputs system unstablePkgs;
         };
         modules = [
+          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
           ./machines/cygate2/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
@@ -201,6 +211,7 @@
             wsl.enable = true;
           }
 	  ./machines/wsl/configuration.nix
+          inputs.stylix.nixosModules.stylix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;

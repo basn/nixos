@@ -76,7 +76,7 @@
   users.users.basn = {
     isNormalUser = true;
     description = "Fredrik Bergstrom";
-    extraGroups = [ "networkmanager" "wheel" "gamemode" ];
+    extraGroups = [ "networkmanager" "wheel" "gamemode" "input"];
     packages = with pkgs; [
       kdePackages.kate
     ];
