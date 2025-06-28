@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, lib, ... }:
 {
   services = {
     ssh-agent = {
@@ -41,11 +41,10 @@
       enable = true;
       settings = {
         vim = {
-#          theme = {
+          theme = {
 #            enable = true;
 #            name = "onedark";
-#            style = "darker";
-#          };
+          };
           lsp = {
             enable = true;
           };
