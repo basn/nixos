@@ -63,7 +63,7 @@
             home-manager = {
               useGlobalPkgs = false;
               useUserPackages = true;
-              users.basn = import ./home/home.nix;
+              users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
               extraSpecialArgs = {
                 pkgs = unstablePkgs;
@@ -140,7 +140,7 @@
             home-manager = {
               useGlobalPkgs = false;
               useUserPackages = true;
-              users.basn = import ./home/home.nix;
+              users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
               extraSpecialArgs = {
                 pkgs = unstablePkgs;
@@ -165,7 +165,7 @@
             home-manager = {
               useGlobalPkgs = false;
               useUserPackages = true;
-              users.basn = import ./home/home.nix;
+              users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
               extraSpecialArgs = {
                 pkgs = unstablePkgs;
@@ -190,7 +190,7 @@
             home-manager = {
               useGlobalPkgs = false;
               useUserPackages = true;
-              users.basn = import ./home/home.nix;
+              users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
               extraSpecialArgs = {
                 pkgs = unstablePkgs;
@@ -216,7 +216,7 @@
             home-manager = {
               useGlobalPkgs = false;
               useUserPackages = true;
-              users.basn = import ./home/home.nix;
+              users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
               extraSpecialArgs = {
                 pkgs = unstablePkgs;
