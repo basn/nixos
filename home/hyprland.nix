@@ -30,22 +30,17 @@
             gaps_in = 1;
             gaps_out = 5;
             border_size = 2;
-            col.active_border = "rgba(33ccffee) rgba(00ff99ee) 45deg";
-            col.inactive_border = "rgba(595959aa)";
             resize_on_border = false;
             allow_tearing = false;
             layout = "dwindle";
           };
           decoration = {
-            rouding = 10;
-            rouding_power = 2;
             active_opacity = 1;
             inactive_opacity = 1;
             shadow = {
               enabled = true;
               range = 4;
               render_power = 3;
-              color = "rgba(1a1a1aee)";
             };
             blur = {
               enabled = false;
@@ -76,7 +71,6 @@
           dwindle = {
             pseudotile = true;
             preserve_split = true;
-            no_gaps_when_only = 1;
             smart_split = false;
             smart_resizing = false;
           };
@@ -130,14 +124,14 @@
             "$modifier, mouse:272, movewindow"
             "$modifier, mouse:273, resizewindow"
           ];
+          master = {
+            new_status = "master";
+          };
+          monitor = [
+            "desc: Samsung Electric Company Odyssey G50A HNMTC00138, prefered, auto-right, 1"
+            "desc: Samsung Electric Company Odyssey G5 HNAX900314, prefered, auto-left, 1"
+          ];
         };
-        master = {
-          new_status = "master";
-        };
-        monitor = [
-          "desc: Samsung Electric Company Odyssey G50A HNMTC00138, prefered, auto-right, 1"
-          "desc: Samsung Electric Company Odyssey G5 HNAX900314, prefered, auto-left, 1"
-        ];
       };
     };
   };
@@ -282,6 +276,70 @@
           };
         }
       ];
+      style = ''
+        * {
+           border: none;
+           border-radius: 0;
+           font-family: Roboto, Helvetica, Arial, sans-serif;
+           font-size: 13px;
+           min-height: 0;
+        }
+        window#waybar {
+          background: rgba(43, 48, 59, 0.5);
+          border-bottom: 3px solid rgba(100, 114, 125, 0.5);
+          color: white;
+        }
+        tooltip {
+          background: rgba(43, 48, 59, 0.5);
+          border: 1px solid rgba(100, 114, 125, 0.5);
+        }
+        tooltip label {
+          color: white;
+        }
+        #workspaces button {
+          padding: 0 5px;
+          background: transparent;
+          color: white;
+          border-bottom: 3px solid transparent;
+        }
+        #workspaces button.focused {
+          background: #64727D;
+          border-bottom: 3px solid white;
+        }
+        #mode, #clock, #battery {
+          padding: 0 10px;
+        }
+        #mode {
+          background: #64727D;
+          border-bottom: 3px solid white;
+        }
+        #clock {
+          background-color: #64727D;
+        }
+        #battery {
+          background-color: #ffffff;
+          color: black;
+        }
+        #battery.charging {
+          color: white;
+          background-color: #26A65B;
+        }
+        @keyframes blink {
+          to {
+            background-color: #ffffff;
+            color: black;
+          }
+        }
+        #battery.warning:not(.charging) {
+          background: #f53c3c;
+          color: white;
+          animation-name: blink;
+          animation-duration: 0.5s;
+          animation-timing-function: steps(12);
+          animation-iteration-count: infinite;
+          animation-direction: alternate;
+        }
+      '';
     };
     rofi = {
       enable = true;
@@ -293,6 +351,88 @@
     };
   };
   services = {
+    dunst = {
+      enable = true;
+      package = pkgs.dunst;
+      settings = {
+        global = {
+           monitor = 0;
+           follow = "none";
+           width = "(100, 300)";
+           height = "(0, 300)";
+           origin = "top-right";
+           offset = "(5, 15)";
+           scale = 0;
+           notification_limit = 10;
+           progress_bar = true;
+           progress_bar_height = 14;
+           progress_bar_frame_width = 0;
+           progress_bar_min_width = 100;
+           progress_bar_max_width = 300;
+           progress_bar_corner_radius = 50;
+           progress_bar_corners = "bottom-left, top-right";
+           icon_corner_radius = 0;
+           icon_corners = "all";
+           indicate_hidden = "yes";
+           transparency = 0;
+           separator_height = 6;
+           padding = 10;
+           horizontal_padding = 8;
+           text_icon_padding = 12;
+           frame_width = 1;
+           gap_size = 6;
+           sort = "yes";
+           line_height = "0";
+           markup = "full";
+           format = "<b>%s</b>$\n%b";
+           alignment = "left";
+           vertical_alignment = "center";
+           show_age_threshold = -1;
+           ellipsize = "middle";
+           ignore_newline = "no";
+           stack_duplicates = true;
+           hide_duplicate_count = false;
+           show_indicators = "yes";
+           enable_recursive_icon_lookup = "true";
+           icon_theme = "Adwaita";
+           icon_position = "right";
+           min_icon_size = 32;
+           max_icon_size = 128;
+           icon_path = "/usr/share/icons/gnome/16x16/status/:/usr/share/icons/gnome/16x16/devices/";
+           sticky_history = "yes";
+           history_length = 30;
+           dmenu = "/usr/bin/dmenu -l 10 -p dunst:";
+           browser = "/usr/bin/xdg-open";
+           always_run_script = true;
+           title = "Dunst";
+           class = "Dunst";
+           corner_radius = 10;
+           corners = "bottom, top-left";
+           ignore_dbusclose = false;
+           force_xwayland = false;
+           force_xinerama = false;
+           mouse_left_click = "close_current";
+           mouse_middle_click = "do_action, close_current";
+           mouse_right_click = "close_all";
+        };
+        experimental = {
+          per_monitor_dpi = false;
+        };
+        urgency_low = {
+          timeout = 20;
+        };
+        urgency_normal = {
+          timeout = 20;
+          override_pause_level = 30;
+          default_icon = "dialog-information";
+        };
+        urgency_critical = {
+          timeout = 0;
+          override_pause_level = 60;
+          default_icon = "dialog-warning";
+        };
+      };
+    };
     hypridle = {
       enable = true;
       settings = {
