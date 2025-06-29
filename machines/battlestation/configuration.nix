@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 {
-  imports = [ ../../common/common.nix ../../common/hyprland.nix ./ollama.nix ];
+  imports = [ ../../common/common.nix ../../common/hyprland.nix ./ollama.nix ./qmk.nix ];
   boot = {
     initrd = {
       availableKernelModules = [ "vmd" "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
