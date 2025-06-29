@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, ... }:
 {
   services = {
     ssh-agent = {
@@ -41,18 +41,20 @@
       enable = true;
       settings = {
         vim = {
-          theme = {
-#            enable = true;
-#            name = "onedark";
-          };
           lsp = {
             enable = true;
           };
           languages = {
+            enableFormat = true;
+            enableTreesitter = true;
+            enableExtraDiagnostics = true;
             nix = {
               enable = true;
             };
             yaml = {
+              enable = true;
+            };
+            python = {
               enable = true;
             };
           };
@@ -70,7 +72,6 @@
       };
     };
   };
-
   home = {
     enableNixpkgsReleaseCheck = false;
     username = "basn";
