@@ -122,8 +122,6 @@
             "$modifier SHIFT, 8, movetoworkspace, 8"
             "$modifier SHIFT, 9, movetoworkspace, 9"
             "$modifier SHIFT, 0, movetoworkspace, 10"
-            "ALT,Tab,cyclenext"
-            "ALT,Tab,bringactivetotop"
             ",XF86AudioRaiseVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
             ",XF86AudioLowerVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
             ",XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
@@ -131,6 +129,9 @@
             ",XF86AudioPause, exec, playerctl play-pause"
             ",XF86AudioNext, exec, playerctl next"
             ",XF86AudioPrev, exec, playerctl previous"
+            "$modifier, PRINT, exec, hyprshot -m window"
+            ", PRINT, exec, hyprshot -m output"
+            "$modifier_shift, PRINT, exec, hyprshot -m region"
           ];
           bindm = [
             "$modifier, mouse:272, movewindow"

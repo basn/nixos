@@ -16,5 +16,6 @@
     hyprlock
     pavucontrol
     hypridle
+    hyprshot
   ];
 }
