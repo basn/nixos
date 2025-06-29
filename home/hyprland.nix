@@ -5,6 +5,7 @@
       hyprland = {
         enable = true;
         settings = {
+          "$modifier" = "SUPER";
           exec-once = [
             "nm-applet --indicator"
             "waybar"
@@ -26,7 +27,6 @@
             accel_profile = "flat";
           };
           general = {
-            "$modifier" = "SUPER";
             gaps_in = 1;
             gaps_out = 5;
             border_size = 2;
@@ -75,12 +75,12 @@
             smart_resizing = false;
           };
           bind = [
-            "$modifier, T, exec, $terminal"
+            "$modifier, T, exec, ghostty"
             "$modifier, Q, killactive"
             "$modifier_shift, M, exit"
-            "$modifier, E, exec, $fileManager"
+            "$modifier, E, exec, dolphin"
             "$modifier, V, togglefloating"
-            "$modifier, R, exec, $menu"
+            "$modifier, R, exec, rofi -show drun -show-icons"
             "$modifier, P, pseudo"
             "$modifier, J, togglesplit"
             "$modifier, L, exec, hyprlock"
