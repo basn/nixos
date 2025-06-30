@@ -83,16 +83,21 @@
   };
   programs.firefox.enable = true;
   nixpkgs.config.allowUnfree = true;
-  environment.systemPackages = with pkgs; [
-    neovim
-    nh
-    discord
-    spotify
-    protonup
-    ghostty
-    google-chrome
-    orca-slicer
-  ];
+  environment = {
+    systemPackages = with pkgs; [
+      neovim
+      nh
+      discord
+      spotify
+      protonup
+      ghostty
+      google-chrome
+      orca-slicer
+    ];
+    variables = {
+      NIXOS_OZONE_WL = "1";
+    };
+  };
   hardware = {
     enableRedistributableFirmware = true;
     cpu = {
@@ -108,7 +113,7 @@
       modesetting.enable = true;
       powerManagement.enable = false;
       powerManagement.finegrained = false;
-      open = false;
+      open = true;
       nvidiaSettings = true;
       package = config.boot.kernelPackages.nvidiaPackages.beta;
     };

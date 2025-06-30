@@ -144,6 +144,10 @@
             "desc: Samsung Electric Company Odyssey G50A HNMTC00138, prefered, auto-right, 1"
             "desc: Samsung Electric Company Odyssey G5 HNAX900314, prefered, auto-left, 1"
           ];
+          env = [
+            "LIBVA_DRIVER_NAME,nvidia"
+            "__GLX_VENDOR_LIBRARY_NAME,nvidia"
+          ];
         };
       };
     };
