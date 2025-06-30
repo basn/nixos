@@ -7,31 +7,46 @@
       kernelModules = [ ];
     };
     loader = {
-      systemd-boot.enable = true;
+      systemd-boot = {
+        enable = true;
+      };
       efi = {
         canTouchEfiVariables = true;
       };
-    };
-    kernel = {
     };
     kernelModules = [ "kvm-intel" ];
     kernelPackages = pkgs.linuxPackages_zen;
   };
   fileSystems = {
-    "/" = {
-      device = "/dev/disk/by-uuid/b37712b5-bbc0-4bb3-99b6-75190a75b1a9";
-      fsType = "ext4";
-    };
     "/boot" = {
-      device = "/dev/disk/by-uuid/E012-C83B";
+      device = "/dev/disk/by-label/boot";
       fsType = "vfat";
       options = [ "fmask=0077" "dmask=0077" ];
-    }; 
+    };
+    "/" = {
+      device = "osdisk/root";
+      fsType = "zfs";
+    };
+    "/nix" = {
+      device = "osdisk/nix";
+      fsType = "zfs";
+    };
+    "/var" = {
+      device = "osdisk/var";
+      fsType = "zfs";
+    };
+    "/home" = {
+      device = "osdisk/home";
+      fsType = "zfs";
+    };
   };
   swapDevices = [ ];
   networking = {
     hostName = "battlestation";
-    networkmanager.enable = true;
+    hostId = "121e3eb9";
+    networkmanager = {
+      enable = true;
+    };
   };
   services = {
       displayManager = {
@@ -64,7 +79,11 @@
       };
     };
   };
-  security.rtkit.enable = true;
+  security = {
+    rtkit = {
+      enable = true;
+    };
+  };
   users.users.basn = {
     isNormalUser = true;
     description = "Fredrik Bergstrom";
@@ -73,8 +92,11 @@
       kdePackages.kate
     ];
   };
-  programs.firefox.enable = true;
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+    };
+  };
   environment = {
     systemPackages = with pkgs; [
       neovim
@@ -102,9 +124,13 @@
       enable32Bit = true;
     };
     nvidia = {
-      modesetting.enable = true;
-      powerManagement.enable = false;
-      powerManagement.finegrained = false;
+      modesetting = {
+        enable = true;
+      };
+      powerManagement = {
+        enable = false;
+        finegrained = false;
+      };
       open = true;
       nvidiaSettings = true;
       package = config.boot.kernelPackages.nvidiaPackages.beta;
@@ -129,7 +155,7 @@
         };
       };
     };
-    chromium = {
+    firefox = {
       enable = true;
     };
   };
