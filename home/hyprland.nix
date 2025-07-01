@@ -160,8 +160,8 @@
       package = pkgs.waybar;
       settings = [
         {
-          "height" = 20; 
-          "spacing" = 4;
+          "height" = 30; 
+          "spacing" = 6;
           "modules-left" = [
             "hyprland/workspaces"
             "custom/media"
