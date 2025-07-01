@@ -17,5 +17,6 @@
     pavucontrol
     hypridle
     hyprshot
+    hyprcursor
   ];
 }

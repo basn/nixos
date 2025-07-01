@@ -124,6 +124,7 @@
       ghostty
       google-chrome
       orca-slicer
+      kdePackages.dolphin
     ];
     variables = {
       NIXOS_OZONE_WL = "1";
