@@ -4,6 +4,7 @@
   boot = {
     initrd = {
       availableKernelModules = [ "vmd" "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
+      supportedFilesystems = [ "zfs" ];
       kernelModules = [ ];
     };
     loader = {
@@ -14,6 +15,10 @@
         canTouchEfiVariables = true;
       };
     };
+    zfs = {
+      requestEncryptionCredentials = true;
+    };
+    supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
     kernelPackages = pkgs.linuxPackages_zen;
   };
@@ -78,6 +83,21 @@
         enable = true;
       };
     };
+    openssh = {
+      enable = true;
+    };
+    zfs = {
+      autoScrub = {
+        enable = true;
+      };
+      trim = {
+        enable = true;
+      };
+    };
+    smartd = {
+      enable = true;
+      autodetect = true;
+    };
   };
   security = {
     rtkit = {
@@ -88,9 +108,6 @@
     isNormalUser = true;
     description = "Fredrik Bergstrom";
     extraGroups = [ "networkmanager" "wheel" "gamemode" "input"];
-    packages = with pkgs; [
-      kdePackages.kate
-    ];
   };
   nixpkgs = {
     config = {
