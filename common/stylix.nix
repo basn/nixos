@@ -15,7 +15,10 @@
       serif = {
         package = pkgs.dejavu_fonts;
         name = "DejaVu Serif";
+      };  
+      sizes = {
+        applications = 10;
       };
     };
-  };
+  }; 
 }
