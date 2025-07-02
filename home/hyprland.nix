@@ -145,8 +145,6 @@
             "desc: Samsung Electric Company Odyssey G5 HNAX900314, prefered, auto-left, auto"
           ];
           env = [
-            "LIBVA_DRIVER_NAME,nvidia"
-            "__GLX_VENDOR_LIBRARY_NAME,nvidia"
             "HYPRCURSOR_THEME,volantes"
             "HYPRCURSOR_SIZE,24"
           ];
