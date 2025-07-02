@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 {
-  imports = [ ../../common/common.nix ../../common/hyprland.nix ./ollama.nix ./qmk.nix ];
+  imports = [ ../../common/common.nix ../../common/hyprland.nix ./ollama.nix ./qmk.nix ./orcaslicer.nix ];
   boot = {
     initrd = {
       availableKernelModules = [ "vmd" "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
@@ -123,7 +123,6 @@
       protonup
       ghostty
       google-chrome
-      orca-slicer
       kdePackages.dolphin
     ];
     variables = {
