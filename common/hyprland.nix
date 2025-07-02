@@ -18,5 +18,6 @@
     hypridle
     hyprshot
     hyprcursor
+    playerctl
   ];
 }
