@@ -57,6 +57,7 @@
       displayManager = {
       sddm = {
         enable = true;
+        theme = "sddm-astronaut";
         wayland = {
           enable = true;
         };
@@ -124,9 +125,13 @@
       ghostty
       google-chrome
       kdePackages.dolphin
+      sddm-astronaut
     ];
     variables = {
       NIXOS_OZONE_WL = "1";
+    };
+    sessionVariables = {
+      STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
     };
   };
   hardware = {
@@ -152,10 +157,6 @@
       nvidiaSettings = true;
       package = config.boot.kernelPackages.nvidiaPackages.beta;
     };
-  };
-  environment.sessionVariables = {
-    STEAM_EXTRA_COMPAT_TOOLS_PATHS =
-      "\${HOME}/.steam/root/compatibilitytools.d";
   };
   programs = {
     steam = {

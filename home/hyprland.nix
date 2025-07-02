@@ -141,8 +141,8 @@
             new_status = "master";
           };
           monitor = [
-            "desc: Samsung Electric Company Odyssey G50A HNMTC00138, prefered, auto-right, 1"
-            "desc: Samsung Electric Company Odyssey G5 HNAX900314, prefered, auto-left, 1"
+            "desc: Samsung Electric Company Odyssey G50A HNMTC00138, prefered, auto-right, auto"
+            "desc: Samsung Electric Company Odyssey G5 HNAX900314, prefered, auto-left, auto"
           ];
           env = [
             "LIBVA_DRIVER_NAME,nvidia"
