@@ -126,6 +126,7 @@
       google-chrome
       kdePackages.dolphin
       sddm-astronaut
+      vivaldi
     ];
     variables = {
       NIXOS_OZONE_WL = "1";
