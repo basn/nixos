@@ -28,9 +28,9 @@
           };
           general = {
             gaps_in = 1;
-            gaps_out = 5;
+            gaps_out = 1;
             border_size = 2;
-            resize_on_border = false;
+            resize_on_border = true;
             allow_tearing = false;
             layout = "dwindle";
           };
