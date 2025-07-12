@@ -168,8 +168,15 @@
     gamemode = {
       enable = true;
       settings = {
+        general = {
+          desiredgov = "performance";
+          desiredprof = "performance";
+        };
         gpu = {
           nv_powermizer_mode = 1;
+        };
+        cpu = {
+          pin_cores = "0-15";
         };
       };
     };
