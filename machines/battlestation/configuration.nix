@@ -127,6 +127,7 @@
       kdePackages.dolphin
       sddm-astronaut
       vivaldi
+      webcord
     ];
     variables = {
       NIXOS_OZONE_WL = "1";

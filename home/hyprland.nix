@@ -76,7 +76,7 @@
           };
           ecosystem = {
             no_donation_nag = true;
-            no_update_news = false;
+            no_update_news = true;
           };
           dwindle = {
             pseudotile = true;
@@ -364,6 +364,8 @@
       extraConfig = {
         modes = [ "combi" ];
         combi-modes = [ "window" "drun" "run" ];
+        show-icons = true;
+        matching = "fuzzy";
       };
     };
   };
@@ -456,12 +458,12 @@
         general = {
           after_sleep_cmd = "hyprctl dispatch dpms on";
           ignore_dbus_inhibit = false;
-          lock_cmd = "hyprlock";
+          lock_cmd = "pidof hyprlock && hyprlock && hyprctl dispatch dpms off";
           };
         listener = [
           {
             timeout = 250;
-            on-timeout = "hyprlock";
+            on-timeout = "pidof hyprlock && hyprlock";
           }
           {
             timeout = 500;
