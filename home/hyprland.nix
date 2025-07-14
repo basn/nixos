@@ -458,12 +458,12 @@
         general = {
           after_sleep_cmd = "hyprctl dispatch dpms on";
           ignore_dbus_inhibit = false;
-          lock_cmd = "pidof hyprlock && hyprlock && hyprctl dispatch dpms off";
+          lock_cmd = "pidof hyprlock || hyprlock && hyprctl dispatch dpms off";
           };
         listener = [
           {
             timeout = 250;
-            on-timeout = "pidof hyprlock && hyprlock";
+            on-timeout = "pidof hyprlock || hyprlock";
           }
           {
             timeout = 500;
