@@ -13,11 +13,10 @@ in
       address = "0.0.0.0";
       port = 8181;
       server_url = "${name}.${basedomain}";
-      dns = {
-        basedomain = "${basedomain}";
-      };
-      logtail = {
-        enabled = true;
+      settings = {
+        dns = {
+          basedomain = "${basedomain}";
+        };
       };
     };
     nginx = {
