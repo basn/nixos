@@ -11,7 +11,6 @@
             "waybar"
             "hyprpaper"
             "dunst"
-            "hypridle"
           ];
           input = {
             kb_layout = "se";

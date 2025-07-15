@@ -20,7 +20,7 @@
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
-    kernelPackages = pkgs.linuxPackages_zen;
+    kernelPackages = pkgs.linuxPackages_xanmod_stable;
   };
   fileSystems = {
     "/boot" = {
