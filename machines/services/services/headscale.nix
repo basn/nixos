@@ -13,7 +13,7 @@ in
       address = "0.0.0.0";
       port = 8181;
       settings = {
-        server_url = "${name}.${basedomain}";
+        server_url = "https://${name}.${basedomain}";
         dns = {
           base_domain = "${basedomain}";
         };
