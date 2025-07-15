@@ -15,7 +15,7 @@ in
       settings = {
         server_url = "https://${name}.${basedomain}";
         dns = {
-          base_domain = "${basedomain}";
+          base_domain = "w.${basedomain}";
         };
       };
     };
