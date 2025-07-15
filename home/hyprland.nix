@@ -456,7 +456,7 @@
       settings = {
         general = {
           after_sleep_cmd = "hyprctl dispatch dpms on";
-          ignore_dbus_inhibit = false;
+          ignore_dbus_inhibit = true;
           lock_cmd = "pidof hyprlock || hyprlock";
           };
         listener = [
