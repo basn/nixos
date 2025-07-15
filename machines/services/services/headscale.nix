@@ -20,15 +20,15 @@ in
         enabled = true;
       };
     };
-  };
-  nginx = {
-    virtualHosts = {
-      ${name}.${basedomain} = {
-        forceSSL = true;
-        enableACME = true;
-        locations."/" = {
-          proxyPass = "http://localhost:${toString config.services.headscale.port}";
-          proxyWebsockets = true;
+    nginx = {
+      virtualHosts = {
+        ${name}.${basedomain} = {
+          forceSSL = true;
+          enableACME = true;
+          locations."/" = {
+            proxyPass = "http://localhost:${toString config.services.headscale.port}";
+            proxyWebsockets = true;
+          };
         };
       };
     };
