@@ -15,13 +15,13 @@ in
       settings = {
         server_url = "${name}.${basedomain}";
         dns = {
-          basedomain = "${basedomain}";
+          base_domain = "${basedomain}";
         };
       };
     };
     nginx = {
       virtualHosts = {
-        ${name}.${basedomain} = {
+        "${name}.${basedomain}" = {
           forceSSL = true;
           enableACME = true;
           locations."/" = {
