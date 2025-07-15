@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 {
-  imports = [ ../../common/common.nix ../../common/hyprland.nix ./ollama.nix ./qmk.nix ./orcaslicer.nix ];
+  imports = [ ../../common/common.nix ../../common/hyprland.nix ./qmk.nix ./orcaslicer.nix ];
   boot = {
     initrd = {
       availableKernelModules = [ "vmd" "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
@@ -189,6 +189,10 @@
   fonts.packages = with pkgs; [
     meslo-lgs-nf
   ];
+  xdg.portal = {
+    enable = true;
+    extraPortals = with pkgs; [ xdg-desktop-portal-hyprland ];
+  };
   system = {
       autoUpgrade = {
       flake = "github:basn/nixos";
