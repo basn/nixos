@@ -94,7 +94,7 @@
             "$modifier, TAB, exec , rofi -show window -show-icons"
             "$modifier, P, pseudo"
             "$modifier, J, togglesplit"
-            "$modifier, L, exec, hyprlock"
+            "$modifier, L, exec, loginctl lock-session"
             # super + arrowkeys
             "$modifier, left, movefocus, l"
             "$modifier, right, movefocus, r"
