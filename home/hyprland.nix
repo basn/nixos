@@ -294,66 +294,124 @@
       ];
       style = ''
         * {
-           border: none;
-           border-radius: 0;
-           font-family: Roboto, Helvetica, Arial, sans-serif;
-           font-size: 13px;
-           min-height: 0;
+          font-family: "MesloLGS NF";
+          font-size: 10px;
+          border-radius: 0;
+          min-height: 0;
+          border: none;
+          font-weight: bold;
         }
-        window#waybar {
-          background: rgba(43, 48, 59, 0.5);
-          border-bottom: 3px solid rgba(100, 114, 125, 0.5);
-          color: white;
+        #workspaces{
+          background-color: rgba(24,24,37,1.0);
+          border: none;
+          box-shadow: none;
         }
-        tooltip {
-          background: rgba(43, 48, 59, 0.5);
-          border: 1px solid rgba(100, 114, 125, 0.5);
+        #tray{
+          margin: 6px 3px;
+          background-color: rgba(36, 36, 52, 1.0);
+          padding: 6px 10px;
+          border-radius: 6px;
+          border-width: 0px;
         }
-        tooltip label {
-          color: white;
+        #waybar {
+          background-color: #181825;
+          transition-property: background-color;
+          transition-duration: 0.5s;
         }
-        #workspaces button {
-          padding: 0 5px;
-          background: transparent;
-          color: white;
-          border-bottom: 3px solid transparent;
-        }
-        #workspaces button.focused {
-          background: #64727D;
-          border-bottom: 3px solid white;
-        }
-        #mode, #clock, #battery {
-          padding: 0 10px;
-        }
-        #mode {
-          background: #64727D;
-          border-bottom: 3px solid white;
+        #window,
+        #clock,
+        #custom-power,
+        #custom-reboot,
+        #bluetooth,
+        #battery,
+        #pulseaudio,
+        #backlight,
+        #custom-temperature,
+        #memory,
+        #cpu,
+        #network,
+        #custom-lock{
+          border-radius: 4px;
+          margin: 6px 3px;
+          padding: 6px 12px;
+          background-color: #1e1e2e;
+          color: #181825;
         }
         #clock {
-          background-color: #64727D;
+          background-color: #89b4fa;
         }
-        #battery {
-          background-color: #ffffff;
-          color: black;
+        #custom-power{
+          background-color: #f38ba8;
         }
-        #battery.charging {
-          color: white;
-          background-color: #26A65B;
+        #custom-reboot{
+          background-color: #a6e3a1;
         }
-        @keyframes blink {
-          to {
-            background-color: #ffffff;
-            color: black;
-          }
+        #bluetooth{
+          background-color: #f9e2af;
         }
-        #battery.warning:not(.charging) {
-          background: #f53c3c;
-          color: white;
-          animation-name: blink;
-          animation-duration: 0.5s;
-          animation-timing-function: steps(12);
-          animation-iteration-count: infinite;
-          animation-direction: alternate;
+        #battery{
+          background-color: #cba6f7;
+        }
+        #pulseaudio{
+          background-color: #89dceb;
+        }
+        #backlight{
+          background-color: #a6a3a1;
+        }
+        #custom-temperature{
+          background-color: #74c7ec;
+        }
+        #memory{
+          background-color: #f7768e;
+        }
+        #cpu{
+          background-color: #f38ba8;
+        }
+        #network{
+          background-color: #fab387;
+        }
+        #custom-lock{
+          background-color: #94e2d5;
+        }
+        #window{
+          background-color: #74c7ec;
+        }
+        #waybar.hidden {
+          opacity: 0.5;
+        }
+        #workspaces button {
+          all: initial;
+          /* Remove GTK theme values (waybar #1351) */
+          min-width: 0;
+          /* Fix weird spacing in materia (waybar #450) */
+          box-shadow: inset 0 -3px transparent;
+          /* Use box-shadow instead of border so the text isn't offset */
+          padding: 6px 10px;
+          margin: 6px 3px;
+          border-radius: 4px;
+          background-color: rgba(36, 36, 52, 1.0);
+          color: #cdd6f4;
+        }
+        #workspaces button.active {
+          color: #1e1e2e;
+          background-color: #cdd6f4;
+        }
+        #workspaces button:hover {
+          box-shadow: inherit;
+          text-shadow: inherit;
+          color: #1e1e2e;
+          background-color: #cdd6f4;
+        }
+        tooltip {
+          border-radius: 8px;
+          padding: 16px;
+          background-color: #131822;
+          color: #C0C0C0;
+        }
+        tooltip label {
+          padding: 5px;
+          background-color: #131822;
+          color: #C0C0C0;
         }
       '';
     };
