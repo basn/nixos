@@ -152,8 +152,7 @@
         enable = true;
       };
       powerManagement = {
-        enable = false;
-        finegrained = false;
+        enable = true;
       };
       open = true;
       nvidiaSettings = true;
