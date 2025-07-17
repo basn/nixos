@@ -295,32 +295,48 @@
       style = ''
         * {
           font-family: "MesloLGS NF";
-          font-size: 10px;
-          border-radius: 0;
-          min-height: 0;
-          border: none;
           font-weight: bold;
+          font-size: 12px;
+          color: #dcdfe1;
         }
-        #workspaces{
-          background-color: rgba(24,24,37,1.0);
+        #waybar {
+          background-color: rgba(0, 0, 0, 0);
           border: none;
           box-shadow: none;
         }
+        
+        #workspaces,
+        #window,
         #tray{
-          margin: 6px 3px;
-          background-color: rgba(36, 36, 52, 1.0);
-          padding: 6px 10px;
-          border-radius: 6px;
+          /*background-color: rgba(29,31,46, 0.95);*/
+          background-color: rgba(15,27,53,0.9);
+          padding: 4px 6px; /* 保持内部间距 */
+          margin-top: 6px; /* 外部间距增加 */
+          margin-left: 6px; /* 外部间距增加 */
+          margin-right: 6px; /* 外部间距增加 */
+          border-radius: 10px;
           border-width: 0px;
         }
-        #waybar {
-          background-color: #181825;
-          transition-property: background-color;
-          transition-duration: 0.5s;
-        }
-        #window,
         #clock,
-        #custom-power,
+        #custom-power{
+          background-color: rgba(15,27,53,0.9);
+          margin-top: 6px; /* 与屏幕顶部留出距离 */
+          margin-right: 6px;
+          /*margin-bottom: 4px;*/
+          padding: 4px 2px; /* 保持内部间距 */
+          border-radius: 0 10px 10px 0;
+          border-width: 0px;
+        }
+        #network,
+        #custom-lock{
+          background-color: rgba(15,27,53,0.9);
+          margin-top: 6px; /* 与屏幕顶部留出距离 */
+          margin-left: 6px;
+          /*margin-bottom: 4px;*/
+          padding: 4px 2px; /* 保持内部间距 */
+          border-radius: 10px 0 0 10px;
+          border-width: 0px;
+        }
         #custom-reboot,
         #bluetooth,
         #battery,
@@ -328,90 +344,62 @@
         #backlight,
         #custom-temperature,
         #memory,
-        #cpu,
-        #network,
-        #custom-lock{
-          border-radius: 4px;
-          margin: 6px 3px;
-          padding: 6px 12px;
-          background-color: #1e1e2e;
-          color: #181825;
-        }
-        #clock {
-          background-color: #89b4fa;
-        }
-        #custom-power{
-          background-color: #f38ba8;
-        }
-        #custom-reboot{
-          background-color: #a6e3a1;
-        }
-        #bluetooth{
-          background-color: #f9e2af;
-        }
-        #battery{
-          background-color: #cba6f7;
-        }
-        #pulseaudio{
-          background-color: #89dceb;
-        }
-        #backlight{
-          background-color: #a6a3a1;
-        }
-        #custom-temperature{
-          background-color: #74c7ec;
-        }
-        #memory{
-          background-color: #f7768e;
-        }
         #cpu{
-          background-color: #f38ba8;
+          background-color: rgba(15,27,53,0.9);
+          margin-top: 6px; /* 与屏幕顶部留出距离 */
+          /*margin-bottom: 4px;*/
+          padding: 4px 2px; /* 保持内部间距 */
+          border-width: 0px;
         }
-        #network{
-          background-color: #fab387;
+        #custpm-temperature.critical,
+        #pulseaudio.muted {
+          color: #FF0000;
+          padding-top: 0;
         }
-        #custom-lock{
-          background-color: #94e2d5;
+        #bluetooth:hover,
+        #network:hover,
+        /*#tray:hover,*/
+        #backlight:hover,
+        #battery:hover,
+        #pulseaudio:hover,
+        #custom-temperature:hover,
+        #memory:hover,
+        #cpu:hover,
+        #clock:hover,
+        #custom-lock:hover,
+        #custom-reboot:hover,
+        #custom-power:hover,
+        /*#workspaces:hover,*/
+        #window:hover {
+          background-color: rgba(70, 75, 90, 0.9);
         }
-        #window{
-          background-color: #74c7ec;
-        }
-        #waybar.hidden {
-          opacity: 0.5;
-        }
-        #workspaces button {
-          all: initial;
-          /* Remove GTK theme values (waybar #1351) */
-          min-width: 0;
-          /* Fix weird spacing in materia (waybar #450) */
-          box-shadow: inset 0 -3px transparent;
-          /* Use box-shadow instead of border so the text isn't offset */
-          padding: 6px 10px;
-          margin: 6px 3px;
-          border-radius: 4px;
-          background-color: rgba(36, 36, 52, 1.0);
-          color: #cdd6f4;
+        #workspaces button:hover{
+          background-color: rgba(97, 175, 239, 0.2);
+          padding: 2px 8px;
+          margin: 0 2px;
+          border-radius: 10px;
         }
         #workspaces button.active {
-          color: #1e1e2e;
-          background-color: #cdd6f4;
+          background-color: #61afef; /* 蓝色高亮 */
+          color: #ffffff;
+          padding: 2px 8px;
+          margin: 0 2px;
+          border-radius: 10px;
         }
-        #workspaces button:hover {
-          box-shadow: inherit;
-          text-shadow: inherit;
-          color: #1e1e2e;
-          background-color: #cdd6f4;
+        
+        /* 未激活工作区按钮 */
+        #workspaces button {
+          background: transparent;
+          border: none;
+          color: #888888;
+          padding: 2px 8px;
+          margin: 0 2px;
+          font-weight: bold;
         }
-        tooltip {
-          border-radius: 8px;
-          padding: 16px;
-          background-color: #131822;
-          color: #C0C0C0;
-        }
-        tooltip label {
-          padding: 5px;
-          background-color: #131822;
-          color: #C0C0C0;
+        
+        #window {
+          font-weight: 500;
+          font-style: italic;
         }
       '';
     };
