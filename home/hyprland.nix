@@ -157,27 +157,21 @@
       package = pkgs.waybar;
       settings = [
         {
-          "height" = 30; 
-          "spacing" = 6;
+          "height" = 42; 
+          "spacing" = 3;
           "modules-left" = [
             "hyprland/workspaces"
-            "custom/media"
           ];
           "modules-center" = [
             "hyprland/window"
           ];
           "modules-right" = [
-            "mpd"
-            "idle_inhibitor"
-            "pulseaudio"
-            "power-profiles-daemon"
+            "custom/waybar-mpris"
             "cpu"
             "memory"
-            "temperature"
-            "backlight"
+            "pulseaudio"
             "clock"
             "tray"
-            "custom/power"
           ];
           "hyprland/workspaces" = {
              "disable-scroll" = true;
@@ -195,15 +189,6 @@
                "focused" = "";
                "default" = "";
              };
-          };
-          "keyboard-state" = {
-            "numlock" = true;
-            "capslock" = true;
-            "format" = "{name} {icon}";
-            "format-icons" = {
-              "locked" = "";
-              "unlocked" = "";
-            };
           };
           "idle_inhibitor" = {
             "format" = "{icon}";
@@ -231,37 +216,6 @@
             "format" = "{temperatureC}°C {icon}";
             "format-icons" = ["" "" ""];
           };
-          "backlight" = {
-            "format" = "{percent}% {icon}";
-            "format-icons" = ["" "" "" "" "" "" "" "" ""];
-          };
-          "battery" = {
-            "states" = {
-              "good" = 60;
-              "warning" = 30;
-              "critical" = 15;
-            };
-          "format" = "{capacity}% {icon}";
-          "format-full" = "{capacity}% {icon}";
-          "format-charging" = "{capacity}% ";
-          "format-plugged" = "{capacity}% ";
-          "format-alt" = "{time} {icon}";
-          "format-icons" = ["" "" "" "" ""];
-          };
-          "battery#bat2" = {
-            "bat" = "BAT2";
-          };
-          "power-profiles-daemon" = {
-            "format" = "{icon}";
-            "tooltip-format" = "Power profile: {profile}\nDriver: {driver}";
-            "tooltip" = true;
-            "format-icons" = {
-              "default" = "";
-              "performance" = "";
-              "balanced" = "";
-              "power-saver" = "";
-            };
-          };
           "pulseaudio" = {
             "format" = "{volume}% {icon} {format_source}";
             "format-bluetooth" = "{volume}% {icon} {format_source}";
@@ -280,15 +234,11 @@
             };
             "on-click" = "pavucontrol";
           };
-          "custom/media" = {
-            "format" = "{icon} {text}";
+          "custom/waybar-mpris" = {
             "return-type" = "json";
-            "max-length" = 40;
-            "format-icons" = {
-              "spotify" = "";
-              "default" = "🎜";
-            };
-            "escape" = true;
+            "exec" = "waybar-mpris --position --autofocus";
+            "on-click" = "waybar-mpris --send toggle";
+            "escape" ="true";
           };
         }
       ];
@@ -296,7 +246,7 @@
         * {
           font-family: "MesloLGS NF";
           font-weight: bold;
-          font-size: 12px;
+          font-size: 10px;
           color: #dcdfe1;
         }
         #waybar {
@@ -304,37 +254,33 @@
           border: none;
           box-shadow: none;
         }
-        
         #workspaces,
         #window,
         #tray{
-          /*background-color: rgba(29,31,46, 0.95);*/
           background-color: rgba(15,27,53,0.9);
-          padding: 4px 6px; /* 保持内部间距 */
-          margin-top: 6px; /* 外部间距增加 */
-          margin-left: 6px; /* 外部间距增加 */
-          margin-right: 6px; /* 外部间距增加 */
-          border-radius: 10px;
+          padding: 4px 6px;
+          margin-top: 1px;
+          margin-left: 6px;
+          margin-right: 6px;
+          border-radius: 5px;
           border-width: 0px;
         }
         #clock,
         #custom-power{
           background-color: rgba(15,27,53,0.9);
-          margin-top: 6px; /* 与屏幕顶部留出距离 */
+          margin-top: 6px; 
           margin-right: 6px;
-          /*margin-bottom: 4px;*/
-          padding: 4px 2px; /* 保持内部间距 */
+          padding: 4px 2px;
           border-radius: 0 10px 10px 0;
           border-width: 0px;
         }
         #network,
         #custom-lock{
           background-color: rgba(15,27,53,0.9);
-          margin-top: 6px; /* 与屏幕顶部留出距离 */
+          margin-top: 6px;
           margin-left: 6px;
-          /*margin-bottom: 4px;*/
-          padding: 4px 2px; /* 保持内部间距 */
-          border-radius: 10px 0 0 10px;
+          padding: 4px 2px;
+          border-radius: 5px 0 0 10px;
           border-width: 0px;
         }
         #custom-reboot,
@@ -342,13 +288,17 @@
         #battery,
         #pulseaudio,
         #backlight,
-        #custom-temperature,
+        #custom-waybar-mpris {
+          background-color: rgba(15,27,53,0.9);
+          padding: 4px 6px;
+          margin-top: 6px;
+          border-width: 0px;        
+        }
         #memory,
         #cpu{
           background-color: rgba(15,27,53,0.9);
-          margin-top: 6px; /* 与屏幕顶部留出距离 */
-          /*margin-bottom: 4px;*/
-          padding: 4px 2px; /* 保持内部间距 */
+          margin-top: 6px;
+          padding: 4px 2px;
           border-width: 0px;
         }
         #custpm-temperature.critical,
@@ -358,7 +308,6 @@
         }
         #bluetooth:hover,
         #network:hover,
-        /*#tray:hover,*/
         #backlight:hover,
         #battery:hover,
         #pulseaudio:hover,
@@ -377,17 +326,15 @@
           background-color: rgba(97, 175, 239, 0.2);
           padding: 2px 8px;
           margin: 0 2px;
-          border-radius: 10px;
+          border-radius: 5px;
         }
         #workspaces button.active {
-          background-color: #61afef; /* 蓝色高亮 */
+          background-color: #61afef;
           color: #ffffff;
           padding: 2px 8px;
           margin: 0 2px;
-          border-radius: 10px;
+          border-radius: 5px;
         }
-        
-        /* 未激活工作区按钮 */
         #workspaces button {
           background: transparent;
           border: none;
@@ -396,7 +343,6 @@
           margin: 0 2px;
           font-weight: bold;
         }
-        
         #window {
           font-weight: 500;
           font-style: italic;
@@ -519,4 +465,5 @@
       };
     };
   };
+  stylix.targets.waybar.addCss = false;
 }
