@@ -8,6 +8,7 @@
   };
   environment.systemPackages = with pkgs; [
     waybar
+    waybar-mpris
     libnotify
     dunst
     hyprpaper
