@@ -464,6 +464,13 @@
         ];
       };
     };
+    hyprpaper = {
+      enable = true;
+      settings = {
+        preload = [ "/home/basn/nixos.png" ];
+        wallpaper = [ ",/home/basn/nixos.png" ];
+      };
+    };
   };
-  stylix.targets.waybar.addCss = false;
+  #stylix.targets.waybar.addCss = false;
 }
