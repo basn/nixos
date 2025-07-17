@@ -57,9 +57,18 @@
       displayManager = {
       sddm = {
         enable = true;
-        theme = "sddm-astronaut";
+        package = pkgs.kdePackages.sddm;
+        extraPackages = with pkgs; [
+          sddm-astronaut
+        ];
+        theme = "sddm-astronaut-theme"; 
         wayland = {
           enable = true;
+        };
+        settings = {
+          Theme = {
+            Current = "sddm-astronaut-theme";
+          };
         };
       };
     };
@@ -126,6 +135,7 @@
       google-chrome
       kdePackages.dolphin
       sddm-astronaut
+      kdePackages.qtmultimedia
       vivaldi
       webcord
     ];
