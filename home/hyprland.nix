@@ -7,9 +7,7 @@
         settings = {
           "$modifier" = "SUPER";
           exec-once = [
-            "nm-applet --indicator"
             "waybar"
-            "hyprpaper"
             "dunst"
           ];
           input = {
