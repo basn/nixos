@@ -13,9 +13,13 @@
     vpn-confinement = {
       url = "github:Maroka-chan/VPN-Confinement";
     };
-    home-manager = {
+    home-manager-unstable = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+    home-manager = {
+      url = "github:nix-community/home-manager?ref=release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nvf = {
       url = "github:notashelf/nvf";
@@ -65,9 +69,6 @@
               useUserPackages = true;
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
-              extraSpecialArgs = {
-                pkgs = unstablePkgs;
-              };
               sharedModules = [
                 inputs.nvf.homeManagerModules.default
               ];
@@ -109,15 +110,12 @@
           inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
           ./machines/battlestation/configuration.nix
-          inputs.home-manager.nixosModules.home-manager {
+          inputs.home-manager-unstable.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
               useUserPackages = true;
               users.basn = import ./home/gui.nix;
               backupFileExtension = "backup";
-              extraSpecialArgs = {
-                pkgs = unstablePkgs;
-              };
               sharedModules = [
                 inputs.nvf.homeManagerModules.default
               ];

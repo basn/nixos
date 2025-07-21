@@ -34,7 +34,7 @@
       userEmail = "basn@lan2k.org";
     };
     oh-my-posh = {
-      enable = true;
+#      enable = true;
       enableZshIntegration = true;
       useTheme = "blue-owl";
     };
@@ -75,6 +75,6 @@
     username = "basn";
     homeDirectory = "/home/basn";
     stateVersion = "24.11";
-    packages = with pkgs; [ whois oh-my-posh ];
+    packages = with pkgs; [ whois ];
   };
 }
