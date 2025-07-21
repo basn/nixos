@@ -85,15 +85,12 @@
           inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
           ./machines/laptop/configuration.nix
-          inputs.home-manager.nixosModules.home-manager {
+          inputs.home-manager-unstable.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
               useUserPackages = true;
               users.basn = import ./home/home.nix;
               backupFileExtension = "backup";
-              extraSpecialArgs = {
-                pkgs = unstablePkgs;
-              };
               sharedModules = [
                 inputs.nvf.homeManagerModules.default
               ];
@@ -140,9 +137,6 @@
               useUserPackages = true;
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
-              extraSpecialArgs = {
-                pkgs = unstablePkgs;
-              };
               sharedModules = [
                 inputs.nvf.homeManagerModules.default
               ];
@@ -165,9 +159,6 @@
               useUserPackages = true;
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
-              extraSpecialArgs = {
-                pkgs = unstablePkgs;
-              };
               sharedModules = [
                 inputs.nvf.homeManagerModules.default
               ];
@@ -190,9 +181,6 @@
               useUserPackages = true;
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
-              extraSpecialArgs = {
-                pkgs = unstablePkgs;
-              };
               sharedModules = [
                 inputs.nvf.homeManagerModules.default
               ];
@@ -216,9 +204,6 @@
               useUserPackages = true;
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
-              extraSpecialArgs = {
-                pkgs = unstablePkgs;
-              };
               sharedModules = [
                 inputs.nvf.homeManagerModules.default
               ];
