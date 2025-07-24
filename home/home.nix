@@ -34,7 +34,8 @@
       userEmail = "basn@lan2k.org";
     };
     oh-my-posh = {
-#      enable = true;
+      enable = true;
+      package = pkgs.oh-my-posh;
       enableZshIntegration = true;
       useTheme = "blue-owl";
     };
