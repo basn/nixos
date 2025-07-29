@@ -76,6 +76,6 @@
     username = "basn";
     homeDirectory = "/home/basn";
     stateVersion = "24.11";
-    packages = with pkgs; [ whois ];
+    packages = with pkgs; [ whois asn ];
   };
 }

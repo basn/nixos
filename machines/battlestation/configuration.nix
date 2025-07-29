@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 {
-  imports = [ ../../common/common.nix ../../common/hyprland.nix ./qmk.nix ./orcaslicer.nix ];
+  imports = [ ../../common/common.nix ../../common/hyprland.nix ./qmk.nix ];
   boot = {
     initrd = {
       availableKernelModules = [ "vmd" "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
@@ -198,9 +198,16 @@
   fonts.packages = with pkgs; [
     meslo-lgs-nf
   ];
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [ xdg-desktop-portal-hyprland ];
+  xdg = {
+    portal = {
+      enable = true;
+      xdgOpenUsePortal = true;
+      config = {
+        common.default = ["gtk"];
+        hyprland.default = ["gtk" "hyprland"];
+      };
+      extraPortals = with pkgs; [ pkgs.xdg-desktop-portal-gtk xdg-desktop-portal-hyprland ];
+    };
   };
   system = {
       autoUpgrade = {
