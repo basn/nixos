@@ -2,7 +2,11 @@
 {
   services = {
     netbird = {
-      enable = true;
+      server = {
+        enable = true;
+        domain = "netbird.basn.se";
+        nginx = true;
+      };
     };
   };
   environment = {
