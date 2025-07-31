@@ -6,6 +6,10 @@
         enable = true;
         domain = "netbird.basn.se";
         enableNginx = true;
+        dashboard = {
+          enable = true;
+          enableNginx = true;
+        };
       };
     };
   };
