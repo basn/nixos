@@ -6,6 +6,6 @@
     };
   };
   environment = {
-    systemPackages = [ pkgs.netbird.ui ];
+    systemPackages = [ pkgs.netbird-ui ];
   };
 }
