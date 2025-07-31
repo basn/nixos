@@ -5,7 +5,7 @@
       server = {
         enable = true;
         domain = "netbird.basn.se";
-        nginx = true;
+        enableNginx = true;
       };
     };
   };
