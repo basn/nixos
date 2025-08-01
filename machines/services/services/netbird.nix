@@ -10,6 +10,10 @@
           enable = true;
           enableNginx = true;
         };
+        signal = {
+          enable = true;
+          enableNginx = true;
+        };
       };
     };
   };
