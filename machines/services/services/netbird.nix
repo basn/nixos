@@ -18,6 +18,6 @@
     };
   };
   environment = {
-    systemPackages = [ pkgs.netbird-ui ];
+    systemPackages = with pkgs; [ netbird-ui netbird-dashboard netbird ];
   };
 }
