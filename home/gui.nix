@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
  imports = [
-   ./hyprland.nix
+   ./hyprland/default.nix
    ./home.nix
    ./vivaldi.nix
  ];
