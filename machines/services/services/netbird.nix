@@ -9,6 +9,9 @@
         dashboard = {
           enable = true;
           enableNginx = true;
+          settings = {
+            AUTH_AUTHORITY = false;
+          };
         };
         signal = {
           enable = true;
