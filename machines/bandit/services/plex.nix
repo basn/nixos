@@ -6,4 +6,5 @@
       openFirewall = true;
       package = unstablePkgs.plex;
   };
+  users.users.plex.extraGroups = [ "video" ];
 }
