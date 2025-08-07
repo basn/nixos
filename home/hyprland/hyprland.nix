@@ -13,14 +13,15 @@
           input = {
             kb_layout = "se";
             follow_mouse = 1;
-            sensitivity = 0;
+            sensitivity = -0.5;
+            accel_profile = "flat";
             touchpad = {
               natural_scroll = false;
             };
           };
           device = {
-            name = "pulsar-pulsar-8kdx-dongle";
-            sensitivity = -0.2;
+            name = "pulsar-pulsar-8kdx-dongle-mouse";
+            sensitivity = -1;
             accel_profile = "flat";
           };
           general = {
@@ -55,6 +56,7 @@
           ];
           windowrulev2 = [
             "float, title:^(.*Bitwarden.*)$"
+            "float, title:^(.*Friends List*.)$"
             "workspace 5 silent, class:^(discord)$"
           ];
           animations = {
