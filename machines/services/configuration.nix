@@ -16,7 +16,7 @@
       ./services/ac.nix
       ./services/teslamate.nix
       ./services/authentik.nix
-      #./services/netbird.nix
+      ./services/headscale.nix
     ];
   boot = {
     zfs = {
