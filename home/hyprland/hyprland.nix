@@ -57,7 +57,8 @@
           windowrulev2 = [
             "float, title:^(.*Bitwarden.*)$"
             "float, title:^(.*Friends List*.)$"
-            "workspace 5 silent, class:^(discord)$"
+            "workspace 5 silent, monitor 1, class:^(discord)$"
+            "workspace 4 silent, monitor 0, class:^(spotify)$"
           ];
           animations = {
             enabled = true;
