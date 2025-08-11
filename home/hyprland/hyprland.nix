@@ -4,6 +4,9 @@
     windowManager = {
       hyprland = {
         enable = true;
+        systemd = {
+          variables = ["--all"];
+        };
         settings = {
           "$modifier" = "SUPER";
           exec-once = [
@@ -29,7 +32,7 @@
             gaps_out = 1;
             border_size = 2;
             resize_on_border = true;
-            allow_tearing = false;
+            allow_tearing = true;
             layout = "dwindle";
           };
           decoration = {
@@ -59,6 +62,7 @@
             "float, title:^(.*Friends List*.)$"
             "workspace 5 silent, monitor 1, class:^(discord)$"
             "workspace 4 silent, monitor 0, class:^(spotify)$"
+            "immediate, class:^(steam_app_221100)$"
           ];
           animations = {
             enabled = true;

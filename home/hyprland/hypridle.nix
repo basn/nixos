@@ -5,11 +5,10 @@
       enable = true;
       settings = {
         general = {
-          after_sleep_cmd = "hyprctl dispatch dpms on";
           ignore_dbus_inhibit = true;
           lock_cmd = "pidof hyprlock || hyprlock";
           };
-        listener = [
+          listener = [
           {
             timeout = 250;
             on-timeout = "pidof hyprlock || hyprlock";
