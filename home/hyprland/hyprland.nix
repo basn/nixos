@@ -47,6 +47,10 @@
               enabled = false;
             };
           };
+          misc = {
+            mouse_move_enables_dpms = true;
+            key_press_enables_dpms = true;
+          };
           workspace = [
             "w[tv1], gapsout:0, gapsin:0"
             "f[1], gapsout:0, gapsin:0"

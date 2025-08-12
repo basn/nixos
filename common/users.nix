@@ -1,10 +1,11 @@
-{ ... }:
+{ pkgs, ... }:
 {
   users  = {
     users = {
       basn = {
         isNormalUser = true;
         extraGroups = [ "wheel" ];
+        shell = pkgs.fish;
         openssh = {
           authorizedKeys = {
             keys = [

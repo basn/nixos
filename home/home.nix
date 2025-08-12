@@ -14,7 +14,7 @@
       addKeysToAgent = "yes";
     };
     zsh = {
-      enable = true;
+      enable = false;
       autosuggestion = {
         enable = true;
       };
@@ -24,9 +24,13 @@
 	share = true;
       };
     };
+    fish = {
+      enable = true;
+    };
     fzf = {
       enable = true;
       enableZshIntegration = true;
+      enableFishIntegration = true;
     };
     git = {
       enable = true;
@@ -34,7 +38,7 @@
       userEmail = "basn@lan2k.org";
     };
     oh-my-posh = {
-      enable = true;
+      enable = false;
       package = pkgs.oh-my-posh;
       enableZshIntegration = true;
       useTheme = "blue-owl";

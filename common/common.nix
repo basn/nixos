@@ -19,7 +19,7 @@
     keyMap = "sv-latin1";
   };
   users  = {
-    defaultUserShell = pkgs.zsh;
+    defaultUserShell = pkgs.fish;
   };
   security = {
     sudo = {
@@ -47,6 +47,7 @@
       ipcalc
       nh
       dust
+      fish
     ];
   };
   programs = {
@@ -60,7 +61,7 @@
       vimAlias = true;
     };
     zsh = {
-      enable = true;
+      enable = false;
       promptInit = "eval \"$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/blue-owl.omp.json')\"";
       syntaxHighlighting = {
         enable = true;
@@ -72,6 +73,9 @@
     fzf = {
       keybindings = true;
       fuzzyCompletion = true;
+    };
+    fish = {
+      enable = true;
     };
     nh = {
       enable = true;
