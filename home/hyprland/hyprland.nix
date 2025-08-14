@@ -50,6 +50,8 @@
           misc = {
             mouse_move_enables_dpms = true;
             key_press_enables_dpms = true;
+            disable_hyprland_logo = true;
+            disable_splash_rendering = true;
           };
           workspace = [
             "w[tv1], gapsout:0, gapsin:0"
@@ -107,7 +109,7 @@
             "$modifier, TAB, exec , rofi -show window -show-icons"
             "$modifier, P, pseudo"
             "$modifier, J, togglesplit"
-            "$modifier, L, exec, loginctl lock-session"
+            "$modifier, L, exec, loginctl lock-session && hyprctl dispatch dpms off"
             # super + arrowkeys
             "$modifier, left, movefocus, l"
             "$modifier, right, movefocus, r"

@@ -4,6 +4,7 @@ let
   seedport = 53090;
 in
 {
+  disabledModules = [ "services/torrent/qbittorrent.nix" ];
   imports = [
     ./modules/qbittorrent.nix
   ];

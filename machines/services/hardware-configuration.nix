@@ -6,7 +6,7 @@
 {
   imports = [ ];
 
-  boot.initrd.availableKernelModules = [ "ata_piix" "vmw_pvscsi" "ahci" "sd_mod" "sr_mod" ];
+  boot.initrd.availableKernelModules = [ "ata_piix" "vmw_pvscsi" "ahci" "sd_mod" "sr_mod" "virtio_pci" "virtio_scsi" "uhci_hcd" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];

@@ -60,15 +60,18 @@
         enable = true;
       };
     };
-  };
-  virtualisation = {
-    vmware = {
-      guest = {
-        enable = true;
-        package = pkgs.open-vm-tools-headless;
-      };
+    qemuGuest = {
+      enable = true;
     };
   };
+#  virtualisation = {
+#    vmware = {
+#      guest = {
+#        enable = true;
+#        package = pkgs.open-vm-tools-headless;
+#      };
+#    };
+#  };
   networking = {
     firewall = {
       allowedTCPPorts = [ 22 80 443 ];

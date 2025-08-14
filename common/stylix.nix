@@ -6,6 +6,7 @@
     polarity = "dark";
     fonts = {
       monospace = {
+        package = pkgs.meslo-lgs-nf;
         name = "MesloLGS NF";
       };
       sansSerif = {

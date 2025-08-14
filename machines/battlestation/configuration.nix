@@ -20,7 +20,7 @@
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
-    kernelPackages = pkgs.linuxPackages_zen;
+    kernelPackages = pkgs.linuxPackages_xanmod_latest;
   };
   fileSystems = {
     "/boot" = {
@@ -70,6 +70,11 @@
             Current = "sddm-astronaut-theme";
           };
         };
+      };
+    };
+    desktopManager = {
+      gnome = {
+        enable = true;
       };
     };
     xserver ={
@@ -190,9 +195,6 @@
           pin_cores = "0-15";
         };
       };
-    };
-    firefox = {
-      enable = true;
     };
   };
   fonts.packages = with pkgs; [
