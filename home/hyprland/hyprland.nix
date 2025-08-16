@@ -4,9 +4,6 @@
     windowManager = {
       hyprland = {
         enable = true;
-        systemd = {
-          variables = ["--all"];
-        };
         settings = {
           "$modifier" = "SUPER";
           exec-once = [

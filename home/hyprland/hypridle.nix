@@ -5,7 +5,7 @@
       enable = true;
       settings = {
         general = {
-          ignore_dbus_inhibit = false;
+          ignore_dbus_inhibit = true;
           lock_cmd = "${pkgs.procps}/bin/pidof ${pkgs.hyprlock}/bin/hyprlock || ${pkgs.hyprlock}/bin/hyprlock";
         };
         listener = [

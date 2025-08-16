@@ -49,8 +49,15 @@
   networking = {
     hostName = "battlestation";
     hostId = "121e3eb9";
-    networkmanager = {
+    interfaces = {
+       eno1 = {
+        useDHCP = true;
+       };
+    };
+    enableIPv6 = false;
+    firewall = {
       enable = true;
+      allowedTCPPorts = [ 22 ];
     };
   };
   services = {
@@ -70,11 +77,6 @@
             Current = "sddm-astronaut-theme";
           };
         };
-      };
-    };
-    desktopManager = {
-      gnome = {
-        enable = true;
       };
     };
     xserver ={
@@ -205,8 +207,8 @@
       enable = true;
       xdgOpenUsePortal = true;
       config = {
-        common.default = ["gtk"];
-        hyprland.default = ["gtk" "hyprland"];
+        common.default = [ "hyprland" ];
+        hyprland.default = [ "hyprland" "gtk" ];
       };
       extraPortals = with pkgs; [ pkgs.xdg-desktop-portal-gtk xdg-desktop-portal-hyprland ];
     };
