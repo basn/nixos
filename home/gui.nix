@@ -3,7 +3,6 @@
  imports = [
    ./hyprland/default.nix
    ./home.nix
-   ./vivaldi.nix
  ];
  programs = {
    ghostty = {

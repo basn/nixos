@@ -76,6 +76,27 @@
           }
         ];
       };
+      vault = inputs.nixpkgs.lib.nixosSystem {
+        system = system;
+        specialArgs = {
+          inherit inputs system unstablePkgs;
+        };
+        modules = [
+          inputs.stylix.nixosModules.stylix
+          ./machines/vault/configuration.nix
+          inputs.home-manager.nixosModules.home-manager {
+            home-manager = {
+              useGlobalPkgs = false;
+              useUserPackages = true;
+              users.basn = import ./home/server.nix;
+              backupFileExtension = "backup";
+              sharedModules = [
+                inputs.nvf.homeManagerModules.default
+              ];
+            };
+          }
+        ];
+      };
       laptop = inputs.nixpkgs-unstable.lib.nixosSystem {
         system = system;
         specialArgs = {
