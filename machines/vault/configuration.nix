@@ -3,6 +3,7 @@
   imports = [ 
     inputs.sops_nix.nixosModules.sops
     ../../common/common.nix
+    ./samba.nix
   ];
   boot = {
     kernelModules = [ "kvm-intel" ];
