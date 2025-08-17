@@ -46,6 +46,10 @@
       fsType = "zfs";
       neededForBoot = true;
     };
+    "/storage" = {
+      device = "storage/nas";
+      fsType = "zfs";
+    };
     "/boot1" = {
       device = "/dev/disk/by-label/boot1";
       fsType = "vfat";
