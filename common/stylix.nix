@@ -21,5 +21,10 @@
         applications = 10;
       };
     };
+    targets = {
+      fish = {
+        enable = false;
+      };
+    };
   }; 
 }
