@@ -23,7 +23,7 @@
       supportedFilesystems = [ "zfs" ];
     };
     supportedFilesystems = [ "zfs" ];
-    kernelPackages = pkgs.linuxPackages_zen;
+    kernelPackages = pkgs.linuxPackages_xanmod_latest;
   };
   networking = {
     hostName = "laptop"; 
