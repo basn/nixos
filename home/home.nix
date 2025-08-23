@@ -62,7 +62,6 @@
       };
     };
   };
-  stylix.targets.starship.enable = false;
   home = {
     enableNixpkgsReleaseCheck = false;
     username = "basn";
