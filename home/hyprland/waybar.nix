@@ -50,8 +50,10 @@
             "spacing" = 10;
           };
           "clock" = {
+            "format" = "{:%T}";
             "tooltip-format" = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
             "format-alt" = "{:%Y-%m-%d}";
+            "interval" = 1;
           };
           "cpu" = {
             "format" = "{usage}% ";
