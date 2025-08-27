@@ -16,6 +16,7 @@
           ];
           "modules-right" = [
             "custom/waybar-mpris"
+            "idle_inhibitor"
             "cpu"
             "memory"
             "pulseaudio"
@@ -96,12 +97,12 @@
       style = ''
         * {
           font-family: "MesloLGS NF";
-          font-weight: bold;
+          font-weight: normal;
           font-size: 10px;
           color: #dcdfe1;
         }
         #waybar {
-          background-color: rgba(0, 0, 0, 0);
+          background-color: rgba(15, 27, 53, 0.9);
           border: none;
           box-shadow: none;
         }
@@ -144,6 +145,12 @@
           padding: 4px 6px;
           margin-top: 6px;
           border-width: 0px;        
+        }
+        #idle_inhibitor {
+          background-color: rgba(15,27,53,0.9); 
+          padding: 4px 6px;
+          margin-top: 6px;
+          border-width: 0px;
         }
         #memory,
         #cpu{
