@@ -20,7 +20,7 @@
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
-    kernelPackages = pkgs.linuxPackages_xanmod_latest;
+    kernelPackages = pkgs.linuxPackages_zen;
   };
   fileSystems = {
     "/boot" = {
@@ -124,7 +124,7 @@
   users.users.basn = {
     isNormalUser = true;
     description = "Fredrik Bergstrom";
-    extraGroups = [ "networkmanager" "wheel" "gamemode" "input"];
+    extraGroups = [ "networkmanager" "wheel" "gamemode" "input" "dailout" ];
   };
   nixpkgs = {
     config = {
