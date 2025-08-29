@@ -14,6 +14,9 @@
      starship = {
        enable = false;
      };
+     waybar = {
+       enable = false;
+     };
    };
  };
  home = {
