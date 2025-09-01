@@ -144,12 +144,15 @@
           background-color: rgba(15,27,53,0.9);
           padding: 4px 6px;
           margin-top: 6px;
+          border-radius: 0 10px 10px 0;
           border-width: 0px;        
         }
         #idle_inhibitor {
           background-color: rgba(15,27,53,0.9); 
           padding: 4px 6px;
           margin-top: 6px;
+          margin-left: 6px;
+          border-radius: 0 10px 10px 0;
           border-width: 0px;
         }
         #memory,
