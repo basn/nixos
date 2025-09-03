@@ -103,7 +103,6 @@
             "$modifier, V, togglefloating"
             "$modifier, R, exec, rofi -show combi -show-icons"
             "$modifier, SPACE, exec, rofi -show drun -show-icons" 
-            "$modifier, TAB, exec , rofi -show window -show-icons"
             "$modifier, P, pseudo"
             "$modifier, J, togglesplit"
             "$modifier, L, exec, loginctl lock-session && hyprctl dispatch dpms off"
