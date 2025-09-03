@@ -124,7 +124,7 @@
   users.users.basn = {
     isNormalUser = true;
     description = "Fredrik Bergstrom";
-    extraGroups = [ "networkmanager" "wheel" "gamemode" "input" "dailout" ];
+    extraGroups = [ "networkmanager" "wheel" "gamemode" "input" "dialout" ];
   };
   nixpkgs = {
     config = {
