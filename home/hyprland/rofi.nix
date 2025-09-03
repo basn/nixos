@@ -9,6 +9,8 @@
         combi-modes = [ "window" "drun" "run" ];
         show-icons = true;
         matching = "fuzzy";
+        display-drun = "";
+        display-combi = "";
       };
     };
   };
