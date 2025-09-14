@@ -14,7 +14,7 @@
     hyprpaper
     ghostty
     kitty
-    rofi-wayland
+    rofi
     hyprlock
     pavucontrol
     hypridle
