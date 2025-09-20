@@ -31,7 +31,6 @@ in
           --transfers=8 \
           --cache-dir=${cacheDir} \
           --dir-cache-time=10000h \
-          --poll-interval=5m \
           --buffer-size 100M \
           --vfs-cache-mode full \
           --vfs-read-chunk-size-limit ${vfsReadChunkSizeLimit} \
@@ -41,7 +40,7 @@ in
           --bwlimit ${bwlimit} \
           --jottacloud-hard-delete
       '';
-      ExecStop = "/bin/fusermount -u ${mountPoint}";
+      ExecStop = "${pkgs.fuse}/bin/fusermount -u ${mountPoint}";
       Restart = "always";
       RestartSec = 10;
     };
