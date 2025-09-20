@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 {
-  imports = [ ../../common/common.nix ../../common/hyprland.nix ./qmk.nix ];
+  imports = [ ../../common/common.nix ./qmk.nix ];
   boot = {
     initrd = {
       availableKernelModules = [ "vmd" "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
@@ -64,7 +64,7 @@
       displayManager = {
       sddm = {
         enable = true;
-        package = pkgs.kdePackages.sddm;
+        #package = pkgs.kdePackages.sddm;
         extraPackages = with pkgs; [
           sddm-astronaut
         ];
@@ -80,7 +80,7 @@
       };
     };
     desktopManager = {
-      cosmic = {
+      plasma6 = {
         enable = true;
       };
     };
