@@ -79,6 +79,11 @@
         };
       };
     };
+    desktopManager = {
+      cosmic = {
+        enable = true;
+      };
+    };
     xserver ={
       enable = true;
       xkb = {
