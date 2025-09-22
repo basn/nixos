@@ -51,6 +51,10 @@
       device = "storage/nas";
       fsType = "zfs";
     };
+    "/berget" = {
+      device = "storage/berget";
+      fsType = "zfs";
+    };
     "/boot1" = {
       device = "/dev/disk/by-label/boot1";
       fsType = "vfat";
