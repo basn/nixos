@@ -8,7 +8,7 @@
   users.users.backup = {
     isNormalUser = true;
     openssh.authorizedKeys.keys = [
-      ''command="${pkgs.rrsync}/bin/rrsync /berget/",restrict ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIwMs+6QCPJafLNgEjKm1Klq5xPZ8kOHaMdOCyqu7Ddr''
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIwMs+6QCPJafLNgEjKm1Klq5xPZ8kOHaMdOCyqu7Ddr"
     ];
   };
 }
