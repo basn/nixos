@@ -2,7 +2,7 @@
 {
   environment = {
     systemPackages = with pkgs; [
-      rrsync
+      rsync
     ];
   };
   users.users.backup = {
