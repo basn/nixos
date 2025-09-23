@@ -5,6 +5,7 @@
     ../../common/common.nix
     ./services/samba.nix
     ./services/rsync.nix
+    ./services/sanoid.nix
   ];
   boot = {
     kernelModules = [ "kvm-intel" ];
