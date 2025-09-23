@@ -10,7 +10,7 @@
       autosnap = true;
     };
     datasets = {
-      "storage/backup" = {
+      "storage/nas" = {
         useTemplate = [ "backup" ];
       };
       "storage/berget" = {
