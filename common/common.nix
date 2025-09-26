@@ -35,12 +35,6 @@
       unzip
       screen
       nmap
-      zsh
-      zsh-fzf-tab
-      zsh-powerlevel10k
-      zsh-fzf-history-search
-      fzf-zsh
-      oh-my-posh
       neofetch
       sops
       git
@@ -59,16 +53,6 @@
       enable = true;
       viAlias = true;
       vimAlias = true;
-    };
-    zsh = {
-      enable = false;
-      promptInit = "eval \"$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/blue-owl.omp.json')\"";
-      syntaxHighlighting = {
-        enable = true;
-      };
-      histSize = 10000;
-      enableLsColors = true;
-      enableCompletion = true;
     };
     fzf = {
       keybindings = true;
