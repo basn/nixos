@@ -1,11 +1,10 @@
-{ pkgs, ... }:
+{ ... }:
 {
   services = {
     syncoid = {
       enable = true;
       user = "syncoid";
       group = "syncoid";
-      pkgs = pkgs.syncoid;
       localTargetAllow = [ "create" "receive" "destroy" "mount" "send" ];
       interval = "daily";
       commands = {
