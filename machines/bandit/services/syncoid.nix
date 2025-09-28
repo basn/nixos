@@ -1,10 +1,16 @@
 { pkgs, ... }:
 {
-  users.users.syncoid = {
-    isSystemUser = true;
-    home = "/var/lib/syncoid";
-    createHome = true;
-    shell = pkgs.bash;  # Needed for SSH
+  users ={
+    users.syncoid = {
+      isSystemUser = true;
+      home = "/var/lib/syncoid";
+      createHome = true;
+      shell = pkgs.bash;
+      group = "syncoid";
+    };
+    groups = {
+      syncoid = {};
+    };
   };
   systemd.tmpfiles.rules = [
     "d /var/lib/syncoid/.ssh 0700 syncoid syncoid -"
