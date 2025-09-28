@@ -123,6 +123,9 @@
       enable = true;
       autodetect = true;
     };
+    tailscale = {
+      enable = true;
+    };
   };
   security = {
     rtkit = {
