@@ -12,7 +12,6 @@
       ./services/kuma.nix
       ./services/pykms.nix
       ./services/vaultwarden.nix
-      ./services/unifi.nix
       ./services/ac.nix
       ./services/teslamate.nix
       ./services/authentik.nix
