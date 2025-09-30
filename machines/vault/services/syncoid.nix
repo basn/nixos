@@ -3,7 +3,6 @@
   users ={
     users.syncoid = {
       isSystemUser = true;
-      createHome = true;
       shell = pkgs.bash;
       group = "syncoid";
     };
