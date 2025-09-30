@@ -7,6 +7,11 @@
       createHome = true;
       shell = pkgs.bash;
       group = "syncoid";
+      openssh = {
+        authorizedKeys = {
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAQXGCj7idWd63vSz70F3wA0jGnGeKVz1bLZlRwsv34z root@vault"
+        };
+      };
     };
     groups = {
       syncoid = {};
