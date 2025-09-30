@@ -4,10 +4,6 @@ let
     extraConfig = ''
     proxy_buffers 8 16k;
     proxy_buffer_size 32k;
-    proxy_buffers 4 32k;
-    proxy_busy_buffers_size 64k;
-    fastcgi_buffers 16 16k;
-    fastcgi_buffer_size 32k;
     location /outpost.goauthentik.io {
       proxy_pass              http://localhost:9000/outpost.goauthentik.io;
       proxy_set_header        Host $host;
