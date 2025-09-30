@@ -23,6 +23,11 @@
           target = "syncoid@bandit:data/nas";
           sshKey = /var/lib/syncoid/.ssh/id_ed25519;
         };
+        "berget" = {
+          source = "storage/berget";
+          target = "syncoid@bandit:data/berget";
+          sshKey = /var/lib/syncoid/.ssh/id_ed25519;
+        };
       };
     };
   };
