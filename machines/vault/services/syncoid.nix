@@ -21,7 +21,7 @@
         "nas" = {
           source = "storage/nas";
           target = "syncoid@bandit:data/nas";
-          sshKey = /var/lib/syncoid/id_ed25519;
+          sshKey = /var/lib/syncoid/.ssh/id_ed25519;
         };
       };
     };
