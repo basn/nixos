@@ -28,6 +28,16 @@
           target = "syncoid@bandit:data/berget";
           sshKey = /var/lib/syncoid/.ssh/id_ed25519;
         };
+        "cygate-berget" = {
+          source = "storage/berget";
+          target = "syncoid@nixos-sov:backup/berget";
+          sshKey = /var/lib/syncoid/.ssh/id_ed25519;
+        };
+        "cygate-nas" = {
+          source = "storage/nas";
+          target = "syncoid@nixos-sov:backup/nas";
+          sshKey = /var/lib/syncoid/.ssh/id_ed25519;
+        };
       };
     };
   };
