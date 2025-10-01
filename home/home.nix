@@ -34,6 +34,10 @@
       enable = true;
       settings = {
         vim = {
+          theme = {
+            enable = true;
+            name = "onedark";
+          };
           lsp = {
             enable = true;
           };

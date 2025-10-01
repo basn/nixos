@@ -1,7 +1,6 @@
 { pkgs, ... }:
 {
  imports = [
-   #./hyprland/default.nix
    ./home.nix
  ];
  programs = {
@@ -9,16 +8,6 @@
      enable = true; 
    };
  };
-# stylix = {
-#  targets = {
-#     starship = {
-#       enable = false;
-#     };
-#     waybar = {
-#       enable = false;
-#     };
-#   };
-# };
  home = {
     packages = with pkgs; [ signal-desktop orca-slicer ];
   };
