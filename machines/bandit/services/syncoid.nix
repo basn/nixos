@@ -23,7 +23,8 @@
     serviceConfig = {
       Type = "oneshot";
       ExecStart = pkgs.writeShellScript "grant-zfs-perms" ''
-        ${pkgs.zfs}/bin/zfs allow -u syncoid send,hold,release data/nas
+        ${pkgs.zfs}/bin/zfs allow -u syncoid compression,mountpoint,create,mount,receive,rollback,destroy data/nas
+        ${pkgs.zfs}/bin/zfs allow -u syncoid compression,mountpoint,create,mount,receive,rollback,destroy data/berget
       '';
     };
   };
