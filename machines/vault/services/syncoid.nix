@@ -15,7 +15,6 @@
       enable = true;
       user = "syncoid";
       group = "syncoid";
-      localTargetAllow = [ "create" "receive" "destroy" "mount" "send" ];
       interval = "daily";
       commands = {
         "nas" = {
