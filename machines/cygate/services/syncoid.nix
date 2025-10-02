@@ -1,5 +1,6 @@
 { pkgs, ... }:
 {
+  environment.systemPackages = with pkgs; [ mbuffer lzop ];
   users ={
     users.syncoid = {
       isSystemUser = true;
