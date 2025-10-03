@@ -37,6 +37,11 @@
           target = "syncoid@nixos-sov:backup/nas";
           sshKey = /var/lib/syncoid/.ssh/id_ed25519;
         };
+        "site1-nas" = {
+          source = "storage/nas";
+          target = "syncoid@nixos-sov2:backup/nas";
+          sshKey = /var/lib/syncoid/.ssh/id_ed25519;
+        };
       };
     };
   };
