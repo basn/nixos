@@ -7,6 +7,7 @@
       ./services/kuma.nix
       ./services/nginx.nix
       ../../common/common.nix
+      ./services/syncoid.nix
     ];
 
   boot = {
