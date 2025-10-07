@@ -44,6 +44,9 @@
           languages = {
             nix = {
               enable = true;
+              treesitter = {
+                enable = true;
+              };
             };
             yaml = {
               enable = true;
