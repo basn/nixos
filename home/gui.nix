@@ -9,6 +9,6 @@
    };
  };
  home = {
-    packages = with pkgs; [ signal-desktop orca-slicer ];
+    packages = with pkgs; [ signal-desktop orca-slicer equibop ];
   };
 }
