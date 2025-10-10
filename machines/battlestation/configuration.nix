@@ -17,10 +17,11 @@
     };
     zfs = {
       requestEncryptionCredentials = true;
+      package = pkgs.zfs_unstable;
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
-    kernelPackages = pkgs.linuxPackages_zen;
+    kernelPackages = pkgs.pkgs.linuxPackages_zen;
   };
   fileSystems = {
     "/boot" = {
