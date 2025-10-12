@@ -38,6 +38,7 @@ let
       proxy_set_header X-authentik-email $authentik_email;
       proxy_set_header X-authentik-name $authentik_name;
       proxy_set_header X-authentik-uid $authentik_uid;
+      proxy_set_header X-Forwarded-Proto https;
       auth_request_set $authentik_auth $upstream_http_authorization;
       proxy_set_header Authorization $authentik_auth;
     '';
