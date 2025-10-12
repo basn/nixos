@@ -2,7 +2,7 @@
 {
   services = {
     teslamate = {
-      enable = false;
+      enable = true;
       secretsFile = "/run/secrets/teslamate";
       autoStart = true;
       listenAddress = "127.0.0.1";
@@ -17,7 +17,7 @@
         port = 5432;
       };
       grafana = {
-        enable = false;
+        enable = true;
         listenAddress = "127.0.0.1";
         port = 3000;
         urlPath = "/";
