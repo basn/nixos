@@ -60,6 +60,7 @@
       enable = true;
       allowedTCPPorts = [ 22 ];
     };
+    extraHosts = "0.0.0.0 apresolve.spotify.com";
   };
   services = {
       displayManager = {
