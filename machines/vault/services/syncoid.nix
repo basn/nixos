@@ -16,7 +16,6 @@
       user = "syncoid";
       group = "syncoid";
       interval = "daily";
-      commonArgs = [ "--no-privilege-escalation" ];
       commands = {
         "nas" = {
           source = "storage/nas";
