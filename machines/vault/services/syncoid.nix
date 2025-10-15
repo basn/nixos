@@ -16,17 +16,17 @@
       user = "syncoid";
       group = "syncoid";
       interval = "daily";
+      localTargetAllow = [
+        "change-key"
+        "compression"
+        "create"
+        "mount"
+        "mountpoint"
+        "receive"
+        "rollback"
+        "destroy"
+        ];
       commands = {
-        "nas" = {
-          source = "storage/nas";
-          target = "syncoid@bandit:data/nas";
-          sshKey = /var/lib/syncoid/.ssh/id_ed25519;
-        };
-        "berget" = {
-          source = "storage/berget";
-          target = "syncoid@bandit:data/berget";
-          sshKey = /var/lib/syncoid/.ssh/id_ed25519;
-        };
         "cygate-berget" = {
           source = "storage/berget";
           target = "syncoid@nixos-sov:backup/berget";
