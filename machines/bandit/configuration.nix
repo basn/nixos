@@ -13,7 +13,6 @@
     ./sops.nix
     ../../common/common.nix
     ./services/immich.nix
-    ./services/syncoid.nix
     inputs.sops_nix.nixosModules.sops
   ];
   boot = {
