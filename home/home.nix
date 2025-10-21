@@ -1,6 +1,6 @@
-{ pkgs, libs, ... }:
+{ pkgs, ... }:
 {
-  imports = [ ./fastfetch.nix ];
+  imports = [ ./fastfetch.nix ./nvf.nix ];
   services = {
     ssh-agent = {
       enable = true;
@@ -29,44 +29,6 @@
     starship = {
       enable = true;
       settings = pkgs.lib.importTOML ./starship/blue.toml;
-    };
-    nvf = {
-      enable = true;
-      settings = {
-        vim = {
-          theme = {
-            enable = true;
-            name = "onedark";
-          };
-          lsp = {
-            enable = true;
-          };
-          languages = {
-            nix = {
-              enable = true;
-              treesitter = {
-                enable = true;
-              };
-            };
-            yaml = {
-              enable = true;
-            };
-            python = {
-              enable = true;
-            };
-          };
-          statusline = {
-            lualine = {
-              enable = true;
-            };
-          };
-          autocomplete = {
-            nvim-cmp = {
-              enable = true;
-            };
-          };
-        }; 
-      };
     };
   };
   home = {
