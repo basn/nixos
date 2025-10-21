@@ -5,15 +5,13 @@
       enable = true;
       settings = {
         vim = {
-          lazy.plugins = {
+          extraPlugins = {
             "onedarkpro.nvim" = {
               package = pkgs.vimPlugins.onedarkpro-nvim;
+              setup = ''
+                vim.cmd("colorscheme onedark_dark")
+              '';
             };
-          };
-          theme = {
-            enable = true;
-            name = "onedark";
-            style = "darker";
           };
           lsp = {
             enable = true;
