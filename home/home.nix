@@ -10,9 +10,6 @@
     home-manager = {
       enable = true;
     };
-    ssh = {
-      addKeysToAgent = "yes";
-    };
     fish = {
       enable = true;
     };
@@ -23,8 +20,12 @@
     };
     git = {
       enable = true;
-      userName = "Fredrik Bergström";
-      userEmail = "basn@lan2k.org";
+      settings = {
+        user = {
+          Name = "Fredrik Bergström";
+          Email = "basn@lan2k.org";
+        };
+      };
     };
     starship = {
       enable = true;
