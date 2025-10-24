@@ -15,6 +15,15 @@
         shell-integration-features = "sudo";
       };
    };
+    git = {
+      enable = true;
+      settings = {
+        user = {
+          Name = "Fredrik Bergström";
+          Email = "basn@lan2k.org";
+        };
+      };
+    };
  };
  home = {
     packages = with pkgs; [ signal-desktop orca-slicer equibop ];

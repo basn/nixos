@@ -18,15 +18,6 @@
       enableZshIntegration = true;
       enableFishIntegration = true;
     };
-    git = {
-      enable = true;
-      settings = {
-        user = {
-          Name = "Fredrik Bergström";
-          Email = "basn@lan2k.org";
-        };
-      };
-    };
     starship = {
       enable = true;
       settings = pkgs.lib.importTOML ./starship/blue.toml;
