@@ -80,9 +80,6 @@
           };
         };
       };
-      fwupd = {
-        enable = true;
-      };
     };
     desktopManager = {
       plasma6 = {
@@ -130,6 +127,9 @@
     };
     tailscale = {
       enable = true;
+    };
+    fwupd = {
+      enable = true; #plasma
     };
   };
   security = {
