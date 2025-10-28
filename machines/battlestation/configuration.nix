@@ -80,6 +80,9 @@
           };
         };
       };
+      fwupd = {
+        enable = true;
+      };
     };
     desktopManager = {
       plasma6 = {
@@ -220,8 +223,8 @@
       enable = true;
       xdgOpenUsePortal = true;
       config = {
-        common.default = [ "hyprland" ];
-        hyprland.default = [ "hyprland" "gtk" ];
+        #common.default = [ "hyprland" ];
+        #hyprland.default = [ "hyprland" "gtk" ];
       };
       extraPortals = with pkgs; [ pkgs.xdg-desktop-portal-gtk xdg-desktop-portal-hyprland ];
     };
