@@ -5,7 +5,6 @@
     ../../common/common.nix
     ./services/samba.nix
     ./services/rsync.nix
-    ./services/sanoid.nix
     ./services/znapzend.nix
   ];
   boot = {
