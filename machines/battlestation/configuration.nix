@@ -1,6 +1,6 @@
-{ config, pkgs, ... }:
-{
-  imports = [ ../../common/common.nix ./qmk.nix ];
+{ config, pkgs, lib, ... }:
+{ 
+  imports = [ ../../common/common.nix ];
   boot = {
     initrd = {
       availableKernelModules = [ "vmd" "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
@@ -66,7 +66,6 @@
       displayManager = {
       sddm = {
         enable = true;
-        #package = pkgs.kdePackages.sddm;
         extraPackages = with pkgs; [
           sddm-astronaut
         ];
@@ -153,7 +152,7 @@
       nh
       discord
       spotify
-      protonup
+      protonup-ng
       ghostty
       google-chrome
       kdePackages.dolphin
@@ -218,17 +217,6 @@
   fonts.packages = with pkgs; [
     meslo-lgs-nf
   ];
-  xdg = {
-    portal = {
-      enable = true;
-      xdgOpenUsePortal = true;
-      config = {
-        #common.default = [ "hyprland" ];
-        #hyprland.default = [ "hyprland" "gtk" ];
-      };
-      extraPortals = with pkgs; [ pkgs.xdg-desktop-portal-gtk xdg-desktop-portal-hyprland ];
-    };
-  };
   system = {
       autoUpgrade = {
       flake = "github:basn/nixos";

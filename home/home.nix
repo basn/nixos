@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  imports = [ ./fastfetch.nix ./nvf.nix ];
+  imports = [ ./fastfetch.nix ];
   services = {
     ssh-agent = {
       enable = true;
