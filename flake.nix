@@ -23,6 +23,7 @@
     };
     nvf = {
       url = "github:notashelf/nvf/v0.8";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-search-tv = {
       url = "github:3timeslazy/nix-search-tv";

@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  imports = [ ./users.nix ];
+  imports = [ ./users.nix ./nvf.nix ];
   time = {
     timeZone = "Europe/Stockholm";
   };
