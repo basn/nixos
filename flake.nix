@@ -36,10 +36,6 @@
     authentik-nix = {
       url = "github:nix-community/authentik-nix";
     };
-    stylix = {
-      url = "github:danth/stylix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
   };
   outputs = inputs:
   let
@@ -59,9 +55,9 @@
           inherit inputs system unstablePkgs;
         };
         modules = [
-          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
           inputs.vpn-confinement.nixosModules.default
+	  inputs.nvf.nixosModules.default
           ./machines/bandit/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
@@ -69,9 +65,6 @@
               useUserPackages = true;
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
-              sharedModules = [
-                inputs.nvf.homeManagerModules.default
-              ];
             };
           }
         ];
@@ -82,7 +75,7 @@
           inherit inputs system unstablePkgs;
         };
         modules = [
-          inputs.stylix.nixosModules.stylix
+	  inputs.nvf.nixosModules.default
           ./machines/vault/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
@@ -90,9 +83,6 @@
               useUserPackages = true;
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
-              sharedModules = [
-                inputs.nvf.homeManagerModules.default
-              ];
             };
           }
         ];
@@ -103,8 +93,8 @@
           inherit inputs system;
         };
         modules = [
-          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
+          inputs.nvf.nixosModules.default
           ./machines/laptop/configuration.nix
           inputs.home-manager-unstable.nixosModules.home-manager {
             home-manager = {
@@ -112,9 +102,6 @@
               useUserPackages = true;
               users.basn = import ./home/home.nix;
               backupFileExtension = "backup";
-              sharedModules = [
-                inputs.nvf.homeManagerModules.default
-              ];
             };
           }
         ];
@@ -125,8 +112,8 @@
           inherit inputs system;
         };
         modules = [
-          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
+	  inputs.nvf.nixosModules.default
           ./machines/battlestation/configuration.nix
           inputs.home-manager-unstable.nixosModules.home-manager {
             home-manager = {
@@ -134,9 +121,6 @@
               useUserPackages = true;
               users.basn = import ./home/gui.nix;
               backupFileExtension = "backup";
-              sharedModules = [
-                inputs.nvf.homeManagerModules.default
-              ];
             };
           }
         ];
@@ -147,20 +131,17 @@
           inherit inputs system unstablePkgs;
         };
         modules = [
-          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
           ./machines/services/configuration.nix
           inputs.teslamate.nixosModules.default
           inputs.authentik-nix.nixosModules.default
+	  inputs.nvf.nixosModules.default
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
               useUserPackages = true;
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
-              sharedModules = [
-                inputs.nvf.homeManagerModules.default
-              ];
             };
           }
         ];
@@ -171,8 +152,8 @@
           inherit inputs system unstablePkgs;
         };
         modules = [
-          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
+	  inputs.nvf.nixosModules.default
           ./machines/cygate/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
@@ -180,9 +161,6 @@
               useUserPackages = true;
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
-              sharedModules = [
-                inputs.nvf.homeManagerModules.default
-              ];
             };
           }
 	];
@@ -193,8 +171,8 @@
           inherit inputs system unstablePkgs;
         };
         modules = [
-          inputs.stylix.nixosModules.stylix
           inputs.sops_nix.nixosModules.sops
+	  inputs.nvf.nixosModules.default
           ./machines/cygate2/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
@@ -202,9 +180,6 @@
               useUserPackages = true;
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
-              sharedModules = [
-                inputs.nvf.homeManagerModules.default
-              ];
             };
           }
         ];
@@ -218,16 +193,13 @@
             wsl.enable = true;
           }
 	  ./machines/wsl/configuration.nix
-          inputs.stylix.nixosModules.stylix
+	  inputs.nvf.nixosModules.default
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
               useUserPackages = true;
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
-              sharedModules = [
-                inputs.nvf.homeManagerModules.default
-              ];
             };
 	  }
         ];

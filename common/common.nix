@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  imports = [ ./users.nix ./stylix.nix ];
+  imports = [ ./users.nix ];
   time = {
     timeZone = "Europe/Stockholm";
   };
