@@ -3,6 +3,7 @@
   services.znapzend = {
     enable = true;
     autoCreation = true;
+    pure = true;
     zetup = {
       "storage/nas" = {
         enable = true;
