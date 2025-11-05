@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   users = {
-    users.backup = {
+    users.zfsbackup = {
       isSystemUser = true;
       createHome = true;
       shell = pkgs.bash;
@@ -16,7 +16,7 @@
       Type = "oneshot";
       ExecStart = pkgs.writeShellScript "grant-zfs-perms" ''
         ${pkgs.zfs}/bin/zfs create storage/backup
-        ${pkgs.zfs}/bin/zfs allow -u backup compression,mountpoint,create,mount,receive,rollback,destroy storage/backup
+        ${pkgs.zfs}/bin/zfs allow -u zfsbackup compression,mountpoint,create,mount,receive,rollback,destroy storage/backup
       '';
     };
   };
