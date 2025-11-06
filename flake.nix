@@ -25,9 +25,6 @@
       url = "github:notashelf/nvf/v0.8";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    nix-search-tv = {
-      url = "github:3timeslazy/nix-search-tv";
-    };
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
     };
@@ -58,7 +55,7 @@
         modules = [
           inputs.sops_nix.nixosModules.sops
           inputs.vpn-confinement.nixosModules.default
-	  inputs.nvf.nixosModules.default
+      	  inputs.nvf.nixosModules.default
           ./machines/bandit/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
@@ -76,7 +73,7 @@
           inherit inputs system unstablePkgs;
         };
         modules = [
-	  inputs.nvf.nixosModules.default
+	        inputs.nvf.nixosModules.default
           ./machines/vault/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
@@ -114,7 +111,7 @@
         };
         modules = [
           inputs.sops_nix.nixosModules.sops
-	  inputs.nvf.nixosModules.default
+       	  inputs.nvf.nixosModules.default
           ./machines/battlestation/configuration.nix
           inputs.home-manager-unstable.nixosModules.home-manager {
             home-manager = {
@@ -136,7 +133,7 @@
           ./machines/services/configuration.nix
           inputs.teslamate.nixosModules.default
           inputs.authentik-nix.nixosModules.default
-	  inputs.nvf.nixosModules.default
+       	  inputs.nvf.nixosModules.default
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
@@ -154,7 +151,7 @@
         };
         modules = [
           inputs.sops_nix.nixosModules.sops
-	  inputs.nvf.nixosModules.default
+      	  inputs.nvf.nixosModules.default
           ./machines/cygate/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
@@ -164,7 +161,7 @@
               backupFileExtension = "backup";
             };
           }
-	];
+      	];
       };
       nixos-sov2 = inputs.nixpkgs.lib.nixosSystem {
         system = system;
@@ -173,7 +170,7 @@
         };
         modules = [
           inputs.sops_nix.nixosModules.sops
-	  inputs.nvf.nixosModules.default
+	        inputs.nvf.nixosModules.default
           ./machines/cygate2/configuration.nix
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
@@ -193,8 +190,8 @@
             system.stateVersion = "24.11";
             wsl.enable = true;
           }
-	  ./machines/wsl/configuration.nix
-	  inputs.nvf.nixosModules.default
+      	  ./machines/wsl/configuration.nix
+	        inputs.nvf.nixosModules.default
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = false;
@@ -202,7 +199,7 @@
               users.basn = import ./home/server.nix;
               backupFileExtension = "backup";
             };
-	  }
+	        }
         ];
      };
      # nix build .#nixosConfigurations.minimalIso.config.system.build.isoImage
