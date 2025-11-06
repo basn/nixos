@@ -14,6 +14,7 @@
       };
       disable_startup_analytics = true;
       avatars = "initials";
+      postgresql.host = "/run/postgresql";
       nginx = {
         enable = true;
         enableACME = true;
