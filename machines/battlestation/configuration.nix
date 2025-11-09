@@ -159,7 +159,6 @@
       sddm-astronaut
       kdePackages.qtmultimedia
       vivaldi
-      webcord
     ];
     variables = {
       NIXOS_OZONE_WL = "1";
