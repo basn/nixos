@@ -34,6 +34,9 @@
     authentik-nix = {
       url = "github:nix-community/authentik-nix";
     };
+    chaotic = {
+      url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    };
   };
   outputs = inputs:
   let
@@ -112,6 +115,7 @@
         modules = [
           inputs.sops_nix.nixosModules.sops
        	  inputs.nvf.nixosModules.default
+          inputs.chaotic.nixosModules.default
           ./machines/battlestation/configuration.nix
           inputs.home-manager-unstable.nixosModules.home-manager {
             home-manager = {

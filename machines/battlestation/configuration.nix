@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 { 
   imports = [ ../../common/common.nix ];
   boot = {
@@ -21,8 +21,10 @@
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
-    kernelPackages = pkgs.pkgs.linuxPackages_zen;
+    #kernelPackages = pkgs.pkgs.linuxPackages_zen;
+    kernelPackages = pkgs.linuxPackages_cachyos.cachyOverride { mArch = "GENERIC_V4"; };
   };
+  services.scx.enable = true;
   fileSystems = {
     "/boot" = {
       device = "/dev/disk/by-label/boot";

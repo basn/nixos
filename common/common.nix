@@ -42,6 +42,7 @@
       nh
       dust
       fish
+      alejandra
     ];
   };
   programs = {
