@@ -1,4 +1,4 @@
-{...}: {
+{lib, ...}: {
   imports = [
     ../../common/common.nix
   ];
@@ -37,9 +37,33 @@
     enableIPv6 = false;
     hostName = "netbird";
     timeServers = ["ntp1.sp.se"];
+    useDHCP = lib.mkDefault false;
     firewall = {
       enable = true;
       allowedTCPPorts = [22 80 443];
+    };
+  };
+  fileSystems = {
+    "/" = {
+      device = "osdisk/root";
+      fsType = "zfs";
+    };
+    "/nix" = {
+      device = "osdisk/nix";
+      fsType = "zfs";
+    };
+    "/var" = {
+      device = "osdisk/var";
+      fsType = "zfs";
+    };
+    "/home" = {
+      device = "osdisk/home";
+      fsType = "zfs";
+    };
+    "/boot" = {
+      device = "/dev/disk/by-uuid/DB8A-5926";
+      fsType = "vfat";
+      options = ["fmask=0022" "dmask=0022"];
     };
   };
   services = {
@@ -47,6 +71,7 @@
     zfs.autoScrub.enable = true;
   };
   virtualisation.vmware.guest.enable = true;
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system = {
     stateVersion = "24.05";
     autoUpgrade = {
