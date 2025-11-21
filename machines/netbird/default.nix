@@ -16,11 +16,11 @@
       };
     };
     initrd = {
-      availableKernelModules = [ "ata_piix" "vmw_pvscsi" "floppy" "sd_mod" "sr_mod" ];
-      kernelModules = [ ];
+      availableKernelModules = ["ata_piix" "vmw_pvscsi" "floppy" "sd_mod" "sr_mod"];
+      kernelModules = [];
     };
-    kernelModules = [ ];
-    extraModulePackages = [ ];
+    kernelModules = [];
+    extraModulePackages = [];
   };
   networking = {
     interfaces = {
@@ -33,7 +33,7 @@
     };
     defaultGateway = "10.140.12.1";
     nameservers = ["8.8.8.8"];
-    hostId = "e5dafd0b";
+    hostId = "8012ebed";
     enableIPv6 = false;
     hostName = "netbird";
     timeServers = ["ntp1.sp.se"];
