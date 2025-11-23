@@ -1,6 +1,7 @@
 {lib, ...}: {
   imports = [
     ../../common/common.nix
+    ./netbird.nix
   ];
   boot = {
     zfs = {
