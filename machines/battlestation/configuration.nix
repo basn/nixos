@@ -17,7 +17,7 @@
     };
     zfs = {
       requestEncryptionCredentials = true;
-      package = pkgs.zfs_unstable;
+      package = pkgs.zfs_cachyos;
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
