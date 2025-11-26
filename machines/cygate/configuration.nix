@@ -1,18 +1,15 @@
-{ config, lib, pkgs, ... }:
-
-{
-  imports =
-    [
-      ./hardware-configuration.nix
-      ./services/kuma.nix
-      ./services/nginx.nix
-      ../../common/common.nix
-      ./services/syncoid.nix
-    ];
+{pkgs, ...}: {
+  imports = [
+    ./hardware-configuration.nix
+    ./services/kuma.nix
+    ./services/nginx.nix
+    ../../common/common.nix
+    ./services/syncoid.nix
+  ];
 
   boot = {
     zfs = {
-      extraPools = [ "osdisk" ];
+      extraPools = ["osdisk" "backup"];
       devNodes = "/dev/disk/by-path";
     };
     loader.grub = {
@@ -21,7 +18,10 @@
       efiSupport = true;
       efiInstallAsRemovable = true;
       mirroredBoots = [
-        { devices = [ "nodev"]; path = "/boot"; }
+        {
+          devices = ["nodev"];
+          path = "/boot";
+        }
       ];
     };
   };
@@ -35,14 +35,14 @@
       ];
     };
     defaultGateway = "10.140.12.1";
-    nameservers = [ "8.8.8.8" ];
+    nameservers = ["8.8.8.8"];
     hostId = "e5dafd0b";
-    enableIPv6  = false;
+    enableIPv6 = false;
     hostName = "nixos-sov";
-    timeServers = [ "ntp1.sp.se" ];
+    timeServers = ["ntp1.sp.se"];
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 80 443 ];
+      allowedTCPPorts = [22 80 443];
     };
   };
   environment.systemPackages = with pkgs; [
