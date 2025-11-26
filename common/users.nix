@@ -6,6 +6,7 @@
         isNormalUser = true;
         extraGroups = [ "wheel" ];
         shell = pkgs.fish;
+        packages = [ pkgs.whois pkgs.asn pkgs.gh pkgs.nixpkgs-review ];
         openssh = {
           authorizedKeys = {
             keys = [

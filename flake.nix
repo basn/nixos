@@ -160,15 +160,6 @@
           inputs.sops_nix.nixosModules.sops
           inputs.nvf.nixosModules.default
           ./machines/cygate/configuration.nix
-          inputs.home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = false;
-              useUserPackages = true;
-              users.basn = import ./home/server.nix;
-              backupFileExtension = "backup";
-            };
-          }
         ];
       };
       nixos-sov2 = inputs.nixpkgs.lib.nixosSystem {
@@ -180,15 +171,6 @@
           inputs.sops_nix.nixosModules.sops
           inputs.nvf.nixosModules.default
           ./machines/cygate2/configuration.nix
-          inputs.home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = false;
-              useUserPackages = true;
-              users.basn = import ./home/server.nix;
-              backupFileExtension = "backup";
-            };
-          }
         ];
       };
       nixos = inputs.nixpkgs.lib.nixosSystem {
