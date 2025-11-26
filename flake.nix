@@ -58,15 +58,6 @@
           inputs.vpn-confinement.nixosModules.default
           inputs.nvf.nixosModules.default
           ./machines/bandit/configuration.nix
-          inputs.home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = false;
-              useUserPackages = true;
-              users.basn = import ./home/server.nix;
-              backupFileExtension = "backup";
-            };
-          }
         ];
       };
       vault = inputs.nixpkgs.lib.nixosSystem {
@@ -77,15 +68,6 @@
         modules = [
           inputs.nvf.nixosModules.default
           ./machines/vault/configuration.nix
-          inputs.home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = false;
-              useUserPackages = true;
-              users.basn = import ./home/server.nix;
-              backupFileExtension = "backup";
-            };
-          }
         ];
       };
       laptop = inputs.nixpkgs-unstable.lib.nixosSystem {
@@ -140,15 +122,6 @@
           inputs.teslamate.nixosModules.default
           inputs.authentik-nix.nixosModules.default
           inputs.nvf.nixosModules.default
-          inputs.home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = false;
-              useUserPackages = true;
-              users.basn = import ./home/server.nix;
-              backupFileExtension = "backup";
-            };
-          }
         ];
       };
       nixos-sov = inputs.nixpkgs.lib.nixosSystem {
@@ -173,42 +146,12 @@
           ./machines/cygate2/configuration.nix
         ];
       };
-      nixos = inputs.nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          inputs.nixos-wsl.nixosModules.default
-          {
-            system.stateVersion = "24.11";
-            wsl.enable = true;
-          }
-          ./machines/wsl/configuration.nix
-          inputs.nvf.nixosModules.default
-          inputs.home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = false;
-              useUserPackages = true;
-              users.basn = import ./home/server.nix;
-              backupFileExtension = "backup";
-            };
-          }
-        ];
-      };
       netbird = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./machines/netbird/default.nix
           inputs.nvf.nixosModules.default
           inputs.sops_nix.nixosModules.default
-          inputs.home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = false;
-              useUserPackages = true;
-              users.basn = import ./home/server.nix;
-              backupFileExtension = "backup";
-            };
-          }
         ];
       };
       # nix build .#nixosConfigurations.minimalIso.config.system.build.isoImage
