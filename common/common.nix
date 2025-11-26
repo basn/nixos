@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  imports = [ ./users.nix ./nvf.nix ];
+  imports = [ ./users.nix ./nvf.nix ./fish.nix ];
   time = {
     timeZone = "Europe/Stockholm";
   };
@@ -54,13 +54,6 @@
       enable = true;
       viAlias = true;
       vimAlias = true;
-    };
-    fzf = {
-      keybindings = true;
-      fuzzyCompletion = true;
-    };
-    fish = {
-      enable = true;
     };
     nh = {
       enable = true;

@@ -10,18 +10,6 @@
     home-manager = {
       enable = true;
     };
-    fish = {
-      enable = true;
-    };
-    fzf = {
-      enable = true;
-      enableZshIntegration = true;
-      enableFishIntegration = true;
-    };
-    starship = {
-      enable = true;
-      settings = pkgs.lib.importTOML ./starship/blue.toml;
-    };
   };
   home = {
     enableNixpkgsReleaseCheck = false;
