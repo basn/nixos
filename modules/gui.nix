@@ -3,7 +3,7 @@
 with lib;
 
 let
-  cfg = config.userGraphicalModule;
+  cfg = config.basn;
 in
 {
   options = {
