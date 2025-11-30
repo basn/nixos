@@ -61,7 +61,7 @@
             enable = true;
             friendly-snippets.enable = true;
           };
-        }; 
+        };
       };
     };
   };
