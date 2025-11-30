@@ -42,7 +42,7 @@
       nh
       dust
       fish
-      alejandra
+      nixfmt
     ];
   };
   programs = {
