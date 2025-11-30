@@ -2,7 +2,7 @@
   description = "Basn flake for machines.";
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs?ref=nixos-25.05";
+      url = "github:nixos/nixpkgs?ref=nixos-25.11";
     };
     nixpkgs-unstable = {
       url = "github:nixos/nixpkgs?ref=nixos-unstable";
@@ -16,10 +16,6 @@
     home-manager-unstable = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-    home-manager = {
-      url = "github:nix-community/home-manager?ref=release-25.05";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
     nvf = {
       url = "github:notashelf/nvf/v0.8";
