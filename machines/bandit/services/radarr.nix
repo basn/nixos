@@ -1,4 +1,10 @@
-{ config, lib, pkgs, unstablePkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  unstablePkgs,
+  ...
+}:
 {
   services = {
     radarr = {

@@ -1,9 +1,12 @@
-{ config, pkgs, unstablePkgs, ... }:
+{
+  config,
+  pkgs,
+  unstablePkgs,
+  ...
+}:
 
 {
-  environment.systemPackages = with unstablePkgs; [
-    jellyfin-ffmpeg
-  ];
+  environment.systemPackages = with unstablePkgs; [ jellyfin-ffmpeg ];
 
   services.jellyfin = {
     enable = true;

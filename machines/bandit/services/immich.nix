@@ -4,7 +4,10 @@ in
 { ... }:
 
 {
-  users.users.immich.extraGroups = [ "video" "render" ];
+  users.users.immich.extraGroups = [
+    "video"
+    "render"
+  ];
   services.immich = {
     enable = true;
     host = "0.0.0.0";

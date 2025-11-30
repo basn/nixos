@@ -16,7 +16,7 @@ in
   systemd.services.rclone = {
     description = "Telia Crypt (rclone)";
     after = [ "network.target" ];
-    
+
     serviceConfig = {
       ExecStart = ''
         ${pkgs.rclone}/bin/rclone mount \

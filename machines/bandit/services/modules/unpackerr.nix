@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ...}:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.services.unpackerr;
 in
@@ -56,7 +61,9 @@ in
           RestrictSUIDSGID = true;
           SystemCallArchitectures = "native";
           PrivateUsers = true;
-          ExecStart = "${lib.getExe cfg.package} -c ${(pkgs.formats.toml {}).generate "config.toml" cfg.settings}";
+          ExecStart = "${lib.getExe cfg.package} -c ${
+            (pkgs.formats.toml { }).generate "config.toml" cfg.settings
+          }";
           EnvironmentFile = cfg.environmentFile;
         };
 

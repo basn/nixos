@@ -1,6 +1,12 @@
-{ inputs, config, lib, pkgs, ... }:
 {
-  imports = [ 
+  inputs,
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
+  imports = [
     ./services/plex.nix
     ./services/sonarr.nix
     ./services/radarr.nix
@@ -16,19 +22,36 @@
     inputs.sops_nix.nixosModules.sops
   ];
   boot = {
-    kernelModules = [ "kvm-intel" "r8169" ];
+    kernelModules = [
+      "kvm-intel"
+      "r8169"
+    ];
     kernelParams = [ "ip=dhcp" ];
     supportedFilesystems = [ "zfs" ];
     initrd = {
       kernelModules = [ "r8169" ];
-      availableKernelModules = [ "r8169" "vmd" "xhci_pci" "mpt3sas" "ahci" "usb_storage" "sd_mod" ];
+      availableKernelModules = [
+        "r8169"
+        "vmd"
+        "xhci_pci"
+        "mpt3sas"
+        "ahci"
+        "usb_storage"
+        "sd_mod"
+      ];
       network = {
         enable = true;
         ssh = {
           enable = true;
           port = 2222;
           hostKeys = [ "/root/hostkey.ssh" ];
-          authorizedKeys = with lib; concatLists (mapAttrsToList (name: user: if elem "wheel" user.extraGroups then user.openssh.authorizedKeys.keys else []) config.users.users);
+          authorizedKeys =
+            with lib;
+            concatLists (
+              mapAttrsToList (
+                name: user: if elem "wheel" user.extraGroups then user.openssh.authorizedKeys.keys else [ ]
+              ) config.users.users
+            );
         };
         postCommands = ''
           zpool import osdisk
@@ -46,14 +69,20 @@
         efiSupport = true;
         efiInstallAsRemovable = true;
         mirroredBoots = [
-          { devices = [ "nodev"]; path = "/boot1"; }
-          { devices = [ "nodev"]; path = "/boot2"; }
+          {
+            devices = [ "nodev" ];
+            path = "/boot1";
+          }
+          {
+            devices = [ "nodev" ];
+            path = "/boot2";
+          }
         ];
       };
     };
   };
   fileSystems = {
-    "/" ={
+    "/" = {
       device = "osdisk/root";
       fsType = "zfs";
     };
@@ -83,34 +112,41 @@
     "/boot1" = {
       device = "/dev/disk/by-uuid/7821-EDA9";
       fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ];
+      options = [
+        "fmask=0022"
+        "dmask=0022"
+      ];
     };
     "/boot2" = {
       device = "/dev/disk/by-uuid/7824-6948";
       fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ];
+      options = [
+        "fmask=0022"
+        "dmask=0022"
+      ];
     };
   };
   networking = {
     interfaces = {
-       enp5s0 = {
+      enp5s0 = {
         useDHCP = true;
-       };
+      };
     };
     nameservers = [ "10.1.1.8" ];
-    enableIPv6  = false;
+    enableIPv6 = false;
     timeServers = [ "ntp1.sp.se" ];
-    hostName = "bandit"; 
+    hostName = "bandit";
     hostId = "4c79e250";
-    firewall = { 
+    firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 80 ];
+      allowedTCPPorts = [
+        22
+        80
+      ];
     };
   };
   environment = {
-    systemPackages = with pkgs; [
-      rclone
-    ];
+    systemPackages = with pkgs; [ rclone ];
   };
   services = {
     openssh = {
@@ -141,7 +177,7 @@
       extraPackages = with pkgs; [
         intel-media-driver
         vpl-gpu-rt
-	intel-ocl
+        intel-ocl
         libva-vdpau-driver
         intel-compute-runtime
       ];
