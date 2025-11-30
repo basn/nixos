@@ -27,7 +27,10 @@
               extraDiagnostics.enable = true;
               format = {
                 enable = true;
-                type = "alejandra";
+                type = [ "nixfmt" ];
+              };
+              lsp = {
+                enable = true;
               };
             };
             yaml = {
