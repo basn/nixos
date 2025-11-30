@@ -16,6 +16,12 @@ in
         server_url = "https://${name}.${basedomain}";
         dns = {
           base_domain = "w.${basedomain}";
+          nameservers = {
+            global = [
+              "1.1.1.1"
+              "8.8.8.8"
+            ];
+          };
         };
       };
     };
