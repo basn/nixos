@@ -18,8 +18,25 @@ let
       "application/x-amf"
       "x-scheme-handler/orcaslicer"
     ];
-    categories = [ "Graphics" "3DGraphics" "Engineering" ];
-    keywords = [ "3D" "Printing" "Slicer" "slice" "3D" "printer" "convert" "gcode" "stl" "obj" "amf" "SLA" ];
+    categories = [
+      "Graphics"
+      "3DGraphics"
+      "Engineering"
+    ];
+    keywords = [
+      "3D"
+      "Printing"
+      "Slicer"
+      "slice"
+      "3D"
+      "printer"
+      "convert"
+      "gcode"
+      "stl"
+      "obj"
+      "amf"
+      "SLA"
+    ];
     startupNotify = false;
     startupWMClass = "orca-slicer";
   };

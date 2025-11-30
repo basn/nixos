@@ -38,151 +38,138 @@
       url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     };
   };
-  outputs = inputs: let
-    system = "x86_64-linux";
-    unstablePkgs = import inputs.nixpkgs-unstable {
-      inherit system;
-      config = {
-        allowUnfree = true;
+  outputs =
+    inputs:
+    let
+      system = "x86_64-linux";
+      unstablePkgs = import inputs.nixpkgs-unstable {
+        inherit system;
+        config = {
+          allowUnfree = true;
+        };
+      };
+    in
+    {
+      nixosConfigurations = {
+        bandit = inputs.nixpkgs.lib.nixosSystem {
+          system = system;
+          specialArgs = { inherit inputs system unstablePkgs; };
+          modules = [
+            inputs.sops_nix.nixosModules.sops
+            inputs.vpn-confinement.nixosModules.default
+            inputs.nvf.nixosModules.default
+            ./machines/bandit/configuration.nix
+          ];
+        };
+        vault = inputs.nixpkgs.lib.nixosSystem {
+          system = system;
+          specialArgs = { inherit inputs system unstablePkgs; };
+          modules = [
+            inputs.nvf.nixosModules.default
+            ./machines/vault/configuration.nix
+          ];
+        };
+        laptop = inputs.nixpkgs-unstable.lib.nixosSystem {
+          system = system;
+          specialArgs = { inherit inputs system; };
+          modules = [
+            inputs.sops_nix.nixosModules.sops
+            inputs.nvf.nixosModules.default
+            ./machines/laptop/configuration.nix
+            inputs.home-manager-unstable.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = false;
+                useUserPackages = true;
+                users.basn = import ./home/home.nix;
+                backupFileExtension = "backup";
+              };
+            }
+          ];
+        };
+        battlestation = inputs.nixpkgs-unstable.lib.nixosSystem {
+          system = system;
+          specialArgs = { inherit inputs system; };
+          modules = [
+            inputs.sops_nix.nixosModules.sops
+            inputs.nvf.nixosModules.default
+            inputs.chaotic.nixosModules.default
+            ./machines/battlestation/configuration.nix
+            inputs.home-manager-unstable.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = false;
+                useUserPackages = true;
+                users.basn = import ./home/gui.nix;
+                backupFileExtension = "backup";
+              };
+            }
+          ];
+        };
+        services = inputs.nixpkgs.lib.nixosSystem {
+          system = system;
+          specialArgs = { inherit inputs system unstablePkgs; };
+          modules = [
+            inputs.sops_nix.nixosModules.sops
+            ./machines/services/configuration.nix
+            inputs.teslamate.nixosModules.default
+            inputs.authentik-nix.nixosModules.default
+            inputs.nvf.nixosModules.default
+          ];
+        };
+        nixos-sov = inputs.nixpkgs.lib.nixosSystem {
+          system = system;
+          specialArgs = { inherit inputs system unstablePkgs; };
+          modules = [
+            inputs.sops_nix.nixosModules.sops
+            inputs.nvf.nixosModules.default
+            ./machines/cygate/configuration.nix
+          ];
+        };
+        nixos-sov2 = inputs.nixpkgs.lib.nixosSystem {
+          system = system;
+          specialArgs = { inherit inputs system unstablePkgs; };
+          modules = [
+            inputs.sops_nix.nixosModules.sops
+            inputs.nvf.nixosModules.default
+            ./machines/cygate2/configuration.nix
+          ];
+        };
+        netbird = inputs.nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./machines/netbird/default.nix
+            inputs.nvf.nixosModules.default
+            inputs.sops_nix.nixosModules.default
+          ];
+        };
+        # nix build .#nixosConfigurations.minimalIso.config.system.build.isoImage
+        minimalIso = inputs.nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            (
+              { pkgs, modulesPath, ... }:
+              {
+                imports = [ (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix") ];
+                environment.systemPackages = [ pkgs.neovim ];
+              }
+            )
+            ./common/users.nix
+          ];
+        };
+        graphicalIso = inputs.nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            (
+              { pkgs, modulesPath, ... }:
+              {
+                imports = [ (modulesPath + "/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix") ];
+                environment.systemPackages = [ pkgs.neovim ];
+              }
+            )
+            ./common/common.nix
+          ];
+        };
       };
     };
-  in {
-    nixosConfigurations = {
-      bandit = inputs.nixpkgs.lib.nixosSystem {
-        system = system;
-        specialArgs = {
-          inherit inputs system unstablePkgs;
-        };
-        modules = [
-          inputs.sops_nix.nixosModules.sops
-          inputs.vpn-confinement.nixosModules.default
-          inputs.nvf.nixosModules.default
-          ./machines/bandit/configuration.nix
-        ];
-      };
-      vault = inputs.nixpkgs.lib.nixosSystem {
-        system = system;
-        specialArgs = {
-          inherit inputs system unstablePkgs;
-        };
-        modules = [
-          inputs.nvf.nixosModules.default
-          ./machines/vault/configuration.nix
-        ];
-      };
-      laptop = inputs.nixpkgs-unstable.lib.nixosSystem {
-        system = system;
-        specialArgs = {
-          inherit inputs system;
-        };
-        modules = [
-          inputs.sops_nix.nixosModules.sops
-          inputs.nvf.nixosModules.default
-          ./machines/laptop/configuration.nix
-          inputs.home-manager-unstable.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = false;
-              useUserPackages = true;
-              users.basn = import ./home/home.nix;
-              backupFileExtension = "backup";
-            };
-          }
-        ];
-      };
-      battlestation = inputs.nixpkgs-unstable.lib.nixosSystem {
-        system = system;
-        specialArgs = {
-          inherit inputs system;
-        };
-        modules = [
-          inputs.sops_nix.nixosModules.sops
-          inputs.nvf.nixosModules.default
-          inputs.chaotic.nixosModules.default
-          ./machines/battlestation/configuration.nix
-          inputs.home-manager-unstable.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = false;
-              useUserPackages = true;
-              users.basn = import ./home/gui.nix;
-              backupFileExtension = "backup";
-            };
-          }
-        ];
-      };
-      services = inputs.nixpkgs.lib.nixosSystem {
-        system = system;
-        specialArgs = {
-          inherit inputs system unstablePkgs;
-        };
-        modules = [
-          inputs.sops_nix.nixosModules.sops
-          ./machines/services/configuration.nix
-          inputs.teslamate.nixosModules.default
-          inputs.authentik-nix.nixosModules.default
-          inputs.nvf.nixosModules.default
-        ];
-      };
-      nixos-sov = inputs.nixpkgs.lib.nixosSystem {
-        system = system;
-        specialArgs = {
-          inherit inputs system unstablePkgs;
-        };
-        modules = [
-          inputs.sops_nix.nixosModules.sops
-          inputs.nvf.nixosModules.default
-          ./machines/cygate/configuration.nix
-        ];
-      };
-      nixos-sov2 = inputs.nixpkgs.lib.nixosSystem {
-        system = system;
-        specialArgs = {
-          inherit inputs system unstablePkgs;
-        };
-        modules = [
-          inputs.sops_nix.nixosModules.sops
-          inputs.nvf.nixosModules.default
-          ./machines/cygate2/configuration.nix
-        ];
-      };
-      netbird = inputs.nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ./machines/netbird/default.nix
-          inputs.nvf.nixosModules.default
-          inputs.sops_nix.nixosModules.default
-        ];
-      };
-      # nix build .#nixosConfigurations.minimalIso.config.system.build.isoImage
-      minimalIso = inputs.nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ({
-            pkgs,
-            modulesPath,
-            ...
-          }: {
-            imports = [(modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")];
-            environment.systemPackages = [pkgs.neovim];
-          })
-          ./common/users.nix
-        ];
-      };
-      graphicalIso = inputs.nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ({
-            pkgs,
-            modulesPath,
-            ...
-          }: {
-            imports = [(modulesPath + "/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix")];
-            environment.systemPackages = [pkgs.neovim];
-          })
-          ./common/common.nix
-        ];
-      };
-    };
-  };
 }

@@ -1,11 +1,20 @@
 { pkgs, ... }:
 {
-  imports = [ ./users.nix ./nvf.nix ./fish.nix ];
+  imports = [
+    ./users.nix
+    ./nvf.nix
+    ./fish.nix
+  ];
   time = {
     timeZone = "Europe/Stockholm";
   };
   networking = {
-    timeServers = [ "sth1.ntp.se" "sth2.ntp.se" "gbg1.ntp.se" "gbg2.ntp.se" ];
+    timeServers = [
+      "sth1.ntp.se"
+      "sth2.ntp.se"
+      "gbg1.ntp.se"
+      "gbg2.ntp.se"
+    ];
   };
   i18n = {
     defaultLocale = "en_US.UTF-8";
@@ -18,7 +27,7 @@
     font = "Lat2-Terminus16";
     keyMap = "sv-latin1";
   };
-  users  = {
+  users = {
     defaultUserShell = pkgs.fish;
   };
   security = {
@@ -42,7 +51,7 @@
       nh
       dust
       fish
-      nixfmt
+      nixfmt-rfc-style
     ];
   };
   programs = {
@@ -72,7 +81,10 @@
   };
   nix = {
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
       trusted-users = [ "basn" ];
     };
   };

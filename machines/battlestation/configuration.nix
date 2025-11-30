@@ -1,9 +1,17 @@
 { config, pkgs, ... }:
-{ 
+{
   imports = [ ../../common/common.nix ];
   boot = {
     initrd = {
-      availableKernelModules = [ "vmd" "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
+      availableKernelModules = [
+        "vmd"
+        "xhci_pci"
+        "ahci"
+        "nvme"
+        "usbhid"
+        "usb_storage"
+        "sd_mod"
+      ];
       supportedFilesystems = [ "zfs" ];
       kernelModules = [ ];
     };
@@ -29,7 +37,10 @@
     "/boot" = {
       device = "/dev/disk/by-label/boot";
       fsType = "vfat";
-      options = [ "fmask=0077" "dmask=0077" ];
+      options = [
+        "fmask=0077"
+        "dmask=0077"
+      ];
     };
     "/" = {
       device = "osdisk/root";
@@ -53,9 +64,9 @@
     hostName = "battlestation";
     hostId = "121e3eb9";
     interfaces = {
-       eno1 = {
+      eno1 = {
         useDHCP = true;
-       };
+      };
     };
     enableIPv6 = false;
     firewall = {
@@ -65,13 +76,11 @@
     extraHosts = "0.0.0.0 apresolve.spotify.com";
   };
   services = {
-      displayManager = {
+    displayManager = {
       sddm = {
         enable = true;
-        extraPackages = with pkgs; [
-          sddm-astronaut
-        ];
-        theme = "sddm-astronaut-theme"; 
+        extraPackages = with pkgs; [ sddm-astronaut ];
+        theme = "sddm-astronaut-theme";
         wayland = {
           enable = true;
         };
@@ -90,13 +99,13 @@
         enable = true;
       };
     };
-    xserver ={
+    xserver = {
       enable = true;
       xkb = {
         layout = "se";
         variant = "";
-      }; 
-      videoDrivers = ["nvidia"];
+      };
+      videoDrivers = [ "nvidia" ];
     };
     pulseaudio = {
       enable = false;
@@ -130,7 +139,7 @@
       enable = true;
     };
     fwupd = {
-      enable = true; #plasma
+      enable = true; # plasma
     };
   };
   security = {
@@ -141,7 +150,13 @@
   users.users.basn = {
     isNormalUser = true;
     description = "Fredrik Bergstrom";
-    extraGroups = [ "networkmanager" "wheel" "gamemode" "input" "dialout" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "gamemode"
+      "input"
+      "dialout"
+    ];
   };
   nixpkgs = {
     config = {
@@ -215,11 +230,9 @@
       };
     };
   };
-  fonts.packages = with pkgs; [
-    meslo-lgs-nf
-  ];
+  fonts.packages = with pkgs; [ meslo-lgs-nf ];
   system = {
-      autoUpgrade = {
+    autoUpgrade = {
       flake = "github:basn/nixos";
       enable = true;
     };
