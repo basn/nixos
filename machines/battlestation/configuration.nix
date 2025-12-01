@@ -25,14 +25,14 @@
     };
     zfs = {
       requestEncryptionCredentials = true;
-      package = pkgs.zfs_cachyos;
+      #package = pkgs.zfs_cachyos;
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
-    #kernelPackages = pkgs.pkgs.linuxPackages_zen;
-    kernelPackages = pkgs.linuxPackages_cachyos.cachyOverride { mArch = "GENERIC_V4"; };
+    kernelPackages = pkgs.pkgs.linuxPackages_zen;
+    #kernelPackages = pkgs.linuxPackages_cachyos.cachyOverride { mArch = "GENERIC_V4"; };
   };
-  services.scx.enable = true;
+  #services.scx.enable = true;
   fileSystems = {
     "/boot" = {
       device = "/dev/disk/by-label/boot";
