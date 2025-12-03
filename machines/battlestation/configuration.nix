@@ -1,6 +1,9 @@
 { config, pkgs, ... }:
 {
-  imports = [ ../../common/common.nix ];
+  imports = [
+    ../../common/common.nix
+    ./ollama.nix
+  ];
   boot = {
     initrd = {
       availableKernelModules = [
@@ -25,14 +28,11 @@
     };
     zfs = {
       requestEncryptionCredentials = true;
-      #package = pkgs.zfs_cachyos;
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
     kernelPackages = pkgs.pkgs.linuxPackages_zen;
-    #kernelPackages = pkgs.linuxPackages_cachyos.cachyOverride { mArch = "GENERIC_V4"; };
   };
-  #services.scx.enable = true;
   fileSystems = {
     "/boot" = {
       device = "/dev/disk/by-label/boot";
@@ -205,6 +205,11 @@
       open = true;
       nvidiaSettings = true;
       package = config.boot.kernelPackages.nvidiaPackages.beta;
+    };
+    keyboard = {
+      qmk = {
+        enable = true;
+      };
     };
   };
   programs = {
