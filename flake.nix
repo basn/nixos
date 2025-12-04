@@ -21,17 +21,11 @@
       url = "github:notashelf/nvf/v0.8";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    nixos-wsl = {
-      url = "github:nix-community/NixOS-WSL/main";
-    };
     teslamate = {
       url = "github:teslamate-org/teslamate/main";
     };
     authentik-nix = {
       url = "github:nix-community/authentik-nix";
-    };
-    chaotic = {
-      url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     };
   };
   outputs =
@@ -89,7 +83,6 @@
           modules = [
             inputs.sops_nix.nixosModules.sops
             inputs.nvf.nixosModules.default
-            inputs.chaotic.nixosModules.default
             ./machines/battlestation/configuration.nix
             inputs.home-manager-unstable.nixosModules.home-manager
             {
