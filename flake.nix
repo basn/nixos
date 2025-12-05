@@ -126,6 +126,7 @@
         };
         netbird = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
+          specialArgs = { inherit inputs system unstablePkgs; };
           modules = [
             ./machines/netbird/default.nix
             inputs.nvf.nixosModules.default
