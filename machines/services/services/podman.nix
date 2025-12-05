@@ -1,8 +1,6 @@
 { pkgs, ... }:
 {
-  environment.systemPackages = with pkgs; [
-    podman
-  ];
+  environment.systemPackages = with pkgs; [ podman ];
   virtualisation = {
     podman = {
       enable = true;
@@ -14,7 +12,7 @@
       defaultNetwork = {
         settings = {
           dns_enabled = true;
-	};
+        };
       };
     };
   };

@@ -1,4 +1,4 @@
-{ pkgs,  ... }:
+{ pkgs, ... }:
 {
   services = {
     postgresql = {
@@ -9,7 +9,7 @@
         #type database  DBuser  auth-method
         local all       all     trust
         local teslamate teslamate  trust
-        '';      
-      };
+      '';
+    };
   };
 }
