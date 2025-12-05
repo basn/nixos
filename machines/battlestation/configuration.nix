@@ -2,7 +2,6 @@
 {
   imports = [
     ../../common/common.nix
-    ./ollama.nix
   ];
   boot = {
     initrd = {
