@@ -133,6 +133,15 @@
             inputs.sops_nix.nixosModules.default
           ];
         };
+        skullcanyon =  inputs.nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs system unstablePkgs; };
+          modules = [
+            ./machines/skullcanyon/default.nix
+            inputs.nvf.nixosModules.default
+            inputs.sops_nix.nixosModules.default
+          ];
+        };
         # nix build .#nixosConfigurations.minimalIso.config.system.build.isoImage
         minimalIso = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -142,6 +151,7 @@
               {
                 imports = [ (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix") ];
                 environment.systemPackages = [ pkgs.neovim ];
+                programs.fish.enable = true;
               }
             )
             ./common/users.nix
