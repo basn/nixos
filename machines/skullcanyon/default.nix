@@ -1,10 +1,12 @@
-{lib, ...}: {
+{ lib, ... }:
+{
   imports = [
     ../../common/common.nix
+    ./incus.nix
   ];
   boot = {
     zfs = {
-      extraPools = ["osdisk"];
+      extraPools = [ "osdisk" ];
       devNodes = "/dev/disk/by-path";
     };
     loader = {
@@ -16,11 +18,18 @@
       };
     };
     initrd = {
-      availableKernelModules = ["xhci_pci" "nvme" "usbhid" "usb_storage" "sd_mod" "sdhci_pci"];
-      kernelModules = [];
+      availableKernelModules = [
+        "xhci_pci"
+        "nvme"
+        "usbhid"
+        "usb_storage"
+        "sd_mod"
+        "sdhci_pci"
+      ];
+      kernelModules = [ ];
     };
-    kernelModules = ["kvm-intel"];
-    extraModulePackages = [];
+    kernelModules = [ "kvm-intel" ];
+    extraModulePackages = [ ];
   };
   networking = {
     interfaces = {
@@ -32,15 +41,19 @@
       ];
     };
     defaultGateway = "192.168.195.1";
-    nameservers = ["192.168.195.1"];
+    nameservers = [ "192.168.195.1" ];
     hostId = "9757610d";
     enableIPv6 = false;
     hostName = "skullcanyon";
-    timeServers = ["ntp1.sp.se"];
+    timeServers = [ "ntp1.sp.se" ];
     useDHCP = lib.mkDefault false;
     firewall = {
       enable = true;
-      allowedTCPPorts = [22 80 443];
+      allowedTCPPorts = [
+        22
+        80
+        443
+      ];
     };
   };
   fileSystems = {
@@ -63,7 +76,10 @@
     "/boot" = {
       device = "/dev/disk/by-label/boot";
       fsType = "vfat";
-      options = ["fmask=0022" "dmask=0022"];
+      options = [
+        "fmask=0022"
+        "dmask=0022"
+      ];
     };
   };
   services = {
