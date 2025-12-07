@@ -39,11 +39,9 @@
     };
     interfaces = {
       externalbr0 = {
-        addresses =         {
-          address = "192.168.195.15";
-          prefixLength = 24;
-          macAddress = "00:1f:c6:9b:fe:2e";
-        };
+        address = "192.168.195.15";
+        prefixLength = 24;
+        macAddress = "00:1f:c6:9b:fe:2e";
       };
     };
     defaultGateway = "192.168.195.1";
