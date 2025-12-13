@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, unstableSmall, ... }:
 {
   imports = [
     ../../common/common.nix
@@ -26,11 +26,12 @@
       };
     };
     zfs = {
+      package = unstableSmall.zfs_unstable;
       requestEncryptionCredentials = true;
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
-    kernelPackages = pkgs.pkgs.linuxPackages_zen;
+    kernelPackages = unstableSmall.linuxPackages_zen;
   };
   fileSystems = {
     "/boot" = {

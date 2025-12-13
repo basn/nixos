@@ -7,6 +7,9 @@
     nixpkgs-unstable = {
       url = "github:nixos/nixpkgs?ref=nixos-unstable";
     };
+    nixpkgs-unstable-small = {
+      url = "github:nixos/nixpkgs?ref=nixos-unstable-small"; 
+    };
     sops_nix = {
       url = "github:Mic92/sops-nix";
     };
@@ -18,7 +21,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nvf = {
-      url = "github:notashelf/nvf/v0.8";
+      url = "github:notashelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     teslamate = {
@@ -33,6 +36,12 @@
     let
       system = "x86_64-linux";
       unstablePkgs = import inputs.nixpkgs-unstable {
+        inherit system;
+        config = {
+          allowUnfree = true;
+        };
+      };
+      unstableSmall = import inputs.nixpkgs-unstable-small {
         inherit system;
         config = {
           allowUnfree = true;
@@ -79,7 +88,7 @@
         };
         battlestation = inputs.nixpkgs-unstable.lib.nixosSystem {
           system = system;
-          specialArgs = { inherit inputs system; };
+          specialArgs = { inherit inputs system unstableSmall; };
           modules = [
             inputs.sops_nix.nixosModules.sops
             inputs.nvf.nixosModules.default
