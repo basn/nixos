@@ -105,7 +105,7 @@
       encrypted.keyFile = "/root/zfs-data.key";
     };
     "/data2/files" = {
-      device = "data2/files";
+      device = "data/torrent";
       fsType = "zfs";
       encrypted.keyFile = "/root/zfs-data2.key";
     };
