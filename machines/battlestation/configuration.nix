@@ -32,7 +32,7 @@
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
     kernelPackages = unstableSmall.linuxPackages_zen;
-    blacklistedKernelModules = [ "noveau" ];
+    blacklistedKernelModules = [ "noveau" "nova_core" ];
   };
   fileSystems = {
     "/boot" = {
