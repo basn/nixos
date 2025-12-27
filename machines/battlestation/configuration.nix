@@ -2,7 +2,6 @@
 {
   imports = [
     ../../common/common.nix
-    ./orca.nix
   ];
   boot = {
     initrd = {
