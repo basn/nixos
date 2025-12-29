@@ -13,8 +13,9 @@
         sopsFile = ./secrets/wg.conf;
       };
       zfs = {
-        format = "dotenv";
-        sopsFile = "../../secrets/zfs.env";
+        format = "yaml";
+        sopsFile = ../../secrets/zfs.yaml;
+        key = "password";
       };
     };
   };
