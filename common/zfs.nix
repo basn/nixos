@@ -5,15 +5,17 @@
       enable = true;
       setSendmail = true;
       defaults = {
+        auth = true;
         aliases = "/etc/aliases";
         port = 587;
         tls = "on";
+        tls_starttls = true;
       };
       accounts = {
         default = {
           host = "mail.lan2k.org";
           passwordeval = "cat /run/secrets/zfs";
-          user = "basn@lan2k.org";
+          user = "zfs@basn.se";
           from = "zfs@basn.se";
         };
       };
