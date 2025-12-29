@@ -65,6 +65,7 @@
           specialArgs = { inherit inputs system unstablePkgs; };
           modules = [
             inputs.nvf.nixosModules.default
+            inputs.sops_nix.nixosModules.sops
             ./machines/vault/configuration.nix
           ];
         };

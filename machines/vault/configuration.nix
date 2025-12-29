@@ -3,6 +3,7 @@
   imports = [ 
     inputs.sops_nix.nixosModules.sops
     ../../common/common.nix
+    ../../common/zfs.nix
     ./services/samba.nix
     ./services/rsync.nix
     ./services/znapzend.nix

@@ -3,6 +3,7 @@ keys:
   - &basn age15k0qtgxzppsfrh8h8x08zw2qd0nxdumdhlxe3yqwpx8z3y3rn5yshwkvjh
   - &server_bandit age172785hat7wh3sfcq7kx2qwzrr8tg3jy928ldly7q74shn8hup39sqy8q7q
   - &server_services age16pxhjh47yzlz8umdpu6rt6f2s2z5gmkvvqrh6g0hl53kjqe3pgcslugkvg
+  - &server_vault age18l3ntnq64h46xlf0w826jvvnjj093wkmtn4khqa5nnf39xd98f5qee3f5l
 creation_rules:
   - path_regex: machines/bandit/secrets/[^/]+\.(yaml|json|env|ini|conf)$
     key_groups:
@@ -19,3 +20,4 @@ creation_rules:
       - age:
         - *basn
         - *server_bandit
+        - *server_vault
