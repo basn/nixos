@@ -105,6 +105,10 @@
       fsType = "zfs";
       encrypted.keyFile = "/root/zfs-data.key";
     };
+    "/data/immich/" = {
+      device = "data/immich";
+      fsType = "zfs";
+    };
     "/data2/files" = {
       device = "data/torrent";
       fsType = "zfs";
