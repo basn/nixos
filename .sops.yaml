@@ -14,3 +14,8 @@ creation_rules:
       - age:
         - *basn
         - *server_services
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini|conf)$
+    key_groups:
+      - age:
+        - *basn
+        - *server_bandit

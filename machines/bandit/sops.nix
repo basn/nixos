@@ -1,9 +1,4 @@
-{
-  config,
-  pkgs,
-  sops,
-  ...
-}:
+{ ... }:
 
 {
   sops = {
@@ -16,6 +11,10 @@
       wg = {
         format = "binary";
         sopsFile = ./secrets/wg.conf;
+      };
+      zfs = {
+        format = "dotenv";
+        sopsFile = "../../secrets/zfs.env";
       };
     };
   };
