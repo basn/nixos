@@ -22,7 +22,7 @@
           "create mask" = "0644";
           "directory mask" = "0755";
           "force user" = "basn";
-          "force group" = "users";          
+          "force group" = "users";
         };
       };
     };

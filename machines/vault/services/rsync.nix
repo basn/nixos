@@ -1,9 +1,7 @@
 { pkgs, ... }:
 {
   environment = {
-    systemPackages = with pkgs; [
-      rsync
-    ];
+    systemPackages = with pkgs; [ rsync ];
   };
   users.users.backup = {
     isNormalUser = true;

@@ -1,6 +1,6 @@
 { inputs, pkgs, ... }:
 {
-  imports = [ 
+  imports = [
     inputs.sops_nix.nixosModules.sops
     ../../common/common.nix
     ../../common/zfs.nix
@@ -14,8 +14,14 @@
     supportedFilesystems = [ "zfs" ];
     initrd = {
       kernelModules = [ ];
-      availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" "sd_mod" "sdhci_pci" ];
-      };
+      availableKernelModules = [
+        "xhci_pci"
+        "nvme"
+        "usb_storage"
+        "sd_mod"
+        "sdhci_pci"
+      ];
+    };
     zfs = {
       devNodes = "/dev/disk/by-id";
     };
@@ -26,16 +32,25 @@
         efiSupport = true;
         efiInstallAsRemovable = true;
         mirroredBoots = [
-          { devices = [ "nodev" ]; path = "/boot1"; }
-          { devices = [ "nodev" ]; path = "/boot2"; }
-          { devices = [ "nodev" ]; path = "/boot3"; }
+          {
+            devices = [ "nodev" ];
+            path = "/boot1";
+          }
+          {
+            devices = [ "nodev" ];
+            path = "/boot2";
+          }
+          {
+            devices = [ "nodev" ];
+            path = "/boot3";
+          }
         ];
       };
     };
     kernelPackages = pkgs.linuxPackages_latest;
   };
   fileSystems = {
-    "/" ={
+    "/" = {
       device = "storage/root";
       fsType = "zfs";
     };
@@ -63,39 +78,49 @@
     "/boot1" = {
       device = "/dev/disk/by-label/boot1";
       fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ];
+      options = [
+        "fmask=0022"
+        "dmask=0022"
+      ];
     };
     "/boot2" = {
       device = "/dev/disk/by-label/boot2";
       fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ];
+      options = [
+        "fmask=0022"
+        "dmask=0022"
+      ];
     };
     "/boot3" = {
       device = "/dev/disk/by-label/boot3";
       fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ]; 
+      options = [
+        "fmask=0022"
+        "dmask=0022"
+      ];
     };
   };
   networking = {
     interfaces = {
-       enp2s0 = {
+      enp2s0 = {
         useDHCP = true;
-       };
+      };
     };
     nameservers = [ "10.1.1.8" ];
-    enableIPv6  = false;
+    enableIPv6 = false;
     timeServers = [ "ntp1.sp.se" ];
-    hostName = "vault"; 
+    hostName = "vault";
     hostId = "8ede279f";
-    firewall = { 
+    firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 80 ];
+      allowedTCPPorts = [
+        22
+        80
+      ];
     };
   };
   environment = {
-    systemPackages = with pkgs; [
-      rclone
-    ];
+    systemPackages = with pkgs; [ rclone ];
   };
   services = {
     openssh = {
@@ -126,7 +151,7 @@
       extraPackages = with pkgs; [
         intel-media-driver
         vpl-gpu-rt
-	intel-ocl
+        intel-ocl
         libva-vdpau-driver
         intel-compute-runtime
       ];

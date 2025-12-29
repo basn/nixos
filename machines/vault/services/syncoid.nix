@@ -1,13 +1,13 @@
 { pkgs, ... }:
 {
-  users ={
+  users = {
     users.syncoid = {
       isSystemUser = true;
       shell = pkgs.bash;
       group = "syncoid";
     };
     groups = {
-      syncoid = {};
+      syncoid = { };
     };
   };
   services = {
@@ -25,7 +25,7 @@
         "receive"
         "rollback"
         "destroy"
-        ];
+      ];
       commands = {
         "cygate-berget" = {
           source = "storage/berget";
