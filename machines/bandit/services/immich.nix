@@ -1,5 +1,5 @@
 let
-  photosLocation = "/data/files/immich";
+  photosLocation = "/data/immich";
 in
 { ... }:
 
