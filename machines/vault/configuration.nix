@@ -8,6 +8,7 @@
     ./services/rsync.nix
     ./services/znapzend.nix
     ./services/backupuser.nix
+    ./sops.nix
   ];
   boot = {
     kernelModules = [ "kvm-intel" ];
