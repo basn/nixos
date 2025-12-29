@@ -47,7 +47,6 @@
         ];
       };
     };
-    kernelPackages = pkgs.linuxPackages_latest;
   };
   fileSystems = {
     "/" = {
