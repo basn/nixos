@@ -1,10 +1,13 @@
-{lib, ...}: {
+{ lib, ... }:
+{
   imports = [
     ../../common/common.nix
+    ./netbird.nix
+    ./sops.nix
   ];
   boot = {
     zfs = {
-      extraPools = ["osdisk"];
+      extraPools = [ "osdisk" ];
       devNodes = "/dev/disk/by-path";
     };
     loader = {
@@ -16,11 +19,17 @@
       };
     };
     initrd = {
-      availableKernelModules = ["ata_piix" "vmw_pvscsi" "floppy" "sd_mod" "sr_mod"];
-      kernelModules = [];
+      availableKernelModules = [
+        "ata_piix"
+        "vmw_pvscsi"
+        "floppy"
+        "sd_mod"
+        "sr_mod"
+      ];
+      kernelModules = [ ];
     };
-    kernelModules = [];
-    extraModulePackages = [];
+    kernelModules = [ ];
+    extraModulePackages = [ ];
   };
   networking = {
     interfaces = {
@@ -32,15 +41,19 @@
       ];
     };
     defaultGateway = "10.140.12.1";
-    nameservers = ["8.8.8.8"];
+    nameservers = [ "8.8.8.8" ];
     hostId = "8012ebed";
     enableIPv6 = false;
     hostName = "netbird";
-    timeServers = ["ntp1.sp.se"];
+    timeServers = [ "ntp1.sp.se" ];
     useDHCP = lib.mkDefault false;
     firewall = {
       enable = true;
-      allowedTCPPorts = [22 80 443];
+      allowedTCPPorts = [
+        22
+        80
+        443
+      ];
     };
   };
   fileSystems = {
@@ -63,7 +76,10 @@
     "/boot" = {
       device = "/dev/disk/by-label/boot";
       fsType = "vfat";
-      options = ["fmask=0022" "dmask=0022"];
+      options = [
+        "fmask=0022"
+        "dmask=0022"
+      ];
     };
   };
   services = {
