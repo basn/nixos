@@ -59,7 +59,9 @@ in
                 GrantType = "client_credentials";
               };
               ExtraConfig = {
-                Password =  { _secret = "/var/run/secrets/idp"; };
+                Password = {
+                  _secret = "/var/run/secrets/idp";
+                };
                 Username = "netbird";
               };
             };
@@ -95,7 +97,17 @@ in
               };
             };
             TURNConfig = {
-              Secret = { _secret = "/var/run/secrets/coturn"; };
+              Secret = {
+                _secret = "/var/run/secrets/coturn";
+              };
+              Turns = [
+                {
+                  Proto = "udp";
+                  URI = "turn:netbird.basn.se:3478";
+                  Username = "netbird";
+                  Password._secret = "/var/run/secrets/coturn";
+                }
+              ];
             };
             DataStoreEncryptionKey = {
               _secret = config.sops.secrets.datastore.path;

@@ -78,6 +78,9 @@
       enable = true;
       openFirewall = true;
     };
+    netbird = {
+      enable = true;
+    };
   };
   nix = {
     settings = {
