@@ -69,14 +69,6 @@
       enable = true;
     };
   };
-  #  virtualisation = {
-  #    vmware = {
-  #      guest = {
-  #        enable = true;
-  #        package = pkgs.open-vm-tools-headless;
-  #      };
-  #    };
-  #  };
   networking = {
     firewall = {
       allowedTCPPorts = [

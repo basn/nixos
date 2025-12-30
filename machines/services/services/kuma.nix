@@ -1,11 +1,9 @@
 {
-  config,
-  lib,
-  pkgs,
+  unstablePkgs,
   ...
 }:
 {
-  environment.systemPackages = with pkgs; [ uptime-kuma ];
+  environment.systemPackages = with unstablePkgs; [ uptime-kuma ];
   services = {
     uptime-kuma = {
       enable = true;
