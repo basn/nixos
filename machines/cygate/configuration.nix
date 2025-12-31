@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ ... }:
+{
   imports = [
     ./hardware-configuration.nix
     ./services/kuma.nix
@@ -9,7 +10,10 @@
 
   boot = {
     zfs = {
-      extraPools = ["osdisk" "backup"];
+      extraPools = [
+        "osdisk"
+        "backup"
+      ];
       devNodes = "/dev/disk/by-path";
     };
     loader.grub = {
@@ -19,7 +23,7 @@
       efiInstallAsRemovable = true;
       mirroredBoots = [
         {
-          devices = ["nodev"];
+          devices = [ "nodev" ];
           path = "/boot";
         }
       ];
@@ -35,19 +39,23 @@
       ];
     };
     defaultGateway = "10.140.12.1";
-    nameservers = ["8.8.8.8"];
+    nameservers = [ "8.8.8.8" ];
     hostId = "e5dafd0b";
     enableIPv6 = false;
     hostName = "nixos-sov";
-    timeServers = ["ntp1.sp.se"];
+    timeServers = [ "ntp1.sp.se" ];
     firewall = {
       enable = true;
-      allowedTCPPorts = [22 80 443];
+      allowedTCPPorts = [
+        22
+        80
+        443
+      ];
     };
+    extraHosts = ''
+      10.140.12.20 netbird.basn.se
+    '';
   };
-  environment.systemPackages = with pkgs; [
-  ];
-
   services = {
     openssh.enable = true;
     zfs.autoScrub.enable = true;
