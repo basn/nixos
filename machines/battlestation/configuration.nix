@@ -136,9 +136,6 @@
       enable = true;
       autodetect = true;
     };
-    tailscale = {
-      enable = true;
-    };
     fwupd = {
       enable = true; # plasma
     };
