@@ -26,6 +26,6 @@
     };
  };
  home = {
-    packages = with pkgs; [ signal-desktop orca-slicer equibop vesktop bitwarden-desktop ];
+    packages = with pkgs; [ signal-desktop orca-slicer bitwarden-desktop ];
   };
 }
