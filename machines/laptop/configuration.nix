@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, unstableSmall, ... }:
 {
   imports =
     [ 
@@ -17,13 +17,14 @@
       };
     };
     zfs = {
+      package = unstableSmall.zfs_unstable;
       requestEncryptionCredentials = true;
     };
     initrd = {
       supportedFilesystems = [ "zfs" ];
     };
     supportedFilesystems = [ "zfs" ];
-    kernelPackages = pkgs.linuxPackages_xanmod_latest;
+    kernelPackages = unstableSmall.linuxPackages_zen;
   };
   networking = {
     hostName = "laptop"; 
