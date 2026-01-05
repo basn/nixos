@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
   programs = {
     nvf = {
@@ -22,7 +22,7 @@
             nix = {
               enable = true;
               treesitter = {
-                enable = true;
+                enable = config.programs.nvf.settings.vim.languages.enableTreesitter;
               };
               extraDiagnostics.enable = true;
               format = {
@@ -36,7 +36,7 @@
             yaml = {
               enable = true;
               lsp.enable = true;
-              treesitter.enable = true;
+              treesitter.enable = config.programs.nvf.settings.vim.languages.enableTreesitter;
             };
           };
           statusline = {
