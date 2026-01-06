@@ -222,7 +222,10 @@
       };
     };
   };
-  fonts.packages = with pkgs; [ meslo-lgs-nf ];
+  fonts = {
+    fontDir.enable = true;
+    packages = with pkgs; [ meslo-lgs-nf ];
+  };
   system = {
     autoUpgrade = {
       flake = "github:basn/nixos";
