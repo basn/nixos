@@ -23,6 +23,7 @@
   };
   services = {
     zfs = {
+      autoScrub = true;
       zed = {
         enableMail = true;
         settings = {
