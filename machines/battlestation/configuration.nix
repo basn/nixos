@@ -104,7 +104,8 @@
       enable = true;
       xkb = {
         layout = "se";
-        variant = "";
+        variant = "nodeadkeys";
+        model = "pc105";
       };
       videoDrivers = [ "nvidia" ];
     };
@@ -174,6 +175,7 @@
       sddm-astronaut
       kdePackages.qtmultimedia
       vivaldi
+      vesktop
     ];
     variables = {
       NIXOS_OZONE_WL = "1";

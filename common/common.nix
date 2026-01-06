@@ -2,8 +2,10 @@
 {
   imports = [
     ./users.nix
-    ./nvf.nix
+    ./neovim.nix
     ./fish.nix
+    ./openssh.nix
+    ./netbird.nix
   ];
   time = {
     timeZone = "Europe/Stockholm";
@@ -21,6 +23,7 @@
     extraLocaleSettings = {
       LC_TIME = "sv_SE.UTF-8";
       LC_MONETARY = "sv_SE.UTF-8";
+      LC_MEASUREMENT = "sv_SE.UTF-8";
     };
   };
   console = {
@@ -58,12 +61,6 @@
     mtr = {
       enable = true;
     };
-    neovim = {
-      defaultEditor = true;
-      enable = true;
-      viAlias = true;
-      vimAlias = true;
-    };
     nh = {
       enable = true;
       clean = {
@@ -73,22 +70,16 @@
       flake = "/home/basn/nixos";
     };
   };
-  services = {
-    tailscale = {
-      enable = false;
-      openFirewall = true;
-    };
-    netbird = {
-      enable = true;
-    };
-  };
   nix = {
     settings = {
       experimental-features = [
         "nix-command"
         "flakes"
       ];
-      trusted-users = [ "basn" ];
+      trusted-users = [ "@wheel" ];
+    };
+    sshServe =  {
+      trusted = true;
     };
   };
   nixpkgs = {

@@ -5,13 +5,15 @@ keys:
   - &server_services age16pxhjh47yzlz8umdpu6rt6f2s2z5gmkvvqrh6g0hl53kjqe3pgcslugkvg
   - &server_vault age18l3ntnq64h46xlf0w826jvvnjj093wkmtn4khqa5nnf39xd98f5qee3f5l
   - &server_netbird age1a23remuxvzd5scx0g67us68mtg20908k4w44r3rc3gpgmpaf7dyqx4r4a2
+  - &ws_battlestation age1pjxrfvc2hg6pelm0qy7lxq6jtr4q4n3rd8c89aj7ynqvtr4z0urq3320za
+  - &server_nixossov age166z4n8ytjy0qrehac9cyjnh7k8cu4h72vddze72d87hd9kfdm5yqg5kw5t
 creation_rules:
-  - path_regex: machines/bandit/secrets/[^/]+\.(yaml|json|env|ini|conf)$
+  - path_regex: ^machines/bandit/secrets/[^/]+\.(yaml|json|env|ini|conf)$
     key_groups:
       - age:
         - *basn
         - *server_bandit
-  - path_regex: machines/services/secrets/[^/]+\.(yaml|json|env|ini|conf)$
+  - path_regex: ^machines/services/secrets/[^/]+\.(yaml|json|env|ini|conf)$
     key_groups:
       - age:
         - *basn
@@ -22,7 +24,9 @@ creation_rules:
         - *basn
         - *server_bandit
         - *server_vault
-  - path_regex: machines/netbird/secrets/[^/]+\.(yaml|json|env|ini|conf)$
+        - *server_nixossov
+        - *ws_battlestation
+  - path_regex: ^machines/netbird/secrets/[^/]+\.(yaml|json|env|ini|conf)$
     key_groups:
       - age:
         - *basn

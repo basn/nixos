@@ -8,7 +8,7 @@
       url = "github:nixos/nixpkgs?ref=nixos-unstable";
     };
     nixpkgs-unstable-small = {
-      url = "github:nixos/nixpkgs?ref=nixos-unstable-small"; 
+      url = "github:nixos/nixpkgs?ref=nixos-unstable-small";
     };
     sops_nix = {
       url = "github:Mic92/sops-nix";
@@ -16,8 +16,8 @@
     vpn-confinement = {
       url = "github:Maroka-chan/VPN-Confinement";
     };
-    home-manager-unstable = {
-      url = "github:nix-community/home-manager";
+    hjem = {
+      url = "github:feel-co/hjem";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nvf = {
@@ -76,15 +76,8 @@
             inputs.sops_nix.nixosModules.sops
             inputs.nvf.nixosModules.default
             ./machines/laptop/configuration.nix
-            inputs.home-manager-unstable.nixosModules.home-manager
-            {
-              home-manager = {
-                useGlobalPkgs = false;
-                useUserPackages = true;
-                users.basn = import ./home/home.nix;
-                backupFileExtension = "backup";
-              };
-            }
+            inputs.hjem.nixosModules.default
+            ./hjem/default.nix
           ];
         };
         battlestation = inputs.nixpkgs-unstable.lib.nixosSystem {
@@ -94,15 +87,8 @@
             inputs.sops_nix.nixosModules.sops
             inputs.nvf.nixosModules.default
             ./machines/battlestation/configuration.nix
-            inputs.home-manager-unstable.nixosModules.home-manager
-            {
-              home-manager = {
-                useGlobalPkgs = false;
-                useUserPackages = true;
-                users.basn = import ./home/gui.nix;
-                backupFileExtension = "backup";
-              };
-            }
+            inputs.hjem.nixosModules.default
+            ./hjem/default.nix
           ];
         };
         services = inputs.nixpkgs.lib.nixosSystem {
@@ -143,7 +129,7 @@
             inputs.sops_nix.nixosModules.default
           ];
         };
-        skullcanyon =  inputs.nixpkgs.lib.nixosSystem {
+        skullcanyon = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs system unstablePkgs; };
           modules = [
