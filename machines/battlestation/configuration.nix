@@ -72,7 +72,6 @@
     enableIPv6 = false;
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 ];
     };
     extraHosts = "0.0.0.0 apresolve.spotify.com";
   };
@@ -122,9 +121,6 @@
         enable = true;
       };
     };
-    openssh = {
-      enable = true;
-    };
     zfs = {
       autoScrub = {
         enable = true;
@@ -147,8 +143,6 @@
     };
   };
   users.users.basn = {
-    isNormalUser = true;
-    description = "Fredrik Bergstrom";
     extraGroups = [
       "networkmanager"
       "wheel"
@@ -156,11 +150,6 @@
       "input"
       "dialout"
     ];
-  };
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-    };
   };
   environment = {
     systemPackages = with pkgs; [
@@ -171,9 +160,7 @@
       protonup-ng
       ghostty
       google-chrome
-      kdePackages.dolphin
       sddm-astronaut
-      kdePackages.qtmultimedia
       vivaldi
       vesktop
     ];
