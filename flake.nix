@@ -71,7 +71,7 @@
         };
         laptop = inputs.nixpkgs-unstable.lib.nixosSystem {
           system = system;
-          specialArgs = { inherit inputs system; };
+          specialArgs = { inherit inputs system unstableSmall; };
           modules = [
             inputs.sops_nix.nixosModules.sops
             inputs.nvf.nixosModules.default
