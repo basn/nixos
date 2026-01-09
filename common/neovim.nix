@@ -11,7 +11,7 @@
       enable = true;
       settings = {
         vim = {
-          extraPlugins = {
+           extraPlugins = {
             "onedarkpro.nvim" = {
               package = pkgs.vimPlugins.onedarkpro-nvim;
               setup = ''
@@ -44,6 +44,31 @@
               lsp.enable = true;
               treesitter.enable = config.programs.nvf.settings.vim.languages.enableTreesitter;
             };
+            json = {
+              enable = true;
+              lsp.enable = true;
+              treesitter.enable = config.programs.nvf.settings.vim.languages.enableTreesitter;
+            };
+            markdown = {
+              enable = true;
+              lsp.enable = true;
+              treesitter.enable = config.programs.nvf.settings.vim.languages.enableTreesitter;
+            };
+            python = {
+              enable = true;
+              lsp.enable = true;
+              treesitter.enable = config.programs.nvf.settings.vim.languages.enableTreesitter;
+            };
+            bash = {
+              enable = true;
+              lsp.enable = true;
+              treesitter.enable = config.programs.nvf.settings.vim.languages.enableTreesitter;
+            };
+            terraform = {
+              enable = true;
+              lsp.enable = true;
+              treesitter.enable = config.programs.nvf.settings.vim.languages.enableTreesitter;
+            };
           };
           statusline = {
             lualine = {
@@ -66,6 +91,26 @@
           autocomplete.blink-cmp = {
             enable = true;
             friendly-snippets.enable = true;
+          };
+          fzf-lua = {
+            enable = true;
+            profile = "fzf-native";
+          };
+          utility = {
+            nvim-biscuits = {
+              enable = false; #troubleshoot this?
+            };
+          };
+          visuals = {
+            nvim-scrollbar = {
+              enable = true;
+            };
+            rainbow-delimiters = {
+              enable = true;
+            };
+            tiny-devicons-auto-colors = {
+              enable = true;
+            };
           };
         };
       };

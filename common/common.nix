@@ -54,7 +54,7 @@
       nh
       dust
       fish
-      nixfmt-rfc-style
+      nixfmt
     ];
   };
   programs = {
