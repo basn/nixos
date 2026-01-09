@@ -4,7 +4,7 @@
   hjem = {
     users = {
       basn = {
-        packages = [ pkgs.vivaldi ] ;
+        packages = [ pkgs.vivaldi ];
         files.".local/share/applications/vivaldi.desktop".text = ''
           [Desktop Entry]
           Type=Application

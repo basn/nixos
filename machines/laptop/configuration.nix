@@ -1,11 +1,10 @@
 { pkgs, unstableSmall, ... }:
 {
-  imports =
-    [ 
-      ./hardware-configuration.nix
-      ../../common/common.nix
-      ./plasma6.nix
-    ];
+  imports = [
+    ./hardware-configuration.nix
+    ../../common/common.nix
+    ./plasma6.nix
+  ];
 
   boot = {
     loader = {
@@ -27,7 +26,7 @@
     kernelPackages = unstableSmall.linuxPackages_zen;
   };
   networking = {
-    hostName = "laptop"; 
+    hostName = "laptop";
     hostId = "3e25a9f6";
     networkmanager = {
       enable = true;
@@ -76,7 +75,10 @@
   users.users.basn = {
     isNormalUser = true;
     description = "Fredrik Bergström";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     packages = with pkgs; [
       discord
       chromium
@@ -89,12 +91,8 @@
       enable = true;
     };
   };
-  environment.systemPackages = with pkgs; [
-    neovim
-  ];
-  fonts.packages = with pkgs; [
-    meslo-lgs-nf
-  ];
+  environment.systemPackages = with pkgs; [ neovim ];
+  fonts.packages = with pkgs; [ meslo-lgs-nf ];
   powerManagement = {
     enable = true;
   };

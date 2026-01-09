@@ -1,8 +1,11 @@
-{ config, pkgs, unstableSmall, ... }:
 {
-  imports = [
-    ../../common/common.nix
-  ];
+  config,
+  pkgs,
+  unstableSmall,
+  ...
+}:
+{
+  imports = [ ../../common/common.nix ];
   boot = {
     initrd = {
       availableKernelModules = [
@@ -32,7 +35,10 @@
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
     kernelPackages = unstableSmall.linuxPackages_zen;
-    blacklistedKernelModules = [ "noveau" "nova_core" ];
+    blacklistedKernelModules = [
+      "noveau"
+      "nova_core"
+    ];
   };
   fileSystems = {
     "/boot" = {

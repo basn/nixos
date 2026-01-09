@@ -11,7 +11,7 @@
       enable = true;
       settings = {
         vim = {
-           extraPlugins = {
+          extraPlugins = {
             "onedarkpro.nvim" = {
               package = pkgs.vimPlugins.onedarkpro-nvim;
               setup = ''
@@ -98,7 +98,7 @@
           };
           utility = {
             nvim-biscuits = {
-              enable = false; #troubleshoot this?
+              enable = false; # troubleshoot this?
             };
           };
           visuals = {

@@ -1,14 +1,18 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
-  imports =
-    [
-      ./hardware-configuration.nix
-      ./services/kuma.nix
-      ./services/nginx.nix
-      ../../common/common.nix
-      ./services/syncoid.nix
-    ];
+  imports = [
+    ./hardware-configuration.nix
+    ./services/kuma.nix
+    ./services/nginx.nix
+    ../../common/common.nix
+    ./services/syncoid.nix
+  ];
 
   boot = {
     zfs = {
@@ -21,7 +25,10 @@
       efiSupport = true;
       efiInstallAsRemovable = true;
       mirroredBoots = [
-        { devices = [ "nodev"]; path = "/boot"; }
+        {
+          devices = [ "nodev" ];
+          path = "/boot";
+        }
       ];
     };
   };
@@ -35,18 +42,24 @@
       ];
     };
     defaultGateway = "10.136.37.1";
-    nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    nameservers = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ];
     hostId = "e5dafd0b";
-    enableIPv6  = false;
+    enableIPv6 = false;
     hostName = "nixos-sov2";
     timeServers = [ "ntp1.sp.se" ];
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 80 443 ];
+      allowedTCPPorts = [
+        22
+        80
+        443
+      ];
     };
   };
-  environment.systemPackages = with pkgs; [
-  ];
+  environment.systemPackages = with pkgs; [ ];
 
   services = {
     openssh.enable = true;

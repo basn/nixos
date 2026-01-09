@@ -78,7 +78,7 @@
       ];
       trusted-users = [ "@wheel" ];
     };
-    sshServe =  {
+    sshServe = {
       trusted = true;
     };
   };
