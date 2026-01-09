@@ -87,4 +87,5 @@
       allowUnfree = true;
     };
   };
+  documentation.man.generateCaches = false;
 }
