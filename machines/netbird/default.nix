@@ -54,6 +54,7 @@
         80
         443
       ];
+      checkReversePath = "loose";
     };
   };
   fileSystems = {

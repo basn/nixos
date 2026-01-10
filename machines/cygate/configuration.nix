@@ -51,10 +51,8 @@
         80
         443
       ];
+      checkReversePath = "loose";
     };
-    extraHosts = ''
-      10.140.12.20 netbird.basn.se
-    '';
   };
   services = {
     openssh.enable = true;
