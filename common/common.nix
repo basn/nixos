@@ -55,6 +55,7 @@
       dust
       fish
       nixfmt
+      helix
     ];
   };
   programs = {
