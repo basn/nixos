@@ -126,6 +126,54 @@
       pulse = {
         enable = true;
       };
+      wireplumber.extraConfig = {
+        "50-fosi-k7-pro" = {
+          "monitor.alsa.rules" = [
+            {
+              matches = [ { "device.name" = "~alsa_card.usb-Fosi_Audio_Fosi_Audio_K7.*"; } ];
+
+              actions = {
+                update-props = {
+                  # Make this device preferred
+                  "priority.session" = 2000;
+                  "priority.driver" = 2000;
+
+                  # Force audio format / channels
+                  "audio.format" = "S32LE";
+                  "audio.channels" = 2;
+                  "audio.position" = [
+                    "FL"
+                    "FR"
+                  ];
+
+                  # Default rate
+                  "audio.rate" = 192000;
+
+                  # Allow full capability range
+                  "audio.allowed-rates" = [
+                    44100
+                    48000
+                    88200
+                    96000
+                    176400
+                    192000
+                    352800
+                    384000
+                    705600
+                    768000
+                  ];
+
+                  # Disable DSD unless explicitly requested
+                  "api.alsa.disable-dsd" = true;
+
+                  # Optional: force headroom and period size if needed
+                  "api.alsa.headroom" = 512;
+                };
+              };
+            }
+          ];
+        };
+      };
     };
     zfs = {
       autoScrub = {
