@@ -112,7 +112,7 @@
         variant = "nodeadkeys";
         model = "pc105";
       };
-      videoDrivers = [ "nvidia" ];
+      #videoDrivers = [ "nvidia" ];
     };
     pulseaudio = {
       enable = false;
@@ -241,11 +241,11 @@
         enable = true;
       };
       powerManagement = {
-        enable = true;
+        enable = false; 
       };
-      open = true;
+      open = false;
       nvidiaSettings = true;
-      package = config.boot.kernelPackages.nvidiaPackages.beta;
+            package = config.boot.kernelPackages.nvidiaPackages.legacy_535;
     };
     keyboard = {
       qmk = {
@@ -268,7 +268,7 @@
           desiredprof = "performance";
         };
         gpu = {
-          nv_powermizer_mode = 1;
+          # nv_powermizer_mode = 1;
         };
         cpu = {
           pin_cores = "0-15";
