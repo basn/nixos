@@ -35,10 +35,10 @@
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
     kernelPackages = unstableSmall.linuxPackages_zen;
-    blacklistedKernelModules = [
-      "noveau"
-      "nova_core"
-    ];
+    #blacklistedKernelModules = [
+    #  "noveau"
+    #  "nova_core"
+    #];
   };
   fileSystems = {
     "/boot" = {
@@ -236,17 +236,17 @@
       enable = true;
       enable32Bit = true;
     };
-    nvidia = {
-      modesetting = {
-        enable = true;
-      };
-      powerManagement = {
-        enable = false; 
-      };
-      open = false;
-      nvidiaSettings = true;
-            package = config.boot.kernelPackages.nvidiaPackages.legacy_535;
-    };
+    #nvidia = {
+    #  modesetting = {
+    #    enable = true;
+    #  };
+    #  powerManagement = {
+    #    enable = true;
+    #  };
+    #  open = true;
+    #  nvidiaSettings = true;
+    #        package = config.boot.kernelPackages.nvidiaPackages.beta;
+    #};
     keyboard = {
       qmk = {
         enable = true;
@@ -268,7 +268,7 @@
           desiredprof = "performance";
         };
         gpu = {
-          # nv_powermizer_mode = 1;
+          #nv_powermizer_mode = 1;
         };
         cpu = {
           pin_cores = "0-15";
