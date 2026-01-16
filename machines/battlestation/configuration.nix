@@ -35,10 +35,6 @@
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
     kernelPackages = unstableSmall.linuxPackages_zen;
-    #blacklistedKernelModules = [
-    #  "noveau"
-    #  "nova_core"
-    #];
   };
   fileSystems = {
     "/boot" = {
@@ -112,7 +108,6 @@
         variant = "nodeadkeys";
         model = "pc105";
       };
-      #videoDrivers = [ "nvidia" ];
     };
     pulseaudio = {
       enable = false;
@@ -190,6 +185,9 @@
     fwupd = {
       enable = true; # plasma
     };
+    lact = {
+      enable = true;
+    };
   };
   security = {
     rtkit = {
@@ -236,17 +234,17 @@
       enable = true;
       enable32Bit = true;
     };
-    #nvidia = {
-    #  modesetting = {
-    #    enable = true;
-    #  };
-    #  powerManagement = {
-    #    enable = true;
-    #  };
-    #  open = true;
-    #  nvidiaSettings = true;
-    #        package = config.boot.kernelPackages.nvidiaPackages.beta;
-    #};
+    amdgpu = {
+      initrd = {
+        enable = true;
+      };
+      opencl = {
+        enable = true;
+      };
+      overdrive = {
+        enable = true;
+      };
+    };
     keyboard = {
       qmk = {
         enable = true;
