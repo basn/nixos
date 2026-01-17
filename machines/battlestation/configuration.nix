@@ -103,6 +103,7 @@
     };
     xserver = {
       enable = true;
+      videoDrivers = [ "amdgpu" ];
       xkb = {
         layout = "se";
         variant = "nodeadkeys";
