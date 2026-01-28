@@ -35,6 +35,7 @@
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
     kernelPackages = unstableSmall.linuxPackages_zen;
+    kernelParams = [ "split_lock_detect=off" ];
   };
   fileSystems = {
     "/boot" = {
@@ -187,7 +188,7 @@
       enable = true; # plasma
     };
     lact = {
-      enable = true;
+      enable = false;
     };
   };
   security = {
