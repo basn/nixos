@@ -217,6 +217,7 @@
       sddm-astronaut
       vivaldi
       vesktop
+      equibop
     ];
     variables = {
       NIXOS_OZONE_WL = "1";
