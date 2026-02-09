@@ -218,6 +218,8 @@
       vivaldi
       vesktop
       equibop
+      rocmPackages.rocm-smi
+      rocmPackages.rocminfo
     ];
     variables = {
       NIXOS_OZONE_WL = "1";
