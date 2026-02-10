@@ -220,6 +220,7 @@
       equibop
       rocmPackages.rocm-smi
       rocmPackages.rocminfo
+      teamspeak6-client
     ];
     variables = {
       NIXOS_OZONE_WL = "1";
