@@ -12,6 +12,7 @@
   ];
   boot = {
     kernelModules = [ "kvm-intel" ];
+    kernelPackages = pkgs.linuxPackages_latest;
     supportedFilesystems = [ "zfs" ];
     initrd = {
       kernelModules = [ ];
@@ -24,6 +25,7 @@
       ];
     };
     zfs = {
+      package = pkgs.zfs_2_4;
       devNodes = "/dev/disk/by-id";
     };
     loader = {
