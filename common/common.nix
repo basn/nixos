@@ -56,6 +56,7 @@
       fish
       nixfmt
       helix
+      trippy
     ];
   };
   programs = {
