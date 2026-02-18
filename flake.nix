@@ -30,6 +30,9 @@
     authentik-nix = {
       url = "github:nix-community/authentik-nix";
     };
+    nix-cachyos-kernel = {
+      url = "github:xddxdd/nix-cachyos-kernel";
+    };
   };
   outputs =
     inputs:
@@ -88,6 +91,7 @@
             inputs.nvf.nixosModules.default
             ./machines/battlestation/configuration.nix
             inputs.hjem.nixosModules.default
+            ( { pkgs, ... }: { nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ]; })
             ./hjem/default.nix
           ];
         };

@@ -29,12 +29,12 @@
       };
     };
     zfs = {
-      package = unstableSmall.zfs_unstable;
+      package = config.boot.kernelPackages.zfs_cachyos;
       requestEncryptionCredentials = true;
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
-    kernelPackages = unstableSmall.linuxPackages_zen;
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v4;
     kernelParams = [ "split_lock_detect=off" ];
   };
   fileSystems = {
