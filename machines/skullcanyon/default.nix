@@ -34,7 +34,7 @@
   networking = {
     bridges = {
       br0 = {
-        interfaces = [ "enp0s31f6" ];
+        interfaces = [ "eno1" ];
       };
     };
     interfaces = {
