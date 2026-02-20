@@ -2,7 +2,6 @@
 {
   imports = [
     ../../common/common.nix
-    ./incus.nix
   ];
   boot = {
     zfs = {
@@ -33,15 +32,19 @@
   };
   networking = {
     bridges = {
-      externalbr0 = {
+      br0 = {
         interfaces = [ "enp0s31f6" ];
       };
     };
     interfaces = {
-      externalbr0 = {
-        address = "192.168.195.15";
-        prefixLength = 24;
-        macAddress = "00:1f:c6:9b:fe:2e";
+      br0 = {
+        useDHCP = false;
+        ipv4.addresses = [
+          {
+            address = "192.168.195.15";
+            prefixLength = 24;
+          }
+        ];
       };
     };
     defaultGateway = "192.168.195.1";
