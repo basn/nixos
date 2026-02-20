@@ -14,6 +14,7 @@
       };
       efi = {
         canTouchEfiVariables = true;
+        efiSysMountPoint = "/boot";
       };
     };
     initrd = {
@@ -81,7 +82,7 @@
       fsType = "zfs";
     };
     "/boot" = {
-      device = "/dev/disk/by-label/boot";
+      device = "/dev/disk/by-partuuid/58372a76-6fb3-41aa-86bb-d66b3806d45f";
       fsType = "vfat";
       options = [
         "fmask=0022"
