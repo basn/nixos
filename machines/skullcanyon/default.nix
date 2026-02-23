@@ -2,6 +2,7 @@
 {
   imports = [
     ../../common/common.nix
+    ./libvirt.nix
   ];
   boot = {
     zfs = {
