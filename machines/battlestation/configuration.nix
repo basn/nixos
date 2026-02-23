@@ -5,6 +5,7 @@
   ...
 }:
 {
+  swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
   imports = [ ../../common/common.nix ];
   boot = {
     initrd = {
@@ -39,6 +40,7 @@
       "split_lock_detect=off"
       "amdgpu.mes=0"
     ];
+    extraModprobeConfig = "options zfs zfs_arc_max=6442450944";
   };
   fileSystems = {
     "/boot" = {
@@ -66,7 +68,6 @@
       fsType = "zfs";
     };
   };
-  swapDevices = [ ];
   networking = {
     hostName = "battlestation";
     hostId = "121e3eb9";
