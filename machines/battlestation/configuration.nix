@@ -30,12 +30,13 @@
       };
     };
     zfs = {
-      package = config.boot.kernelPackages.zfs_cachyos;
+      #package = config.boot.kernelPackages.zfs_cachyos;
       requestEncryptionCredentials = true;
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "kvm-intel" ];
-    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v3;
+    #kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v3;
+    kernelPackages = unstableSmall.linuxPackages_zen;
     kernelParams = [
       "split_lock_detect=off"
       "amdgpu.mes=0"
