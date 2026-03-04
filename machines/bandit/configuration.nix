@@ -168,6 +168,14 @@
     smartd = {
       enable = true;
       autodetect = true;
+      notifications = {
+        mail = {
+          sender = "bandit@basn.se";
+          recipient = "basn@lan2k.org";
+          mailer = "${pkgs.msmtp}/bin/msmtp";
+          enable = true;
+        };
+      };
     };
   };
   powerManagement = {
