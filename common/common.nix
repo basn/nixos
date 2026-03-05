@@ -47,7 +47,6 @@
       unzip
       screen
       nmap
-      neofetch
       sops
       git
       ipcalc

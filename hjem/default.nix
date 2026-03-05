@@ -1,9 +1,9 @@
 { pkgs, ... }:
 {
   imports = [
-    ./fastfetch.nix
     ./vivaldi.nix
     ./ghostty.nix
+    ./fastfetch.nix
   ];
   hjem = {
     users = {
