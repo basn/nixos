@@ -14,7 +14,6 @@
     ./services/ac.nix
     ./services/teslamate.nix
     ./services/authentik.nix
-    ./services/headscale.nix
     ./services/znapzend.nix
   ];
   boot = {
