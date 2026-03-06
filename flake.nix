@@ -53,11 +53,13 @@
         {
           nixpkgsLib ? lib,
           modules,
+          includeCommon ? true,
           useManCacheEnable ? false,
           extraSpecialArgs ? { },
         }:
         nixpkgsLib.nixosSystem {
-          inherit system modules;
+          inherit system;
+          modules = lib.optionals includeCommon [ ./common/common.nix ] ++ modules;
           specialArgs =
             {
               inherit
@@ -143,6 +145,7 @@
         };
         # nix build .#nixosConfigurations.minimalIso.config.system.build.isoImage
         minimalIso = mkHost {
+          includeCommon = false;
           modules = [
             (
               { pkgs, modulesPath, ... }:
@@ -156,6 +159,7 @@
           ];
         };
         graphicalIso = mkHost {
+          includeCommon = false;
           modules = [
             inputs.nvf.nixosModules.default
             (
@@ -165,7 +169,6 @@
                 environment.systemPackages = [ pkgs.neovim ];
               }
             )
-            ./common/common.nix
           ];
         };
       };

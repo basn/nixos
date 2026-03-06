@@ -1,6 +1,6 @@
-{ unstablePkgs, ... }:
+{ unstablePkgs, inputs, ... }:
 let
-  prowlarrModule = import "${unstablePkgs.path}/nixos/modules/services/misc/servarr/prowlarr.nix";
+  prowlarrModule = import "${inputs.nixpkgs-unstable.outPath}/nixos/modules/services/misc/servarr/prowlarr.nix";
 in
 {
   disabledModules = [ "services/misc/servarr/prowlarr.nix" ];

@@ -1,7 +1,6 @@
 { lib, ... }:
 {
   imports = [
-    ../../common/common.nix
     ../../modules/vlan-bridges.nix
     ./libvirt.nix
   ];

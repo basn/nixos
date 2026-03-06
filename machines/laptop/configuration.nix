@@ -2,7 +2,6 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../../common/common.nix
     ./plasma6.nix
   ];
 

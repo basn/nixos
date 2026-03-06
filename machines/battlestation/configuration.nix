@@ -6,7 +6,6 @@
 }:
 {
   swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
-  imports = [ ../../common/common.nix ];
   boot = {
     initrd = {
       availableKernelModules = [

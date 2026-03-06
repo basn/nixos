@@ -3,7 +3,6 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../../common/common.nix
     ./sops.nix
     ./services/podman.nix
     ./services/blocky.nix

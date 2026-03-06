@@ -17,7 +17,6 @@
     ./rclone/rclone.nix
     ./services/jellyfin.nix
     ./sops.nix
-    ../../common/common.nix
     ../../common/zfs.nix
     ./services/immich.nix
     inputs.sops_nix.nixosModules.sops
@@ -154,6 +153,12 @@
     systemPackages = with pkgs; [ rclone ];
   };
   services = {
+    thermald = {
+      enable = true;
+    };
+    irqbalance = {
+      enable = true;
+    };
     openssh = {
       enable = true;
     };

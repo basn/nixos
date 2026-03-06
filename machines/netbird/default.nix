@@ -1,7 +1,6 @@
 { lib, ... }:
 {
   imports = [
-    ../../common/common.nix
     ./netbird.nix
     ./sops.nix
   ];
