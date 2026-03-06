@@ -5,6 +5,14 @@
     fish = {
       enable = true;
       shellInit = "set -U fish_greeting";
+      interactiveShellInit = ''
+        if functions -q enable_transience
+          function starship_transient_prompt_func
+            starship module character
+          end
+          enable_transience
+        end
+      '';
     };
     fzf = {
       keybindings = true;
@@ -75,7 +83,7 @@
 
         hostname = {
           format = "[@$hostname]($style)";
-          ssh_only = true;
+          ssh_only = false;
           ssh_symbol = " ";
           style = "bg:color_bg1 fg:color_white";
         };
@@ -134,7 +142,7 @@
         username = {
           disabled = false;
           format = "[$user]($style)";
-          show_always = false;
+          show_always = true;
           style_root = "bg:color_bg1 fg:color_red";
           style_user = "bg:color_bg1 fg:color_white";
         };
