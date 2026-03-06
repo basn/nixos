@@ -39,6 +39,12 @@ in
   options.basn.network.bridgeLayout = {
     enable = lib.mkEnableOption "host bridge and VLAN-backed bridge layout";
 
+    disableBridgeNetfilter = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Disable bridge netfilter hooks to avoid host firewall filtering bridged VM traffic.";
+    };
+
     uplink = lib.mkOption {
       type = lib.types.str;
       example = "eno1";
@@ -123,5 +129,11 @@ in
     networking.vlans = lib.mkIf (cfg.vlanBridges != { }) vlanDefs;
     networking.bridges = bridgeDefs;
     networking.interfaces = interfaceDefs;
+
+    boot.kernel.sysctl = lib.mkIf cfg.disableBridgeNetfilter {
+      "net.bridge.bridge-nf-call-iptables" = 0;
+      "net.bridge.bridge-nf-call-ip6tables" = 0;
+      "net.bridge.bridge-nf-call-arptables" = 0;
+    };
   };
 }
