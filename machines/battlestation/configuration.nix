@@ -24,6 +24,7 @@
     loader = {
       systemd-boot = {
         enable = true;
+        configurationLimit = 3;
       };
       efi = {
         canTouchEfiVariables = true;
@@ -40,6 +41,8 @@
     kernelParams = [
       "split_lock_detect=off"
       "amdgpu.mes=0"
+      "intel_iommu=on"
+      "iommu=pt"
     ];
     extraModprobeConfig = "options zfs zfs_arc_max=6442450944";
   };
@@ -72,11 +75,7 @@
   networking = {
     hostName = "battlestation";
     hostId = "121e3eb9";
-    interfaces = {
-      eno1 = {
-        useDHCP = true;
-      };
-    };
+    networkmanager.enable = true;
     enableIPv6 = false;
     firewall = {
       enable = true;
@@ -84,6 +83,12 @@
     extraHosts = "0.0.0.0 apresolve.spotify.com";
   };
   services = {
+    thermald = {
+      enable = true;
+    };
+    pcscd = {
+      enable = true;
+    };
     displayManager = {
       sddm = {
         enable = true;
@@ -237,6 +242,10 @@
   };
   hardware = {
     enableRedistributableFirmware = true;
+    bluetooth = {
+      enable = true;
+      powerOnBoot = true;
+    };
     cpu = {
       intel = {
         updateMicrocode = true;

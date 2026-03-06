@@ -38,66 +38,77 @@
     inputs:
     let
       system = "x86_64-linux";
-      unstablePkgs = import inputs.nixpkgs-unstable {
-        inherit system;
-        config = {
-          allowUnfree = true;
+      lib = inputs.nixpkgs.lib;
+      mkPkgs =
+        nixpkgsInput:
+        import nixpkgsInput {
+          inherit system;
+          config = {
+            allowUnfree = true;
+          };
         };
-      };
-      unstableSmall = import inputs.nixpkgs-unstable-small {
-        inherit system;
-        config = {
-          allowUnfree = true;
+      unstablePkgs = mkPkgs inputs.nixpkgs-unstable;
+      unstableSmall = mkPkgs inputs.nixpkgs-unstable-small;
+      mkHost =
+        {
+          nixpkgsLib ? lib,
+          modules,
+          useManCacheEnable ? false,
+          extraSpecialArgs ? { },
+        }:
+        nixpkgsLib.nixosSystem {
+          inherit system modules;
+          specialArgs =
+            {
+              inherit
+                inputs
+                system
+                useManCacheEnable
+                ;
+            }
+            // extraSpecialArgs;
         };
-      };
+      baseModules = [
+        inputs.sops_nix.nixosModules.sops
+        inputs.nvf.nixosModules.default
+      ];
     in
     {
       nixosConfigurations = {
-        bandit = inputs.nixpkgs.lib.nixosSystem {
-          system = system;
-          specialArgs = { inherit inputs system unstablePkgs; };
-          modules = [
-            inputs.sops_nix.nixosModules.sops
+        bandit = mkHost {
+          extraSpecialArgs = { inherit unstablePkgs; };
+          modules = baseModules ++ [
             inputs.vpn-confinement.nixosModules.default
-            inputs.nvf.nixosModules.default
             ./machines/bandit/configuration.nix
           ];
         };
-        vault = inputs.nixpkgs.lib.nixosSystem {
-          system = system;
-          specialArgs = { inherit inputs system unstablePkgs; };
-          modules = [
-            inputs.nvf.nixosModules.default
-            inputs.sops_nix.nixosModules.sops
-            ./machines/vault/configuration.nix
-          ];
+        vault = mkHost {
+          extraSpecialArgs = { inherit unstablePkgs; };
+          modules = baseModules ++ [ ./machines/vault/configuration.nix ];
         };
-        laptop = inputs.nixpkgs-unstable.lib.nixosSystem {
-          system = system;
-          specialArgs = { inherit inputs system unstableSmall; };
-          modules = [
-            inputs.sops_nix.nixosModules.sops
-            inputs.nvf.nixosModules.default
+        laptop = mkHost {
+          nixpkgsLib = inputs.nixpkgs-unstable.lib;
+          useManCacheEnable = true;
+          extraSpecialArgs = { inherit unstableSmall; };
+          modules = baseModules ++ [
             ./machines/laptop/configuration.nix
             inputs.hjem.nixosModules.default
             ./hjem/default.nix
           ];
         };
-        battlestation = inputs.nixpkgs-unstable.lib.nixosSystem {
-          system = system;
-          specialArgs = { inherit inputs system unstableSmall; };
-          modules = [
-            inputs.sops_nix.nixosModules.sops
-            inputs.nvf.nixosModules.default
+        battlestation = mkHost {
+          nixpkgsLib = inputs.nixpkgs-unstable.lib;
+          useManCacheEnable = true;
+          extraSpecialArgs = { inherit unstableSmall; };
+          modules = baseModules ++ [
             ./machines/battlestation/configuration.nix
             inputs.hjem.nixosModules.default
-            ( { pkgs, ... }: { nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ]; })
+            ({ ... }: { nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ]; })
             ./hjem/default.nix
           ];
         };
-        services = inputs.nixpkgs.lib.nixosSystem {
-          system = system;
-          specialArgs = { inherit inputs system unstablePkgs; };
+        services = mkHost {
+          extraSpecialArgs = { inherit unstablePkgs; };
           modules = [
             inputs.sops_nix.nixosModules.sops
             ./machines/services/configuration.nix
@@ -106,36 +117,24 @@
             inputs.nvf.nixosModules.default
           ];
         };
-        nixos-sov = inputs.nixpkgs.lib.nixosSystem {
-          system = system;
-          specialArgs = { inherit inputs system unstablePkgs; };
-          modules = [
-            inputs.sops_nix.nixosModules.sops
-            inputs.nvf.nixosModules.default
-            ./machines/cygate/configuration.nix
-          ];
+        nixos-sov = mkHost {
+          extraSpecialArgs = { inherit unstablePkgs; };
+          modules = baseModules ++ [ ./machines/cygate/configuration.nix ];
         };
-        nixos-sov2 = inputs.nixpkgs.lib.nixosSystem {
-          system = system;
-          specialArgs = { inherit inputs system unstablePkgs; };
-          modules = [
-            inputs.sops_nix.nixosModules.sops
-            inputs.nvf.nixosModules.default
-            ./machines/cygate2/configuration.nix
-          ];
+        nixos-sov2 = mkHost {
+          extraSpecialArgs = { inherit unstablePkgs; };
+          modules = baseModules ++ [ ./machines/cygate2/configuration.nix ];
         };
-        netbird = inputs.nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs system unstablePkgs; };
+        netbird = mkHost {
+          extraSpecialArgs = { inherit unstablePkgs; };
           modules = [
             ./machines/netbird/default.nix
             inputs.nvf.nixosModules.default
             inputs.sops_nix.nixosModules.default
           ];
         };
-        skullcanyon = inputs.nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs system unstablePkgs; };
+        skullcanyon = mkHost {
+          extraSpecialArgs = { inherit unstablePkgs; };
           modules = [
             ./machines/skullcanyon/default.nix
             inputs.nvf.nixosModules.default
@@ -143,8 +142,7 @@
           ];
         };
         # nix build .#nixosConfigurations.minimalIso.config.system.build.isoImage
-        minimalIso = inputs.nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+        minimalIso = mkHost {
           modules = [
             (
               { pkgs, modulesPath, ... }:
@@ -157,9 +155,9 @@
             ./common/users.nix
           ];
         };
-        graphicalIso = inputs.nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+        graphicalIso = mkHost {
           modules = [
+            inputs.nvf.nixosModules.default
             (
               { pkgs, modulesPath, ... }:
               {

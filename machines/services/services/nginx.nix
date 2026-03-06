@@ -8,14 +8,18 @@ let
         proxy_pass              http://localhost:9000/outpost.goauthentik.io;
         proxy_set_header        Host $host;
         proxy_set_header        X-Original-URL $scheme://$http_host$request_uri;
-        add_header              Set-Cookie $auth_cookie;
+        proxy_set_header        X-Forwarded-Host $http_host;
+        proxy_set_header        X-Forwarded-Uri $request_uri;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto $scheme;
+        add_header              Set-Cookie $auth_cookie always;
         auth_request_set        $auth_cookie $upstream_http_set_cookie;
         proxy_pass_request_body off;
         proxy_set_header        Content-Length "";
       }
       location @goauthentik_proxy_signin {
         internal;
-        add_header Set-Cookie $auth_cookie;
+        add_header Set-Cookie $auth_cookie always;
         return 302 /outpost.goauthentik.io/start?rd=$scheme://$http_host$request_uri;
       }
     '';
@@ -25,7 +29,7 @@ let
       auth_request /outpost.goauthentik.io/auth/nginx;
       error_page 401 = @goauthentik_proxy_signin;
       auth_request_set $auth_cookie $upstream_http_set_cookie;
-      add_header Set-Cookie $auth_cookie;
+      add_header Set-Cookie $auth_cookie always;
       auth_request_set $authentik_username $upstream_http_x_authentik_username;
       auth_request_set $authentik_groups $upstream_http_x_authentik_groups;
       auth_request_set $authentik_entitlements $upstream_http_x_authentik_entitlements;
@@ -211,6 +215,15 @@ in
         forceSSL = true;
         locations."/" = {
           proxyPass = "http://127.0.0.1:9090";
+          recommendedProxySettings = true;
+          proxyWebsockets = true;
+        };
+      };
+      "network.basn.se" = authentikConfig // {
+        enableACME = true;
+        forceSSL = true;
+        locations."/" = authentikAuth // {
+          proxyPass = "http://127.0.0.1:8042";
           recommendedProxySettings = true;
           proxyWebsockets = true;
         };

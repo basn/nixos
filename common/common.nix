@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, useManCacheEnable, ... }:
 {
   imports = [
     ./users.nix
@@ -88,5 +88,10 @@
       allowUnfree = true;
     };
   };
+}
+// lib.optionalAttrs (!useManCacheEnable) {
   documentation.man.generateCaches = false;
+}
+// lib.optionalAttrs useManCacheEnable {
+  documentation.man.cache.enable = false;
 }
