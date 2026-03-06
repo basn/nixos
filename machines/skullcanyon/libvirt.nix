@@ -3,6 +3,15 @@
   virtualisation = {
     libvirtd = {
       enable = true;
+      qemu = {
+        runAsRoot = false;
+        swtpm = {
+          enable = true;
+        };
+      };
+    };
+    spiceUSBRedirection = {
+      enable = true;
     };
   };
 
@@ -12,6 +21,9 @@
   ];
 
   users.users.basn = {
-    extraGroups = [ "libvirtd" ];
+    extraGroups = [
+      "libvirtd"
+      "kvm"
+    ];
   };
 }

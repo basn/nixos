@@ -2,6 +2,7 @@
 {
   imports = [
     ../../common/common.nix
+    ../../modules/vlan-bridges.nix
     ./libvirt.nix
   ];
   boot = {
@@ -33,22 +34,6 @@
     extraModulePackages = [ ];
   };
   networking = {
-    bridges = {
-      br0 = {
-        interfaces = [ "eno1" ];
-      };
-    };
-    interfaces = {
-      br0 = {
-        useDHCP = false;
-        ipv4.addresses = [
-          {
-            address = "192.168.195.15";
-            prefixLength = 24;
-          }
-        ];
-      };
-    };
     defaultGateway = "192.168.195.1";
     nameservers = [ "192.168.195.1" ];
     hostId = "9757610d";
@@ -63,6 +48,26 @@
         80
         443
       ];
+    };
+  };
+
+  basn.network.bridgeLayout = {
+    enable = true;
+    uplink = "eno1";
+    nativeBridges = {
+      br0 = {
+        ipv4Addresses = [
+          {
+            address = "192.168.195.15";
+            prefixLength = 24;
+          }
+        ];
+      };
+    };
+    vlanBridges = {
+      br7 = {
+        vlanId = 7;
+      };
     };
   };
   fileSystems = {
