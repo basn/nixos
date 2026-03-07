@@ -52,7 +52,9 @@
         22
         80
         443
+        3478
       ];
+      allowedUDPPorts = [ 3478 ];
       checkReversePath = "loose";
     };
   };

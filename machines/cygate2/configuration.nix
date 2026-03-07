@@ -45,7 +45,7 @@
       "1.1.1.1"
       "8.8.8.8"
     ];
-    hostId = "e5dafd0b";
+    hostId = "e5dafd0c";
     enableIPv6 = false;
     hostName = "nixos-sov2";
     timeServers = [ "ntp1.sp.se" ];

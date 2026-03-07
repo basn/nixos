@@ -26,8 +26,8 @@ in
             AUTH_CLIENT_ID = ClientID;
             AUTH_AUTHORITY = "https://auth.basn.se/application/o/netbird/";
             AUTH_SUPPORTED_SCOPES = "openid profile email offline_access api";
-            AUTH_REDIRECT_URI = "/peers";
-            AUTH_SILENT_REDIRECT_URI = "/add-peers";
+            AUTH_REDIRECT_URI = "/nb-auth";
+            AUTH_SILENT_REDIRECT_URI = "/nb-silent-auth";
           };
         };
         management = {
@@ -129,7 +129,7 @@ in
     };
     nginx = {
       commonHttpConfig = ''
-        add_header Access-Control-Allow-Origin "*.basn.se" always;
+        add_header Access-Control-Allow-Origin "$http_origin" always;
         add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always;
         add_header Access-Control-Allow-Headers "Content-Type, Authorization" always;
       '';
