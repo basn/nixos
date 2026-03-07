@@ -26,8 +26,8 @@ in
             AUTH_CLIENT_ID = ClientID;
             AUTH_AUTHORITY = "https://auth.basn.se/application/o/netbird/";
             AUTH_SUPPORTED_SCOPES = "openid profile email offline_access api";
-            AUTH_REDIRECT_URI = "/nb-auth";
-            AUTH_SILENT_REDIRECT_URI = "/nb-silent-auth";
+            AUTH_REDIRECT_URI = "/#callback";
+            AUTH_SILENT_REDIRECT_URI = "/#silent-callback";
           };
         };
         management = {

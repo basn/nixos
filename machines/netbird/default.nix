@@ -90,9 +90,11 @@
     zfs.autoScrub.enable = true;
   };
   systemd.services.netbird-management = {
-    requires = [ "sops-install-secrets.service" ];
-    after = [ "sops-install-secrets.service" ];
-    wants = [ "sops-install-secrets.service" ];
+    unitConfig.ConditionPathExists = [
+      "/run/secrets/datastore"
+      "/run/secrets/idp"
+      "/run/secrets/coturn"
+    ];
   };
   virtualisation.vmware.guest.enable = true;
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
