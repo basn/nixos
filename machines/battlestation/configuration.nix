@@ -133,29 +133,43 @@
         enable = true;
       };
       wireplumber.extraConfig = {
-        "50-fosi-k7-pro" = {
+        "50-fosi-k7-pro-device" = {
           "monitor.alsa.rules" = [
             {
               matches = [ { "device.name" = "~alsa_card.usb-Fosi_Audio_Fosi_Audio_K7.*"; } ];
 
               actions = {
                 update-props = {
-                  # Make this device preferred
+                  # Prefer this card when selecting default audio devices
                   "priority.session" = 2000;
                   "priority.driver" = 2000;
 
-                  # Force audio format / channels
+                  # Disable DSD unless explicitly requested
+                  "api.alsa.disable-dsd" = true;
+
+                  # Optional: force headroom and period size if needed
+                  "api.alsa.headroom" = 512;
+                };
+              };
+            }
+          ];
+        };
+        "51-fosi-k7-pro-node" = {
+          "monitor.alsa.rules" = [
+            {
+              matches = [ { "node.name" = "~alsa_output.usb-Fosi_Audio_Fosi_Audio_K7-00.pro-output-0"; } ];
+              actions = {
+                update-props = {
+                  # Apply playback format/rate on the actual sink node
+                  "priority.session" = 2000;
+                  "priority.driver" = 2000;
                   "audio.format" = "S32LE";
                   "audio.channels" = 2;
                   "audio.position" = [
                     "FL"
                     "FR"
                   ];
-
-                  # Default rate
                   "audio.rate" = 192000;
-
-                  # Allow full capability range
                   "audio.allowed-rates" = [
                     44100
                     48000
@@ -168,12 +182,6 @@
                     705600
                     768000
                   ];
-
-                  # Disable DSD unless explicitly requested
-                  "api.alsa.disable-dsd" = true;
-
-                  # Optional: force headroom and period size if needed
-                  "api.alsa.headroom" = 512;
                 };
               };
             }
@@ -218,13 +226,10 @@
     systemPackages = with pkgs; [
       neovim
       nh
-      spotify
       protonup-ng
-      ghostty
       sddm-astronaut
       rocmPackages.rocm-smi
       rocmPackages.rocminfo
-      teamspeak6-client
       mangohud
     ];
     variables = {

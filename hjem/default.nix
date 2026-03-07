@@ -13,6 +13,7 @@
         enable = true;
         directory = "/home/basn";
         packages = with pkgs; [
+          spotify
           discord
           vesktop
           equibop

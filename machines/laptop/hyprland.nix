@@ -10,7 +10,6 @@
     libnotify
     dunst
     hyprpaper
-    ghostty
     kitty
     rofi-wayland
   ];
