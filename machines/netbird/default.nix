@@ -85,8 +85,14 @@
     };
   };
   services = {
+    netbird.enable = lib.mkForce false;
     openssh.enable = true;
     zfs.autoScrub.enable = true;
+  };
+  systemd.services.netbird-management = {
+    requires = [ "sops-install-secrets.service" ];
+    after = [ "sops-install-secrets.service" ];
+    wants = [ "sops-install-secrets.service" ];
   };
   virtualisation.vmware.guest.enable = true;
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
