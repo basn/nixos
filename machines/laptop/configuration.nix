@@ -91,16 +91,9 @@
       "wheel"
     ];
     packages = with pkgs; [
-      discord
-      chromium
       ghostty
       spotify
     ];
-  };
-  programs = {
-    chromium = {
-      enable = true;
-    };
   };
   environment.systemPackages = with pkgs; [ neovim ];
   fonts.packages = with pkgs; [ meslo-lgs-nf ];

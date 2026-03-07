@@ -197,7 +197,7 @@
       enable = true; # plasma
     };
     lact = {
-      enable = false;
+      enable = true;
     };
   };
   security = {
@@ -218,15 +218,10 @@
     systemPackages = with pkgs; [
       neovim
       nh
-      discord
       spotify
       protonup-ng
       ghostty
-      google-chrome
       sddm-astronaut
-      vivaldi
-      vesktop
-      equibop
       rocmPackages.rocm-smi
       rocmPackages.rocminfo
       teamspeak6-client
@@ -284,12 +279,7 @@
         general = {
           desiredgov = "performance";
           desiredprof = "performance";
-        };
-        gpu = {
-          #nv_powermizer_mode = 1;
-        };
-        cpu = {
-          pin_cores = "0-15";
+          renice = 5;
         };
       };
     };

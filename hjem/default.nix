@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   imports = [
-    ./vivaldi.nix
+    ./browsers.nix
     ./ghostty.nix
     ./fastfetch.nix
     ./mangohud.nix
@@ -13,6 +13,9 @@
         enable = true;
         directory = "/home/basn";
         packages = with pkgs; [
+          discord
+          vesktop
+          equibop
           signal-desktop
           orca-slicer
           bitwarden-desktop
