@@ -4,6 +4,8 @@
     ./vivaldi.nix
     ./ghostty.nix
     ./fastfetch.nix
+    ./mangohud.nix
+    ./git.nix
   ];
   hjem = {
     users = {

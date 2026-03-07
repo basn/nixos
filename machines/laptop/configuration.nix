@@ -49,6 +49,18 @@
     };
   };
   services = {
+    thermald = {
+      enable = true;
+    };
+    power-profiles-daemon = {
+      enable = true;
+    };
+    fstrim = {
+      enable = true;
+    };
+    upower = {
+      enable = true;
+    };
     xserver = {
       xkb = {
         layout = "se";
@@ -94,6 +106,42 @@
   fonts.packages = with pkgs; [ meslo-lgs-nf ];
   powerManagement = {
     enable = true;
+    powertop.enable = true;
+  };
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+  };
+  hardware = {
+    enableRedistributableFirmware = true;
+    cpu.intel.updateMicrocode = true;
+    graphics = {
+      enable = true;
+      extraPackages = with pkgs; [
+        intel-media-driver
+        vpl-gpu-rt
+        intel-compute-runtime
+      ];
+    };
+  };
+  networking.networkmanager.wifi.powersave = true;
+  nix = {
+    distributedBuilds = true;
+    buildMachines = [
+      {
+        hostName = "battlestation";
+        protocol = "ssh-ng";
+        sshUser = "basn";
+        systems = [ "x86_64-linux" ];
+        maxJobs = 16;
+        speedFactor = 2;
+        supportedFeatures = [ "big-parallel" ];
+      }
+    ];
+    settings = {
+      builders-use-substitutes = true;
+    };
   };
   system = {
     stateVersion = "25.05";

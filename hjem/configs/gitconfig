@@ -1,0 +1,15 @@
+[user]
+	name = Fredrik Bergstrom
+	email = basn@lan2k.org
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = false
+
+[push]
+	autoSetupRemote = true
+
+[core]
+	editor = nvim
