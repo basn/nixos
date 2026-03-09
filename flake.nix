@@ -143,6 +143,14 @@
             inputs.sops_nix.nixosModules.default
           ];
         };
+        lenovo = mkHost {
+          extraSpecialArgs = { inherit unstablePkgs; };
+          modules = [
+            ./machines/lenovo/default.nix
+            inputs.nvf.nixosModules.default
+            inputs.sops_nix.nixosModules.default
+          ];
+        };
         # nix build .#nixosConfigurations.minimalIso.config.system.build.isoImage
         minimalIso = mkHost {
           includeCommon = false;

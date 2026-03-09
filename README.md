@@ -22,6 +22,7 @@ Current `nixosConfigurations`:
 - `nixos-sov2`
 - `netbird`
 - `skullcanyon`
+- `lenovo`
 - `minimalIso`
 - `graphicalIso`
 
