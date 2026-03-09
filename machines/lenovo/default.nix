@@ -109,8 +109,7 @@ in
       fsType = "zfs";
     };
     "/boot" = {
-      # Replace this with Lenovo's EFI partition PARTUUID before deploying.
-      device = "/dev/disk/by-partuuid/58372a76-6fb3-41aa-86bb-d66b3806d45f";
+      device = "/dev/disk/by-partuuid/bc650ac7-2616-4086-8905-10a4c18b2e88";
       fsType = "vfat";
       options = [
         "fmask=0022"
