@@ -104,12 +104,16 @@ in
       device = "osdisk/var";
       fsType = "zfs";
     };
+    "/var/lib/libvirt/images" = {
+      device = "osdisk/vms";
+      fsType = "zfs";
+    };
     "/home" = {
       device = "osdisk/home";
       fsType = "zfs";
     };
     "/boot" = {
-      device = "/dev/disk/by-partuuid/bc650ac7-2616-4086-8905-10a4c18b2e88";
+      device = "/dev/disk/by-label/boot";
       fsType = "vfat";
       options = [
         "fmask=0022"
