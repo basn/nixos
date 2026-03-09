@@ -1,6 +1,56 @@
 { pkgs, ... }:
+let
+  migrate = pkgs.writeShellScriptBin "migrate" ''
+    set -eu
+
+    if [ "$#" -ne 3 ]; then
+      echo "usage: migrate <from> <to> <vm>" >&2
+      echo "known hosts: skullcanyon, lenovo" >&2
+      exit 1
+    fi
+
+    from="$1"
+    to="$2"
+    vm="$3"
+
+    case "$from" in
+      skullcanyon) source_uri="qemu+ssh://basn@skullcanyon/system" ;;
+      lenovo) source_uri="qemu+ssh://basn@lenovo/system" ;;
+      *)
+        echo "unknown source host: $from" >&2
+        exit 1
+        ;;
+    esac
+
+    case "$to" in
+      skullcanyon) dest_uri="qemu+ssh://basn@skullcanyon/system" ;;
+      lenovo) dest_uri="qemu+ssh://basn@lenovo/system" ;;
+      *)
+        echo "unknown destination host: $to" >&2
+        exit 1
+        ;;
+    esac
+
+    if [ "$source_uri" = "$dest_uri" ]; then
+      echo "source and destination must be different" >&2
+      exit 1
+    fi
+
+    exec ${pkgs.libvirt}/bin/virsh -c "$source_uri" migrate \
+      --live \
+      --persistent \
+      --undefinesource \
+      --copy-storage-all \
+      --verbose \
+      --desturi "$dest_uri" \
+      "$vm"
+  '';
+in
 {
-  environment.systemPackages = [ pkgs.starship ];
+  environment.systemPackages = [
+    pkgs.starship
+    migrate
+  ];
   programs = {
     fish = {
       enable = true;

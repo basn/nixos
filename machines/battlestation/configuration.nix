@@ -262,7 +262,7 @@
         enable = true;
       };
       overdrive = {
-        enable = false;
+        enable = true;
       };
     };
     keyboard = {

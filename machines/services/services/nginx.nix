@@ -210,6 +210,16 @@ in
           proxyWebsockets = true;
         };
       };
+      "freshrss.basn.se" = authentikConfig // {
+        enableACME = true;
+        forceSSL = true;
+        locations."/" = authentikAuth;
+      };
+      "search.basn.se" = authentikConfig // {
+        enableACME = true;
+        forceSSL = true;
+        locations."/" = authentikAuth;
+      };
       "uptime.basn.se" = {
         enableACME = true;
         forceSSL = true;

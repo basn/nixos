@@ -14,6 +14,11 @@
         sopsFile = ./secrets/authentik.env;
         format = "dotenv";
       };
+      freshrss-password = { };
+      searx = {
+        sopsFile = ./secrets/searx.env;
+        format = "dotenv";
+      };
     };
   };
 }

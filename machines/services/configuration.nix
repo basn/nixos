@@ -13,6 +13,8 @@
     ./services/ac.nix
     ./services/teslamate.nix
     ./services/authentik.nix
+    ./services/freshrss.nix
+    ./services/searx.nix
     ./services/network-optimizer.nix
     ./services/znapzend.nix
   ];
