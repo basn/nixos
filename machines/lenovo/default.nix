@@ -72,7 +72,7 @@ in
     };
     network.bridgeLayout = {
       enable = true;
-      uplink = "eno1";
+      uplink = "enp0s31f6";
       nativeBridges = {
         br0 = {
           ipv4Addresses = [
