@@ -20,6 +20,8 @@
           signal-desktop
           orca-slicer
           bitwarden-desktop
+          virt-manager
+          libvirt
         ];
         clobberFiles = true;
       };

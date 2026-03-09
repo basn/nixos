@@ -65,5 +65,32 @@ in
       libvirtd.members = [ cfg.user ];
       kvm.members = [ cfg.user ];
     };
+
+    systemd.services.libvirt-default-storage-pool = {
+      description = "Ensure default libvirt storage pool exists";
+      after = [ "libvirtd.service" ];
+      requires = [ "libvirtd.service" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig.Type = "oneshot";
+      script = ''
+        target_path=/var/lib/libvirt/images
+        pool_name="$(${config.virtualisation.libvirtd.package}/bin/virsh pool-list --all --name | while read -r pool; do
+          [ -n "$pool" ] || continue
+          xml="$(${config.virtualisation.libvirtd.package}/bin/virsh pool-dumpxml "$pool" 2>/dev/null || true)"
+          printf '%s\n' "$xml" | grep -Fq "<path>$target_path</path>" && {
+            printf '%s\n' "$pool"
+            break
+          }
+        done)"
+
+        if [ -z "$pool_name" ]; then
+          pool_name=default
+          ${config.virtualisation.libvirtd.package}/bin/virsh pool-define-as "$pool_name" dir --target "$target_path"
+        fi
+
+        ${config.virtualisation.libvirtd.package}/bin/virsh pool-start "$pool_name" >/dev/null 2>&1 || true
+        ${config.virtualisation.libvirtd.package}/bin/virsh pool-autostart "$pool_name"
+      '';
+    };
   };
 }

@@ -102,6 +102,10 @@ in
       device = "osdisk/var";
       fsType = "zfs";
     };
+    "/var/lib/libvirt/images" = {
+      device = "osdisk/vms";
+      fsType = "zfs";
+    };
     "/home" = {
       device = "osdisk/home";
       fsType = "zfs";
