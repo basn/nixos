@@ -148,6 +148,8 @@
         lenovo = mkHost {
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = [
+            ./modules/vlan-bridges.nix
+            ./modules/libvirt.nix
             ./machines/lenovo/default.nix
             inputs.nvf.nixosModules.default
             inputs.sops_nix.nixosModules.default
