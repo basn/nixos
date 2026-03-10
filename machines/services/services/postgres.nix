@@ -3,7 +3,8 @@
   services = {
     postgresql = {
       enable = true;
-      ensureDatabases = [ "teslamate" ];
+      #ensureDatabases = [ "teslamate" ];
+      package = pkgs.postgresql_17;
       enableTCPIP = true;
       authentication = pkgs.lib.mkOverride 10 ''
         #type database  DBuser  auth-method
