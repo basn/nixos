@@ -17,6 +17,8 @@
     ./services/searx.nix
     ./services/network-optimizer.nix
     ./services/znapzend.nix
+    ./services/freshrss.nix
+    ./services/searx.nix
   ];
   boot = {
     zfs = {
