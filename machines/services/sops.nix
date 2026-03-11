@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 {
   sops = {
     defaultSopsFile = ./secrets/services.yaml;
@@ -14,7 +14,9 @@
         sopsFile = ./secrets/authentik.env;
         format = "dotenv";
       };
-      freshrss-password = { };
+      freshrss-password = { 
+        owner = config.services.freshrss.user;
+      };
       searx = {
         sopsFile = ./secrets/searx.env;
         format = "dotenv";
