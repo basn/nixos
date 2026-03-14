@@ -16,11 +16,17 @@ let
         auth_request_set        $auth_cookie $upstream_http_set_cookie;
         proxy_pass_request_body off;
         proxy_set_header        Content-Length "";
+        error_page              400 = @goauthentik_proxy_restart;
       }
       location @goauthentik_proxy_signin {
         internal;
         add_header Set-Cookie $auth_cookie always;
         return 302 /outpost.goauthentik.io/start?rd=$scheme://$http_host$request_uri;
+      }
+      location @goauthentik_proxy_restart {
+        internal;
+        add_header Set-Cookie $auth_cookie always;
+        return 302 /outpost.goauthentik.io/start?rd=$scheme://$http_host/;
       }
     '';
   };
