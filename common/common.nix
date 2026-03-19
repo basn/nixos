@@ -54,8 +54,8 @@
       dust
       fish
       nixfmt
-      helix
       trippy
+      rg
     ];
   };
   programs = {
