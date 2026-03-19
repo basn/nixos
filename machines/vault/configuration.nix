@@ -1,17 +1,4 @@
-{ inputs, pkgs, lib, config, ... }:
-let
-  zfsCompatibleKernelPackages = lib.filterAttrs (
-    name: kernelPackages:
-    (builtins.match "linux_[0-9]+_[0-9]+" name) != null
-    && (builtins.tryEval kernelPackages).success
-    && (!kernelPackages.${config.boot.zfs.package.kernelModuleAttribute}.meta.broken)
-  ) pkgs.linuxKernel.packages;
-  latestKernelPackage = lib.last (
-    lib.sort (a: b: (lib.versionOlder a.kernel.version b.kernel.version)) (
-      builtins.attrValues zfsCompatibleKernelPackages
-    )
-  );
-in
+{ inputs, pkgs, ... }:
 {
   imports = [
     inputs.sops_nix.nixosModules.sops
@@ -24,7 +11,9 @@ in
   ];
   boot = {
     kernelModules = [ "kvm-intel" ];
-    kernelPackages = latestKernelPackage;
+    # Keep vault on a conservative LTS kernel to avoid regressions on igc (i225/i226 class NICs).
+    kernelPackages = pkgs.linuxPackages_6_12;
+    kernelParams = [ "pcie_aspm=off" ];
     supportedFilesystems = [ "zfs" ];
     initrd = {
       kernelModules = [ ];
