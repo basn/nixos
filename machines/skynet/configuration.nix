@@ -16,19 +16,14 @@
       extraPools = [
         "osdisk"
       ];
-      devNodes = "/dev/disk/by-path";
+      devNodes = "/dev/disk/by-id";
     };
-    loader.grub = {
-      enable = true;
-      zfsSupport = true;
-      efiSupport = true;
-      efiInstallAsRemovable = true;
-      mirroredBoots = [
-        {
-          devices = [ "nodev" ];
-          path = "/boot";
-        }
-      ];
+    loader = {
+      systemd-boot.enable = true;
+      efi = {
+        canTouchEfiVariables = false;
+        efiSysMountPoint = "/boot";
+      };
     };
   };
   fileSystems = {
