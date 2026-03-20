@@ -54,7 +54,7 @@
   };
   networking = {
     interfaces = {
-      ens192.ipv4.addresses = [
+      ens33.ipv4.addresses = [
         {
           address = "172.30.0.66";
           prefixLength = 27;
