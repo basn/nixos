@@ -127,6 +127,10 @@
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = baseModules ++ [ ./machines/cygate2/configuration.nix ];
         };
+        skynet = mkHost {
+          extraSpecialArgs = { inherit unstablePkgs; };
+          modules = baseModules ++ [ ./machines/skynet/configuration.nix ];
+        };
         netbird = mkHost {
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = [
