@@ -55,7 +55,7 @@
       fish
       nixfmt
       trippy
-      rg
+      ripgrep
     ];
   };
   programs = {
