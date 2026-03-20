@@ -5,7 +5,7 @@
       enable = true;
     };
     nvidia = {
-      enable = true;
+      enabled = true;
       package = config.boot.kernelPackages.nvidiaPackages.beta;
       open = true;
       modesetting = {
