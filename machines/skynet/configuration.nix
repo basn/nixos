@@ -61,12 +61,12 @@
     interfaces = {
       eth0.ipv4.addresses = [
         {
-          address = "10.254.1.2";
-          prefixLength = 24;
+          address = "172.30.0.66";
+          prefixLength = 27;
         }
       ];
     };
-    defaultGateway = "10.254.1.1";
+    defaultGateway = "172.30.0.65";
     nameservers = [ "8.8.8.8" ];
     hostId = "5b8ea90e";
     enableIPv6 = false;
