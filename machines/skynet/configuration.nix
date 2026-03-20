@@ -84,10 +84,6 @@
   virtualisation.vmware.guest.enable = true;
   system = {
     stateVersion = "25.11";
-    autoUpgrade = {
-      flake = "github:basn/nixos";
-      enable = true;
-    };
   };
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 }
