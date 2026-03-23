@@ -6,6 +6,7 @@ let
       proxy_buffer_size 32k;
       location /outpost.goauthentik.io {
         proxy_pass              http://localhost:9000/outpost.goauthentik.io;
+        proxy_intercept_errors  on;
         proxy_set_header        Host $host;
         proxy_set_header        X-Original-URL $scheme://$http_host$request_uri;
         proxy_set_header        X-Forwarded-Host $http_host;

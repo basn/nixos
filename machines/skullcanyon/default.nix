@@ -123,6 +123,11 @@ in
     openssh.enable = true;
     zfs.autoScrub.enable = true;
   };
+  programs.nh.clean = {
+    enable = true;
+    dates = "Sun *-*-* 05:30:00";
+    extraArgs = lib.mkForce "--keep-since 14d --keep 10";
+  };
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system = {
     stateVersion = "24.05";
