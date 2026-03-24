@@ -1,9 +1,41 @@
 {
   config,
+  inputs,
   pkgs,
   unstableSmall,
   ...
 }:
+let
+  stablePkgs = import inputs.nixpkgs {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
+
+  mangoNoctaliaLauncher = pkgs.writeShellScriptBin "mango-noctalia-session" ''
+    set -eu
+    cfg="$HOME/.config/mangowc/mangowc.conf"
+    if [ -f "$cfg" ]; then
+      exec ${pkgs.mangowc}/bin/mango -c "$cfg" -s ${pkgs.noctalia-shell}/bin/noctalia-shell
+    else
+      exec ${pkgs.mangowc}/bin/mango -s ${pkgs.noctalia-shell}/bin/noctalia-shell
+    fi
+  '';
+
+  mangoNoctaliaSession = pkgs.symlinkJoin {
+    name = "mango-noctalia-session";
+    paths = [
+      (pkgs.writeTextDir "share/wayland-sessions/mango-noctalia.desktop" ''
+        [Desktop Entry]
+        Name=Mango (Noctalia)
+        Comment=MangoWC with Noctalia shell
+        Exec=${mangoNoctaliaLauncher}/bin/mango-noctalia-session
+        Type=Application
+        DesktopNames=mango
+      '')
+    ];
+    passthru.providedSessions = [ "mango-noctalia" ];
+  };
+in
 {
   swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
   boot = {
@@ -82,6 +114,8 @@
     extraHosts = "0.0.0.0 apresolve.spotify.com";
   };
   services = {
+    netbird.package = stablePkgs.netbird;
+    netbird.ui.package = stablePkgs.netbird-ui;
     thermald = {
       enable = true;
     };
@@ -108,7 +142,7 @@
         enable = true;
       };
       cosmic = {
-        enable = true;
+        enable = false;
       };
     };
     xserver = {
@@ -207,6 +241,7 @@
     lact = {
       enable = true;
     };
+    displayManager.sessionPackages = [ mangoNoctaliaSession ];
   };
   security = {
     rtkit = {
@@ -228,6 +263,7 @@
       nh
       protonup-ng
       sddm-astronaut
+      playerctl
       rocmPackages.rocm-smi
       rocmPackages.rocminfo
       mangohud
@@ -272,6 +308,7 @@
     };
   };
   programs = {
+    mangowc.enable = true;
     steam = {
       enable = true;
       gamescopeSession = {
