@@ -5,6 +5,8 @@
     ./ghostty.nix
     ./fastfetch.nix
     ./mangohud.nix
+    ./mangowc.nix
+    ./noctalia.nix
     ./git.nix
   ];
   hjem = {
