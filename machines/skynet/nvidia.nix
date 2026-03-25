@@ -14,6 +14,15 @@ let
     useSettings = false;
     usePersistenced = false;
     useFabricmanager = false;
+    postInstall = ''
+      if [ -n "$bin" ] && [ -e nvidia-gridd ]; then
+        install -Dm755 nvidia-gridd "$bin/bin/nvidia-gridd"
+        install -Dm755 nvidia-gridd "$bin/origBin/nvidia-gridd"
+        patchelf --interpreter "$(cat "$NIX_CC/nix-support/dynamic-linker")" \
+          --set-rpath "$out/lib:$libPath" \
+          "$bin/bin/nvidia-gridd"
+      fi
+    '';
   };
 in
 {
@@ -32,7 +41,7 @@ in
       open = false;
       gsp.enable = false;
       nvidiaSettings = false;
-      nvidiaPersistenced = true;
+      nvidiaPersistenced = false;
     };
   };
 
@@ -46,10 +55,15 @@ in
       ConditionPathExists = "/var/lib/nvidia-vgpu/client_configuration_token.tok";
     };
     serviceConfig = {
-      Type = "simple";
+      Type = "forking";
+      PIDFile = "/run/nvidia-gridd/nvidia-gridd.pid";
       ExecStartPre = [
         "${pkgs.coreutils}/bin/install -d -m 0755 /etc/nvidia/ClientConfigToken"
         "${pkgs.coreutils}/bin/install -m 0644 /var/lib/nvidia-vgpu/client_configuration_token.tok /etc/nvidia/ClientConfigToken/client_configuration_token.tok"
+        "${pkgs.coreutils}/bin/install -d -m 0755 /etc/nvidia"
+        "${pkgs.runtimeShell} -lc 'test -e /etc/nvidia/gridd.conf || ${pkgs.coreutils}/bin/touch /etc/nvidia/gridd.conf'"
+        "${pkgs.coreutils}/bin/install -d -m 0755 /var/lib/nvidia/GridLicensing"
+        "${pkgs.runtimeShell} -lc 'if [ -f /run/nvidia-gridd/nvidia-gridd.pid ]; then pid=$(cat /run/nvidia-gridd/nvidia-gridd.pid 2>/dev/null || true); if [ -n \"$pid\" ] && ! kill -0 \"$pid\" 2>/dev/null; then rm -f /run/nvidia-gridd/nvidia-gridd.pid; fi; fi'"
       ];
       ExecStart = "${config.hardware.nvidia.package.bin}/bin/nvidia-gridd";
       Restart = "always";
