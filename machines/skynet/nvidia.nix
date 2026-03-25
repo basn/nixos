@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 let
   vgpuRunfile = builtins.path {
     path = /var/lib/nvidia-vgpu/NVIDIA-Linux-x86_64-580.126.09-grid.run;
@@ -32,7 +32,28 @@ in
       open = false;
       gsp.enable = false;
       nvidiaSettings = false;
-      nvidiaPersistenced = false;
+      nvidiaPersistenced = true;
+    };
+  };
+
+  # Start NVIDIA GRID licensing daemon explicitly; NixOS has no dedicated gridd module.
+  systemd.services.nvidia-gridd = {
+    description = "NVIDIA GRID Licensing Daemon";
+    wantedBy = [ "multi-user.target" ];
+    wants = [ "network-online.target" ];
+    after = [ "network-online.target" ];
+    unitConfig = {
+      ConditionPathExists = "/var/lib/nvidia-vgpu/client_configuration_token.tok";
+    };
+    serviceConfig = {
+      Type = "simple";
+      ExecStartPre = [
+        "${pkgs.coreutils}/bin/install -d -m 0755 /etc/nvidia/ClientConfigToken"
+        "${pkgs.coreutils}/bin/install -m 0644 /var/lib/nvidia-vgpu/client_configuration_token.tok /etc/nvidia/ClientConfigToken/client_configuration_token.tok"
+      ];
+      ExecStart = "${config.hardware.nvidia.package.bin}/bin/nvidia-gridd";
+      Restart = "always";
+      RestartSec = 5;
     };
   };
 }

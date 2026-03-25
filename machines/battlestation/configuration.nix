@@ -264,6 +264,9 @@ in
       protonup-ng
       sddm-astronaut
       playerctl
+      grim
+      slurp
+      wl-clipboard
       rocmPackages.rocm-smi
       rocmPackages.rocminfo
       mangohud
