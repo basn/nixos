@@ -114,8 +114,6 @@ in
     extraHosts = "0.0.0.0 apresolve.spotify.com";
   };
   services = {
-    netbird.package = stablePkgs.netbird;
-    netbird.ui.package = stablePkgs.netbird-ui;
     thermald = {
       enable = true;
     };
