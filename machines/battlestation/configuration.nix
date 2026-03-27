@@ -265,15 +265,18 @@ in
       grim
       slurp
       wl-clipboard
+      noctalia-shell
       rocmPackages.rocm-smi
       rocmPackages.rocminfo
       mangohud
     ];
     variables = {
       NIXOS_OZONE_WL = "1";
+      STEAM_USE_NIX_FONTS = "1";
     };
     sessionVariables = {
       STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
+      STEAM_USE_NIX_FONTS = "1";
     };
   };
   hardware = {

@@ -15,7 +15,6 @@ in
       basn = {
         packages = [
           pkgs.mangowc
-          pkgs.noctalia-shell
         ];
         files = {
           ".config/mangowc/mangowc.conf".source = mangowcConfig;
