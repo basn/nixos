@@ -265,7 +265,6 @@ in
       grim
       slurp
       wl-clipboard
-      noctalia-shell
       rocmPackages.rocm-smi
       rocmPackages.rocminfo
       mangohud
