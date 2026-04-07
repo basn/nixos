@@ -5,9 +5,9 @@ let
       ./configs/mangowc/monitors-laptop.conf
     else
       ./configs/mangowc/monitors-battlestation.conf;
-  mangowcConfig = pkgs.writeText "mangowc.conf" (
-    builtins.readFile monitorConfigFile + builtins.readFile ./configs/mangowc/mangowc.conf
-  );
+  mangowcConfigTemplate = builtins.readFile monitorConfigFile + builtins.readFile ./configs/mangowc/mangowc.conf;
+  mangowcConfigText = builtins.replaceStrings [ "noctalia-shell" ] [ "${pkgs.noctalia-shell}/bin/noctalia-shell" ] mangowcConfigTemplate;
+  mangowcConfig = pkgs.writeText "mangowc.conf" mangowcConfigText;
 in
 {
   hjem = {
