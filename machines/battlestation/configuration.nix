@@ -1,16 +1,9 @@
 {
   config,
-  inputs,
   pkgs,
-  unstableSmall,
   ...
 }:
 let
-  stablePkgs = import inputs.nixpkgs {
-    system = pkgs.stdenv.hostPlatform.system;
-    config.allowUnfree = true;
-  };
-
   mangoNoctaliaLauncher = pkgs.writeShellScriptBin "mango-noctalia-session" ''
     set -eu
     cfg="$HOME/.config/mangowc/mangowc.conf"
@@ -36,6 +29,7 @@ let
     passthru.providedSessions = [ "mango-noctalia" ];
   };
 in
+
 {
   swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
   boot = {
@@ -50,7 +44,6 @@ in
         "sd_mod"
       ];
       supportedFilesystems = [ "zfs" ];
-      kernelModules = [ ];
     };
     loader = {
       systemd-boot = {
@@ -66,9 +59,8 @@ in
       requestEncryptionCredentials = true;
     };
     supportedFilesystems = [ "zfs" ];
-    kernelModules = [ "kvm-intel" ];
+    kernelModules = [ "kvm-intel" "ntsync" ];
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v3;
-    #kernelPackages = unstableSmall.linuxPackages_zen;
     kernelParams = [
       "split_lock_detect=off"
       "amdgpu.mes=0"
