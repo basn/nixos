@@ -172,8 +172,8 @@ in
                   # Disable DSD unless explicitly requested
                   "api.alsa.disable-dsd" = true;
 
-                  # Optional: force headroom and period size if needed
-                  "api.alsa.headroom" = 512;
+                  # Lower headroom for lower latency while keeping some margin.
+                  "api.alsa.headroom" = 256;
                 };
               };
             }
@@ -185,7 +185,7 @@ in
               matches = [ { "node.name" = "~alsa_output.usb-Fosi_Audio_Fosi_Audio_K7-00.pro-output-0"; } ];
               actions = {
                 update-props = {
-                  # Apply playback format/rate on the actual sink node
+                  # Apply playback format and adaptive rate behavior on the sink node.
                   "priority.session" = 2000;
                   "priority.driver" = 2000;
                   "audio.format" = "S32LE";
@@ -194,7 +194,8 @@ in
                     "FL"
                     "FR"
                   ];
-                  "audio.rate" = 192000;
+                  # Allow rate switching to match source material when possible.
+                  "api.alsa.multi-rate" = true;
                   "audio.allowed-rates" = [
                     44100
                     48000
@@ -207,6 +208,11 @@ in
                     705600
                     768000
                   ];
+
+                  # Lower-latency tuning for desktop/gaming.
+                  "api.alsa.period-size" = 128;
+                  "api.alsa.period-num" = 4;
+                  "api.alsa.headroom" = 256;
                 };
               };
             }
