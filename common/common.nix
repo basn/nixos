@@ -1,4 +1,14 @@
-{ lib, pkgs, useManCacheEnable, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  useManCacheEnable,
+  ...
+}:
+let
+  remoteSyslogModule = ../modules/remote-syslog-client.nix;
+  remoteSyslogModuleExists = builtins.pathExists remoteSyslogModule;
+in
 {
   imports = [
     ./users.nix
@@ -6,7 +16,8 @@
     ./fish.nix
     ./openssh.nix
     ./netbird.nix
-  ];
+  ]
+  ++ lib.optional remoteSyslogModuleExists remoteSyslogModule;
   time = {
     timeZone = "Europe/Stockholm";
   };
@@ -87,6 +98,16 @@
     config = {
       allowUnfree = true;
     };
+  };
+}
+# Only set remote syslog defaults when the module is available in this source tree.
+# This avoids flake eval failures while the module is not yet deployed everywhere.
+// lib.optionalAttrs remoteSyslogModuleExists {
+  basn.remoteSyslog = {
+    enable = lib.mkDefault (config.networking.hostName != "logger");
+    target = lib.mkDefault "logger";
+    port = lib.mkDefault 1514;
+    protocol = lib.mkDefault "tcp";
   };
 }
 // lib.optionalAttrs (!useManCacheEnable) {

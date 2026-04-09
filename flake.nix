@@ -119,6 +119,10 @@
             inputs.nvf.nixosModules.default
           ];
         };
+        logger = mkHost {
+          extraSpecialArgs = { inherit unstablePkgs; };
+          modules = baseModules ++ [ ./machines/logger/configuration.nix ];
+        };
         nixos-sov = mkHost {
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = baseModules ++ [ ./machines/cygate/configuration.nix ];

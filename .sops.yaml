@@ -31,3 +31,7 @@ creation_rules:
       - age:
         - *basn
         - *server_netbird
+  - path_regex: ^machines/logger/secrets/[^/]+\.(yaml|json|env|ini|conf)$
+    key_groups:
+      - age:
+        - *basn

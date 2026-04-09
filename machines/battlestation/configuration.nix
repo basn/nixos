@@ -60,7 +60,10 @@ in
       requestEncryptionCredentials = true;
     };
     supportedFilesystems = [ "zfs" ];
-    kernelModules = [ "kvm-intel" "ntsync" ];
+    kernelModules = [
+      "kvm-intel"
+      "ntsync"
+    ];
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v3;
     kernelParams = [
       "split_lock_detect=off"
@@ -157,6 +160,23 @@ in
       pulse = {
         enable = true;
       };
+      extraConfig = {
+        pipewire."10-high-load-stability" = {
+          "context.properties" = {
+            # Keep a conservative default quantum to avoid xruns during compile spikes.
+            "default.clock.rate" = 48000;
+            "default.clock.allowed-rates" = [
+              44100
+              48000
+              96000
+              192000
+            ];
+            "default.clock.quantum" = 1024;
+            "default.clock.min-quantum" = 512;
+            "default.clock.max-quantum" = 2048;
+          };
+        };
+      };
       wireplumber.extraConfig = {
         "50-fosi-k7-pro-device" = {
           "monitor.alsa.rules" = [
@@ -199,20 +219,14 @@ in
                   "audio.allowed-rates" = [
                     44100
                     48000
-                    88200
                     96000
-                    176400
                     192000
-                    352800
-                    384000
-                    705600
-                    768000
                   ];
 
-                  # Lower-latency tuning for desktop/gaming.
-                  "api.alsa.period-size" = 128;
+                  # Keep buffers slightly larger to avoid crackling under heavy CPU load.
+                  "api.alsa.period-size" = 256;
                   "api.alsa.period-num" = 4;
-                  "api.alsa.headroom" = 256;
+                  "api.alsa.headroom" = 512;
                 };
               };
             }
