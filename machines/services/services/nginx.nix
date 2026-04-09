@@ -33,6 +33,12 @@ let
   };
   authentikAuth = {
     extraConfig = ''
+      satisfy any;
+      allow 10.0.0.0/8;
+      allow 172.16.0.0/12;
+      allow 192.168.0.0/16;
+      allow 127.0.0.1/32;
+      deny all;
       auth_request /outpost.goauthentik.io/auth/nginx;
       error_page 401 = @goauthentik_proxy_signin;
       auth_request_set $auth_cookie $upstream_http_set_cookie;
@@ -186,17 +192,11 @@ in
           proxyPass = "http://192.168.180.10:7878";
         };
       };
-      "valetudo.basn.se" = {
+      "valetudo.basn.se" = authentikConfig // {
         enableACME = true;
         forceSSL = true;
-        locations."/" = {
+        locations."/" = authentikAuth // {
           proxyPass = "http://10.0.1.11";
-          extraConfig =
-            "allow 192.168.195.0/24;"
-            + "allow 192.168.196.0/24;"
-            + "allow 10.1.1.0/24;"
-            + "allow 127.0.0.1/32;"
-            + "deny all;";
         };
       };
       "tesla.basn.se" = authentikConfig // {
