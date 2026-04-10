@@ -113,6 +113,13 @@ in
     thermald = {
       enable = true;
     };
+    udev = {
+      extraRules = ''
+        # Prevent autosuspend on Fosi Audio K7 USB DAC to avoid audio crackle/dropouts.
+        ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="152a", ATTR{idProduct}=="889b", TEST=="power/control", ATTR{power/control}="on"
+        ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="152a", ATTR{idProduct}=="889b", TEST=="power/autosuspend_delay_ms", ATTR{power/autosuspend_delay_ms}="-1"
+      '';
+    };
     pcscd = {
       enable = true;
     };
@@ -160,23 +167,6 @@ in
       pulse = {
         enable = true;
       };
-      extraConfig = {
-        pipewire."10-high-load-stability" = {
-          "context.properties" = {
-            # Keep a conservative default quantum to avoid xruns during compile spikes.
-            "default.clock.rate" = 48000;
-            "default.clock.allowed-rates" = [
-              44100
-              48000
-              96000
-              192000
-            ];
-            "default.clock.quantum" = 1024;
-            "default.clock.min-quantum" = 512;
-            "default.clock.max-quantum" = 2048;
-          };
-        };
-      };
       wireplumber.extraConfig = {
         "50-fosi-k7-pro-device" = {
           "monitor.alsa.rules" = [
@@ -191,9 +181,6 @@ in
 
                   # Disable DSD unless explicitly requested
                   "api.alsa.disable-dsd" = true;
-
-                  # Lower headroom for lower latency while keeping some margin.
-                  "api.alsa.headroom" = 256;
                 };
               };
             }
@@ -219,14 +206,11 @@ in
                   "audio.allowed-rates" = [
                     44100
                     48000
+                    88200
                     96000
+                    176400
                     192000
                   ];
-
-                  # Keep buffers slightly larger to avoid crackling under heavy CPU load.
-                  "api.alsa.period-size" = 256;
-                  "api.alsa.period-num" = 4;
-                  "api.alsa.headroom" = 512;
                 };
               };
             }
