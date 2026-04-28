@@ -1,6 +1,14 @@
 { config, unstablePkgs, ... }:
 let
   ClientID = "YevEd2xwJurQd4uDuZIIBrYI1pyXuJ8qNltPzRl5";
+  # NetBird v0.69.0 has hardcoded pprof listeners on 127.0.0.1:6060 in both
+  # management and signal binaries. Rebind signal pprof to avoid port collision.
+  patchedNetbirdSignal = unstablePkgs.netbird-signal.overrideAttrs (old: {
+    postPatch = (old.postPatch or "") + ''
+      substituteInPlace signal/cmd/run.go \
+        --replace-fail '127.0.0.1:6060' '127.0.0.1:6061'
+    '';
+  });
 in
 {
   security.acme = {
@@ -123,7 +131,7 @@ in
         signal = {
           port = 8012;
           enable = true;
-          package = unstablePkgs.netbird-signal;
+          package = patchedNetbirdSignal;
         };
       };
     };
