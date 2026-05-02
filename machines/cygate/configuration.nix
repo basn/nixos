@@ -27,6 +27,9 @@
         }
       ];
     };
+    kernel = {
+      sysctl."net.ipv4.ip_forward" = 1;
+    };
   };
   networking = {
     interfaces = {
@@ -51,6 +54,11 @@
         443
       ];
       checkReversePath = "loose";
+    };
+    nat = {
+      enable = true;
+      externalInterface = "eth0";
+      internalInterfaces = "wt0";
     };
   };
   services = {

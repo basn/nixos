@@ -32,6 +32,8 @@ let
 in
 
 {
+  imports = [ ./opencode.nix ];
+
   swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
   boot = {
     initrd = {
