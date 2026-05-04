@@ -24,6 +24,7 @@
     zfs = {
       extraPools = [ "tank" ];
       devNodes = "/dev/disk/by-path";
+      forceImportRoot = false;
     };
     loader = {
       grub = {

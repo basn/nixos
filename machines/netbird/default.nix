@@ -8,6 +8,7 @@
     zfs = {
       extraPools = [ "osdisk" ];
       devNodes = "/dev/disk/by-path";
+      forceImportRoot = false;
     };
     loader = {
       systemd-boot = {

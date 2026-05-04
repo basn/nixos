@@ -17,6 +17,7 @@
     zfs = {
       package = unstableSmall.zfs_unstable;
       requestEncryptionCredentials = true;
+      forceImportRoot = false;
     };
     initrd = {
       supportedFilesystems = [ "zfs" ];

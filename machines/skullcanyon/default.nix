@@ -20,6 +20,7 @@ in
       package = pkgs.zfs_2_4;
       extraPools = [ "osdisk" ];
       devNodes = "/dev/disk/by-path";
+      forceImportRoot = false;
     };
     loader = {
       systemd-boot = {

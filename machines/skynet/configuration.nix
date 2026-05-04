@@ -17,6 +17,7 @@
         "osdisk"
       ];
       devNodes = "/dev/disk/by-id";
+      forceImportRoot = false;
     };
     loader = {
       systemd-boot.enable = true;

@@ -60,6 +60,7 @@ in
     zfs = {
       package = config.boot.kernelPackages.zfs_cachyos;
       requestEncryptionCredentials = true;
+      forceImportRoot = false;
     };
     supportedFilesystems = [ "zfs" ];
     kernelModules = [

@@ -17,6 +17,7 @@
     zfs = {
       extraPools = [ "osdisk" ];
       devNodes = "/dev/disk/by-path";
+      forceImportRoot = false;
     };
     loader.grub = {
       enable = true;
