@@ -110,7 +110,7 @@
           ];
         };
         services = mkHost {
-          extraSpecialArgs = { inherit unstablePkgs; };
+          extraSpecialArgs = { inherit unstablePkgs unstableSmall; };
           modules = [
             inputs.sops_nix.nixosModules.sops
             ./machines/services/configuration.nix

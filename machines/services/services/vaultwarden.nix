@@ -1,9 +1,9 @@
-{ unstablePkgs, ... }:
+{ unstableSmall, ... }:
 {
   services = {
     vaultwarden = {
       enable = true;
-      package = unstablePkgs.vaultwarden;
+      package = unstableSmall.vaultwarden;
       dbBackend = "sqlite";
       backupDir = "/vaultwarden";
       config = {
