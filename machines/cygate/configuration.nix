@@ -59,7 +59,7 @@
     nat = {
       enable = true;
       externalInterface = "eth0";
-      internalInterfaces = "wt0";
+      internalInterfaces = [ "wt0" ];
     };
   };
   services = {
