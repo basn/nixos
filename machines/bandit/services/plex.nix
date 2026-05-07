@@ -5,10 +5,10 @@
     let
       plexPass = pkgs.plex.override {
         plexRaw = pkgs.plexRaw.overrideAttrs (old: rec {
-          version = "1.43.1.10611-1e34174b1"; # replace with your Plex Pass version
+          version = "1.43.2.10687-563d026ea";
           src = pkgs.fetchurl {
             url = "https://downloads.plex.tv/plex-media-server-new/${version}/debian/plexmediaserver_${version}_amd64.deb";
-            sha256 = "0zsnsxsf5wicpiklpy2wsxn4hrzvpzhpa7ghjw0lnpwv4dapxgd6";
+            sha256 = "13mfmlwvpimyrm3dkdlsr0b9qpbyy5l62q2ckh1xvzgj978j62bn";
           };
         });
       };
