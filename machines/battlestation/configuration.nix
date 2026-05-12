@@ -70,7 +70,6 @@ in
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v3;
     kernelParams = [
       "split_lock_detect=off"
-      "amdgpu.mes=0"
       "intel_iommu=on"
       "iommu=pt"
     ];
