@@ -1,13 +1,11 @@
 # configuration.nix
 {
-  pkgs,
-  lib,
   config,
   unstablePkgs,
   ...
 }:
 let
-  seedport = 53090;
+  seedport = 55323;
 in
 {
   disabledModules = [ "services/torrent/qbittorrent.nix" ];
