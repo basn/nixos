@@ -11,8 +11,6 @@
   ];
   boot = {
     kernelModules = [ "kvm-intel" ];
-    # Keep vault on a conservative LTS kernel to avoid regressions on igc (i225/i226 class NICs).
-    kernelPackages = pkgs.linuxPackages_6_12;
     kernelParams = [ "pcie_aspm=off" ];
     supportedFilesystems = [ "zfs" ];
     initrd = {

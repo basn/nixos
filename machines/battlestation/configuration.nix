@@ -111,6 +111,10 @@ in
     };
     extraHosts = "0.0.0.0 apresolve.spotify.com";
   };
+  nix.settings = {
+    max-jobs = 2;
+    cores = 8;
+  };
   services = {
     thermald = {
       enable = true;

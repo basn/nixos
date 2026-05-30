@@ -2,7 +2,7 @@
   description = "Basn flake for machines.";
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs?ref=nixos-25.11-small";
+      url = "github:nixos/nixpkgs?ref=nixos-26.05-small";
     };
     nixpkgs-unstable = {
       url = "github:nixos/nixpkgs?ref=nixos-unstable";
