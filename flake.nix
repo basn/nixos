@@ -54,7 +54,6 @@
           nixpkgsLib ? lib,
           modules,
           includeCommon ? true,
-          useManCacheEnable ? false,
           extraSpecialArgs ? { },
         }:
         nixpkgsLib.nixosSystem {
@@ -65,7 +64,6 @@
               inherit
                 inputs
                 system
-                useManCacheEnable
                 ;
             }
             // extraSpecialArgs;
@@ -90,7 +88,6 @@
         };
         laptop = mkHost {
           nixpkgsLib = inputs.nixpkgs-unstable.lib;
-          useManCacheEnable = true;
           extraSpecialArgs = { inherit unstableSmall; };
           modules = baseModules ++ [
             ./machines/laptop/configuration.nix
@@ -100,7 +97,6 @@
         };
         battlestation = mkHost {
           nixpkgsLib = inputs.nixpkgs-unstable.lib;
-          useManCacheEnable = true;
           extraSpecialArgs = { inherit unstableSmall; };
           modules = baseModules ++ [
             ./machines/battlestation/configuration.nix

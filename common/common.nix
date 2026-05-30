@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  useManCacheEnable,
   ...
 }:
 let
@@ -102,6 +101,7 @@ in
       allowUnfree = true;
     };
   };
+  documentation.man.cache.enable = false;
 }
 # Only set remote syslog defaults when the module is available in this source tree.
 # This avoids flake eval failures while the module is not yet deployed everywhere.
@@ -112,10 +112,4 @@ in
     port = lib.mkDefault 1514;
     protocol = lib.mkDefault "tcp";
   };
-}
-// lib.optionalAttrs (!useManCacheEnable) {
-  documentation.man.generateCaches = false;
-}
-// lib.optionalAttrs useManCacheEnable {
-  documentation.man.cache.enable = false;
 }

@@ -68,6 +68,10 @@
       autoScrub = {
         enable = true;
       };
+      trim = {
+        enable = true;
+        interval = "weekly";
+      };
     };
     qemuGuest = {
       enable = true;
