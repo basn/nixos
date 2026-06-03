@@ -21,7 +21,6 @@
           equibop
           signal-desktop
           orca-slicer
-          bitwarden-desktop
           virt-manager
           libvirt
         ];
