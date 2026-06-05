@@ -15,6 +15,7 @@ in
     ./fish.nix
     ./openssh.nix
     ./netbird.nix
+    ../modules/nixos-upgrade-notify.nix
   ]
   ++ lib.optional remoteSyslogModuleExists remoteSyslogModule;
   time = {

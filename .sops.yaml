@@ -7,6 +7,9 @@ keys:
   - &server_netbird age1a23remuxvzd5scx0g67us68mtg20908k4w44r3rc3gpgmpaf7dyqx4r4a2
   - &ws_battlestation age1pjxrfvc2hg6pelm0qy7lxq6jtr4q4n3rd8c89aj7ynqvtr4z0urq3320za
   - &server_nixossov age166z4n8ytjy0qrehac9cyjnh7k8cu4h72vddze72d87hd9kfdm5yqg5kw5t
+  - &server_nixossov2 age1qyy2qpmtuhkt9ev5hpswsfnr8yeah8q9duwvenk5utvpnhzp8f6s2dqc2h
+  - &server_lenovo age19ctltmx5axzgvrgke9y5e7v3dnrxdx745hw08qnrk6l0vfut43lq0c32wm
+  - &server_skullcanyon age1vu6x0k0r2mvj8lgw54w8xq69956emeaa549zgjg9y8xqhmpvqpfsanmmt6
 creation_rules:
   - path_regex: ^machines/bandit/secrets/[^/]+\.(yaml|json|env|ini|conf)$
     key_groups:
@@ -26,6 +29,9 @@ creation_rules:
         - *server_vault
         - *server_nixossov
         - *ws_battlestation
+        - *server_lenovo
+        - *server_skullcanyon
+        - *server_nixossov2
   - path_regex: ^machines/netbird/secrets/[^/]+\.(yaml|json|env|ini|conf)$
     key_groups:
       - age:
