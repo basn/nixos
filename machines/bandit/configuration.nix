@@ -25,6 +25,8 @@
     kernelModules = [
       "kvm-intel"
       "r8169"
+      "nct6775"
+      "drivetemp"
     ];
     kernelParams = [ "ip=dhcp" ];
     supportedFilesystems = [ "zfs" ];
@@ -158,7 +160,96 @@
     };
   };
   environment = {
-    systemPackages = with pkgs; [ rclone ];
+    systemPackages = with pkgs; [
+      lm_sensors
+      rclone
+      smartmontools
+    ];
+  };
+  systemd.services.bandit-chassis-fans = {
+    description = "Control chassis fan duty from hard drive temperatures";
+    after = [ "systemd-modules-load.service" ];
+    wantedBy = [ "multi-user.target" ];
+    path = with pkgs; [ coreutils ];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = "10s";
+    };
+    script = ''
+      set -eu
+
+      fan_hwmon=
+      for dir in /sys/class/hwmon/hwmon*; do
+        if [ "$(cat "$dir/name" 2>/dev/null || true)" = "nct6798" ]; then
+          fan_hwmon="$dir"
+          break
+        fi
+      done
+
+      if [ -z "$fan_hwmon" ]; then
+        echo "nct6798 hwmon device not found" >&2
+        exit 1
+      fi
+
+      last_pwm=
+      set_pwm() {
+        pwm="$1"
+        [ "$pwm" = "$last_pwm" ] && return 0
+
+        for channel in 2 4 5; do
+          [ -w "$fan_hwmon/pwm''${channel}_enable" ] || continue
+          echo 1 > "$fan_hwmon/pwm''${channel}_enable"
+          echo "$pwm" > "$fan_hwmon/pwm''${channel}"
+        done
+
+        last_pwm="$pwm"
+        echo "set chassis fans to pwm=$pwm"
+      }
+
+      # Leave the likely CPU fan header on the motherboard's automatic curve.
+      if [ -w "$fan_hwmon/pwm1_enable" ]; then
+        echo 5 > "$fan_hwmon/pwm1_enable"
+      fi
+
+      while true; do
+        max_temp=0
+
+        for dir in /sys/class/hwmon/hwmon*; do
+          [ "$(cat "$dir/name" 2>/dev/null || true)" = "drivetemp" ] || continue
+          for temp_file in "$dir"/temp*_input; do
+            [ -e "$temp_file" ] || continue
+            temp="$(cat "$temp_file")"
+            if [ "$temp" -gt "$max_temp" ]; then
+              max_temp="$temp"
+            fi
+          done
+        done
+
+        if [ "$max_temp" -eq 0 ]; then
+          echo "no drive temperatures found; using cooling fallback" >&2
+          set_pwm 180
+          sleep 60
+          continue
+        fi
+
+        if [ "$max_temp" -ge 50000 ]; then
+          set_pwm 255
+        elif [ "$max_temp" -ge 46000 ]; then
+          set_pwm 200
+        elif [ "$max_temp" -ge 42000 ]; then
+          set_pwm 170
+        elif [ "$max_temp" -ge 38000 ]; then
+          set_pwm 140
+        elif [ "$max_temp" -ge 34000 ]; then
+          set_pwm 115
+        else
+          set_pwm 90
+        fi
+
+        sleep 60
+      done
+    '';
   };
   services = {
     thermald = {
