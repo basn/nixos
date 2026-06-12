@@ -129,15 +129,25 @@ in
       ];
 
       systemd.services.nixos-upgrade = {
-        serviceConfig.OnFailure = [ "nixos-upgrade-notify-failure.service" ];
+        unitConfig.OnFailure = [ "nixos-upgrade-notify-failure.service" ];
         path = with pkgs; [
+          coreutils
           curl
           gnused
           jq
           systemd
         ];
+        preStart = ''
+          mkdir -p /run/nixos-upgrade-notify
+          readlink -f /nix/var/nix/profiles/system > /run/nixos-upgrade-notify/previous-system 2>/dev/null || true
+        '';
         postStart = ''
-          ${notifyScript} success nixos-upgrade.service || true
+          previous_system="$(cat /run/nixos-upgrade-notify/previous-system 2>/dev/null || true)"
+          current_system="$(readlink -f /nix/var/nix/profiles/system 2>/dev/null || true)"
+
+          if [ -n "$current_system" ] && [ "$current_system" != "$previous_system" ]; then
+            ${notifyScript} success nixos-upgrade.service || true
+          fi
         '';
       };
 
