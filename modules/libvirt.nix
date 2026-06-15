@@ -72,7 +72,11 @@ in
 
         virtqemud = {
           after = [ "libvirtd-config.service" ];
-          path = config.systemd.services.libvirtd.path;
+          path = config.systemd.services.libvirtd.path ++ (with pkgs; [
+            dmidecode
+            iproute2
+            openssh
+          ]);
           requires = [ "libvirtd-config.service" ];
         };
 

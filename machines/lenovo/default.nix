@@ -46,6 +46,11 @@ in
     extraModulePackages = [ ];
   };
 
+  hardware = {
+    enableRedistributableFirmware = true;
+    cpu.intel.updateMicrocode = true;
+  };
+
   networking = {
     defaultGateway = "192.168.195.1";
     nameservers = [ "192.168.195.1" ];
