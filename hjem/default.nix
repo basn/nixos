@@ -1,4 +1,22 @@
-{ pkgs, ... }:
+{
+  config,
+  inputs,
+  pkgs,
+  system,
+  ...
+}:
+let
+  stablePkgs = import inputs.nixpkgs {
+    inherit system;
+    config.allowUnfree = true;
+  };
+
+  orcaSlicer =
+    if config.networking.hostName == "battlestation" then
+      stablePkgs.orca-slicer
+    else
+      pkgs.orca-slicer;
+in
 {
   imports = [
     ./browsers.nix
@@ -20,7 +38,7 @@
           vesktop
           equibop
           signal-desktop
-          orca-slicer
+          orcaSlicer
           virt-manager
           libvirt
         ];

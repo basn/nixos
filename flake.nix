@@ -35,7 +35,7 @@
     };
   };
   outputs =
-    inputs:
+    inputs@{ self, ... }:
     let
       system = "x86_64-linux";
       lib = inputs.nixpkgs.lib;
@@ -58,11 +58,17 @@
         }:
         nixpkgsLib.nixosSystem {
           inherit system;
-          modules = lib.optionals includeCommon [ ./common/common.nix ] ++ modules;
+          modules =
+            [
+              { boot.zfs.forceImportRoot = false; }
+            ]
+            ++ lib.optionals includeCommon [ ./common/common.nix ]
+            ++ modules;
           specialArgs =
             {
               inherit
                 inputs
+                self
                 system
                 ;
             }
