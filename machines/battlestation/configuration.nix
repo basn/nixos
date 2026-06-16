@@ -5,8 +5,40 @@
   ...
 }:
 let
+  monadoPimax = pkgs.monado.overrideAttrs (oldAttrs: {
+    version = "25.1.0-pimax-16792a6";
+    src = pkgs.fetchFromGitLab {
+      domain = "gitlab.freedesktop.org";
+      owner = "Coreforge";
+      repo = "monado";
+      rev = "16792a6f26210faca082d192a8fa9fbf625ab1d9";
+      hash = "sha256-M7bjfHS4h0GQ/77PuIxEVvhFZl4dDPVas19/oSfoGCk=";
+    };
+    patches = [ ];
+    meta = oldAttrs.meta // {
+      description = "Open source XR runtime with Coreforge Pimax P2 support";
+    };
+  });
+
+  pimaxDistortion = pkgs.fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    owner = "othello7";
+    repo = "pimax-distortion";
+    rev = "a64c75ed9f4f3bd71847e6daa4b882e38bb5cb07";
+    hash = "sha256-33cimiRQgJkL9xj7Y7cJgiCdRXGqFG9qqdNvx4gm5i8=";
+  };
+
   mangoNoctaliaLauncher = pkgs.writeShellScriptBin "mango-noctalia-session" ''
     set -eu
+    export XDG_CURRENT_DESKTOP=mango:wlroots
+    export XDG_SESSION_DESKTOP=mango
+    export XDG_SESSION_TYPE=wayland
+
+    ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd \
+      DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE
+    ${pkgs.systemd}/bin/systemctl --user import-environment \
+      DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE
+
     cfg="$HOME/.config/mangowc/mangowc.conf"
     if [ -f "$cfg" ]; then
       exec ${pkgs.mangowc}/bin/mango -c "$cfg" -s ${pkgs.noctalia-shell}/bin/noctalia-shell
@@ -24,7 +56,7 @@ let
         Comment=MangoWC with Noctalia shell
         Exec=${mangoNoctaliaLauncher}/bin/mango-noctalia-session
         Type=Application
-        DesktopNames=mango
+        DesktopNames=mango;wlroots
       '')
     ];
     passthru.providedSessions = [ "mango-noctalia" ];
@@ -66,6 +98,22 @@ in
     kernelModules = [
       "kvm-intel"
       "ntsync"
+    ];
+    kernelPatches = [
+      {
+        name = "pimax-non-desktop-edid-quirks";
+        patch = pkgs.fetchurl {
+          url = "https://gist.githubusercontent.com/TayouVR/60e3ee5f95375827a66a8898bea02bec/raw/c85135c8d8821ebb2fa85629d837a41de57e12ef/pimax.patch";
+          hash = "sha256-xD8mUZne3MDFDt4jstsBv5bG7fWSejV4LEAKB3GWdAY=";
+        };
+      }
+      {
+        name = "pimax-edid-checksum-fixup";
+        patch = pkgs.fetchurl {
+          url = "https://gist.githubusercontent.com/Coreforge/59ed3548427c999273ec012002461eab/raw/f70df3afd5cccbfc6fb34ef805db41d00dbf4770/ps0002-drm-edid-fix-checksum-errors-in-Pimax-HMD-EDIDs.patch";
+          hash = "sha256-faggU9KLVydvdQR8m9V7SUQnwtXs+h9IpNv9BS64qZU=";
+        };
+      }
     ];
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v3;
     kernelParams = [
@@ -127,10 +175,18 @@ in
         # Prevent autosuspend on Elgato Wave XLR to avoid mute/unmute wakeup glitches.
         ACTION=="add|change", SUBSYSTEM=="usb", ATTRS{product}=="Wave XLR", TEST=="power/control", ATTR{power/control}="on"
         ACTION=="add|change", SUBSYSTEM=="usb", ATTRS{product}=="Wave XLR", TEST=="power/autosuspend_delay_ms", ATTR{power/autosuspend_delay_ms}="-1"
+        # Allow Monado's Pimax driver to access P2-series headset control HID.
+        SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="0101", MODE="0660", GROUP="input"
+        KERNEL=="hidraw*", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="0101", MODE="0660", GROUP="input"
       '';
     };
     pcscd = {
       enable = true;
+    };
+    monado = {
+      enable = true;
+      package = monadoPimax;
+      defaultRuntime = true;
     };
     displayManager = {
       sddm = {
@@ -261,6 +317,22 @@ in
     };
     displayManager.sessionPackages = [ mangoNoctaliaSession ];
   };
+  systemd.user.services.monado.environment = {
+    STEAMVR_LH_ENABLE = "1";
+    IPC_EXIT_WHEN_IDLE = "1";
+    PIMAX_HID_RETRY_COUNT = "10";
+  };
+  hjem.users.basn.files.".config/openvr/openvrpaths.vrpath".source = pkgs.writeText "openvrpaths.vrpath" (
+    builtins.toJSON {
+      version = 1;
+      jsonid = "vrpathreg";
+      external_drivers = null;
+      config = [ "/home/basn/.local/share/Steam/config" ];
+      log = [ "/home/basn/.local/share/Steam/logs" ];
+      runtime = [ "${pkgs.xrizer}/lib/xrizer" ];
+    }
+  );
+  hjem.users.basn.files.".config/pimax/meshes".source = "${pimaxDistortion}/meshes";
   security = {
     rtkit = {
       enable = true;
@@ -288,6 +360,8 @@ in
       rocmPackages.rocm-smi
       rocmPackages.rocminfo
       mangohud
+      xrizer
+      protontricks
     ];
     variables = {
       NIXOS_OZONE_WL = "1";
@@ -332,6 +406,12 @@ in
     mangowc.enable = true;
     steam = {
       enable = true;
+      package = pkgs.steam.override {
+        extraProfile = ''
+          export PRESSURE_VESSEL_IMPORT_OPENXR_1_RUNTIMES=1
+          unset TZ
+        '';
+      };
       gamescopeSession = {
         enable = true;
       };
