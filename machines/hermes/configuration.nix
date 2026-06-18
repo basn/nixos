@@ -24,7 +24,7 @@ in
     supportedFilesystems = [ "zfs" ];
     zfs = {
       extraPools = [ "osdisk" ];
-      devNodes = "/dev/disk/by-id";
+      devNodes = "/dev/disk/by-partlabel";
       forceImportRoot = false;
     };
     loader = {
