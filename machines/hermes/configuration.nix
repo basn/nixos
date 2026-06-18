@@ -258,6 +258,8 @@ in
     };
   };
 
+  basn.nixosUpgradeNotify.enable = false;
+
   users.users.hermes.extraGroups = [ "docker" ];
   users.users.basn.extraGroups = [
     "docker"
