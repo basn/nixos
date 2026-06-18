@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   zfsCompatibleKernelPackages = lib.filterAttrs (
     name: kernelPackages:
@@ -113,6 +118,10 @@ in
       device = "osdisk/vms";
       fsType = "zfs";
     };
+    "/var/lib/libvirt/images/hermes" = {
+      device = "osdisk/vms/hermes";
+      fsType = "zfs";
+    };
     "/home" = {
       device = "osdisk/home";
       fsType = "zfs";
@@ -128,6 +137,17 @@ in
   };
   services = {
     openssh.enable = true;
+    sanoid = {
+      enable = true;
+      templates.hermes = {
+        hourly = 24;
+        daily = 14;
+        monthly = 3;
+        autoprune = true;
+        autosnap = true;
+      };
+      datasets."osdisk/vms/hermes".useTemplate = [ "hermes" ];
+    };
     zfs.autoScrub.enable = true;
   };
   programs.nh.clean = {

@@ -171,6 +171,19 @@ in
             + "proxy_set_header Connection $connection_upgrade;";
         };
       };
+      "hermes.basn.se" = {
+        enableACME = true;
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://10.1.1.10:9119";
+          proxyWebsockets = true;
+          recommendedProxySettings = true;
+          extraConfig = ''
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+          '';
+        };
+      };
       "prowlarr.basn.se" = authentikConfig // {
         enableACME = true;
         forceSSL = true;

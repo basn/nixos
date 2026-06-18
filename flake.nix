@@ -33,6 +33,10 @@
     nix-cachyos-kernel = {
       url = "github:xddxdd/nix-cachyos-kernel";
     };
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent/v2026.6.5";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
   };
   outputs =
     inputs@{ self, ... }:
@@ -58,21 +62,19 @@
         }:
         nixpkgsLib.nixosSystem {
           inherit system;
-          modules =
-            [
-              { boot.zfs.forceImportRoot = false; }
-            ]
-            ++ lib.optionals includeCommon [ ./common/common.nix ]
-            ++ modules;
-          specialArgs =
-            {
-              inherit
-                inputs
-                self
-                system
-                ;
-            }
-            // extraSpecialArgs;
+          modules = [
+            { boot.zfs.forceImportRoot = false; }
+          ]
+          ++ lib.optionals includeCommon [ ./common/common.nix ]
+          ++ modules;
+          specialArgs = {
+            inherit
+              inputs
+              self
+              system
+              ;
+          }
+          // extraSpecialArgs;
         };
       baseModules = [
         inputs.sops_nix.nixosModules.sops
@@ -121,10 +123,6 @@
             inputs.nvf.nixosModules.default
           ];
         };
-        logger = mkHost {
-          extraSpecialArgs = { inherit unstablePkgs; };
-          modules = baseModules ++ [ ./machines/logger/configuration.nix ];
-        };
         nixos-sov = mkHost {
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = baseModules ++ [ ./machines/cygate/configuration.nix ];
@@ -132,6 +130,15 @@
         nixos-sov2 = mkHost {
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = baseModules ++ [ ./machines/cygate2/configuration.nix ];
+        };
+        hermes = mkHost {
+          nixpkgsLib = inputs.nixpkgs-unstable.lib;
+          modules = [
+            inputs.hermes-agent.nixosModules.default
+            inputs.nvf.nixosModules.default
+            inputs.sops_nix.nixosModules.sops
+            ./machines/hermes/configuration.nix
+          ];
         };
         netbird = mkHost {
           extraSpecialArgs = { inherit unstablePkgs; };

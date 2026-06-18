@@ -1,14 +1,8 @@
 {
-  config,
-  lib,
   pkgs,
   self,
   ...
 }:
-let
-  remoteSyslogModule = ../modules/remote-syslog-client.nix;
-  remoteSyslogModuleExists = builtins.pathExists remoteSyslogModule;
-in
 {
   imports = [
     ./users.nix
@@ -17,8 +11,7 @@ in
     ./openssh.nix
     ./netbird.nix
     ../modules/nixos-upgrade-notify.nix
-  ]
-  ++ lib.optional remoteSyslogModuleExists remoteSyslogModule;
+  ];
   time = {
     timeZone = "Europe/Stockholm";
   };
@@ -106,14 +99,4 @@ in
   documentation.man.cache.enable = false;
   # make a symlink of flake within the generation (e.g. /run/current-system/src) thanks iynaix (i am stealing this with pride)
   system.systemBuilderCommands = "ln -s ${self.sourceInfo.outPath} $out/src";
-}
-# Only set remote syslog defaults when the module is available in this source tree.
-# This avoids flake eval failures while the module is not yet deployed everywhere.
-// lib.optionalAttrs remoteSyslogModuleExists {
-  basn.remoteSyslog = {
-    enable = lib.mkDefault (config.networking.hostName != "logger");
-    target = lib.mkDefault "logger";
-    port = lib.mkDefault 1514;
-    protocol = lib.mkDefault "tcp";
-  };
 }
