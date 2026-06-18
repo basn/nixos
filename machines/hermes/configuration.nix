@@ -74,7 +74,7 @@ in
     useDHCP = false;
     defaultGateway = "10.1.1.1";
     nameservers = [ "10.1.1.8" ];
-    interfaces.eth0.ipv4.addresses = [
+    interfaces.enp1s0.ipv4.addresses = [
       {
         address = "10.1.1.10";
         prefixLength = 24;
