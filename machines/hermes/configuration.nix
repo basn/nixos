@@ -88,6 +88,7 @@ in
           chain output {
             type filter hook output priority 10; policy accept;
 
+            ct state established,related accept
             ip daddr 10.1.1.8 udp dport 53 accept
             ip daddr 10.1.1.8 tcp dport { 53, 443 } accept
             ip daddr 10.0.0.0/8 reject
