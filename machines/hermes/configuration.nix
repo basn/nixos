@@ -152,6 +152,7 @@ in
       addToSystemPackages = true;
       stateDir = "/var/lib/hermes";
       workingDirectory = "/var/lib/hermes/workspace";
+      environmentFiles = [ "/var/lib/hermes/secrets.env" ];
       extraPackages = [
         agentBrowser
         pkgs.chromium
@@ -159,14 +160,17 @@ in
         pkgs.jq
       ];
       environment = {
+        AGENT_BROWSER_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
         AGENT_BROWSER_ENGINE = "chrome";
+        HASS_URL = "https://hass.basn.se";
         HERMES_DOCKER_BINARY = "${pkgs.docker}/bin/docker";
         SEARXNG_URL = "https://search.basn.se";
       };
       settings = {
+        _config_version = 27;
         model = {
           provider = "openai-codex";
-          default = "gpt-5.3-codex";
+          default = "gpt-5.4";
           openai_runtime = "auto";
         };
         timezone = "Europe/Stockholm";
@@ -204,6 +208,7 @@ in
           "delegation"
           "cronjob"
           "todo"
+          "homeassistant"
         ];
         web = {
           backend = "searxng";
@@ -242,6 +247,17 @@ in
           max_concurrent_children = 2;
           max_spawn_depth = 1;
           orchestrator_enabled = true;
+        };
+        platforms.homeassistant = {
+          enabled = true;
+          extra = {
+            watch_domains = [
+              "alarm_control_panel"
+              "binary_sensor"
+              "climate"
+            ];
+            cooldown_seconds = 30;
+          };
         };
         dashboard = {
           public_url = "https://hermes.basn.se";
@@ -305,6 +321,14 @@ in
         PrivateDevices = true;
         ReadWritePaths = [ "/var/lib/hermes" ];
       };
+    };
+    services.hermes-agent = {
+      environment = lib.mkForce {
+        HOME = "/var/lib/hermes";
+        HERMES_HOME = "/var/lib/hermes/.hermes";
+        HERMES_MANAGED = "true";
+      };
+      serviceConfig.TimeoutStopSec = 210;
     };
   };
 

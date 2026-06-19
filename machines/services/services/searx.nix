@@ -9,6 +9,10 @@
     settings = {
       server.secret_key = "$SEARX_SECRET_KEY";
       general.instance_name = "basn search";
+      search.formats = [
+        "html"
+        "json"
+      ];
     };
   };
 }
