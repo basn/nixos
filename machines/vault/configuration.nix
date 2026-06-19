@@ -118,7 +118,7 @@ in
   };
   networking = {
     interfaces = {
-      enp2s0 = {
+      enp1s0 = {
         useDHCP = true;
       };
     };

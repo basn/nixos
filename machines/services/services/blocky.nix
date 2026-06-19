@@ -58,9 +58,11 @@
           customTTL = "30m";
           filterUnmappedTypes = false;
           mapping = {
+            "auth.basn.se" = "10.1.1.8";
             "bandit.basn.se" = "192.168.180.10";
             "hass.basn.se" = "10.1.1.8";
             "rt.basn.se" = "192.168.180.10";
+            "search.basn.se" = "10.1.1.8";
             "vmware.basn.se" = "192.168.195.5";
             "services.basn.se" = "10.1.1.8";
             "cygate.basn.se" = "10.140.12.5";
