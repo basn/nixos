@@ -14,6 +14,7 @@
       networkoptimizer = {
         image = "ghcr.io/ozark-connect/network-optimizer:latest";
         autoStart = true;
+        pull = "newer";
         extraOptions = [ "--network=host" ];
         environment = {
           TZ = "Europe/Stockholm";
@@ -33,6 +34,7 @@
       speedtest = {
         image = "ghcr.io/ozark-connect/speedtest:latest";
         autoStart = true;
+        pull = "newer";
         ports = [ "127.0.0.1:3005:3000" ];
         environment = {
           TZ = "Europe/Stockholm";
@@ -41,5 +43,20 @@
         volumes = [ "/docker/networkoptimizer/speedtest:/config" ];
       };
     };
+  };
+
+  systemd.timers.podman-container-refresh = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "weekly";
+      Persistent = true;
+    };
+  };
+
+  systemd.services.podman-container-refresh = {
+    serviceConfig.Type = "oneshot";
+    script = ''
+      systemctl restart podman-networkoptimizer.service podman-speedtest.service podman-redbot.service
+    '';
   };
 }

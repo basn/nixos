@@ -21,6 +21,7 @@
     containers = {
       redbot = {
         image = "phasecorex/red-discordbot";
+        pull = "newer";
         volumes = [
           "/etc/localtime:/etc/localtime:ro"
           "/docker/redbot/:/data"
