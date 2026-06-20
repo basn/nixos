@@ -21,6 +21,10 @@
         sopsFile = ./secrets/searx.env;
         format = "dotenv";
       };
+      zfs-kuma-vaultwarden-replication = {
+        sopsFile = ./secrets/zfs-kuma.yaml;
+        key = "vaultwarden-replication";
+      };
     };
   };
 }
