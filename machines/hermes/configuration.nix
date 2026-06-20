@@ -251,10 +251,8 @@ in
         platforms.homeassistant = {
           enabled = true;
           extra = {
+            watch_all = false;
             watch_domains = [
-              "alarm_control_panel"
-              "binary_sensor"
-              "climate"
             ];
             cooldown_seconds = 30;
           };
