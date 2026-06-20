@@ -26,6 +26,7 @@ creation_rules:
       - age:
         - *basn
         - *server_bandit
+        - *server_netbird
         - *server_vault
         - *server_nixossov
         - *ws_battlestation

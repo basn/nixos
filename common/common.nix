@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   self,
   ...
@@ -86,6 +87,8 @@
         "nix-command"
         "flakes"
       ];
+      substituters = [ "https://attic.basn.se/nixos" ];
+      trusted-public-keys = [ "nixos:898ivBYBo+6EpTE5aF6NuqMlrKifq6wdOoMQ1A3I+N8=" ];
       trusted-users = [ "@wheel" ];
     };
     sshServe = {

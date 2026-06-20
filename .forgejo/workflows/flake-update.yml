@@ -1,0 +1,47 @@
+name: Flake update
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 01:30 Europe/Stockholm during summer time. Forgejo schedules are UTC.
+    - cron: "30 23 * * *"
+
+concurrency:
+  group: flake-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: nix-nightly
+    env:
+      ATTIC_ENDPOINT: https://attic.basn.se
+      ATTIC_CACHE: ci:nixos
+      ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
+      CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+      UPDATE_BRANCH: ci/flake-lock-update
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check flake update usefulness
+        id: update
+        run: ./ci/flake-update.sh
+
+      - name: Commit and push update branch
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+
+          git config user.name "basn-ci"
+          git config user.email "basn-ci@users.noreply.codeberg.org"
+          git checkout -B "$UPDATE_BRANCH"
+          git add flake.lock
+          git commit -m "Update flake.lock"
+          git remote set-url origin "https://x-access-token:${CODEBERG_TOKEN}@codeberg.org/${GITHUB_REPOSITORY}.git"
+          git push --force-with-lease origin "$UPDATE_BRANCH"
+
+      - name: Create or refresh pull request
+        if: steps.update.outputs.changed == 'true'
+        run: ./ci/open-flake-update-pr.sh

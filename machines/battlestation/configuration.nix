@@ -322,16 +322,18 @@ in
     IPC_EXIT_WHEN_IDLE = "1";
     PIMAX_HID_RETRY_COUNT = "10";
   };
-  hjem.users.basn.files.".config/openvr/openvrpaths.vrpath".source = pkgs.writeText "openvrpaths.vrpath" (
-    builtins.toJSON {
-      version = 1;
-      jsonid = "vrpathreg";
-      external_drivers = null;
-      config = [ "/home/basn/.local/share/Steam/config" ];
-      log = [ "/home/basn/.local/share/Steam/logs" ];
-      runtime = [ "${pkgs.xrizer}/lib/xrizer" ];
-    }
-  );
+  hjem.users.basn.files.".config/openvr/openvrpaths.vrpath".source =
+    pkgs.writeText "openvrpaths.vrpath"
+      (
+        builtins.toJSON {
+          version = 1;
+          jsonid = "vrpathreg";
+          external_drivers = null;
+          config = [ "/home/basn/.local/share/Steam/config" ];
+          log = [ "/home/basn/.local/share/Steam/logs" ];
+          runtime = [ "${pkgs.xrizer}/lib/xrizer" ];
+        }
+      );
   hjem.users.basn.files.".config/pimax/meshes".source = "${pimaxDistortion}/meshes";
   security = {
     rtkit = {
@@ -433,7 +435,7 @@ in
   };
   system = {
     autoUpgrade = {
-      flake = "github:basn/nixos";
+      flake = "git+https://codeberg.org/basn/nixos";
       enable = true;
     };
     stateVersion = "25.05";

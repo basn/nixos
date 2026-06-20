@@ -17,6 +17,16 @@
         sopsFile = ../../secrets/zfs.yaml;
         key = "password";
       };
+      atticd-env = {
+        sopsFile = ./secrets/bandit.yaml;
+        key = "atticd-env";
+        restartUnits = [ "atticd.service" ];
+      };
+      gitea-actions-runner-env = {
+        sopsFile = ./secrets/bandit.yaml;
+        key = "gitea-actions-runner-env";
+        restartUnits = [ "gitea-runner-codeberg.service" ];
+      };
     };
   };
 }

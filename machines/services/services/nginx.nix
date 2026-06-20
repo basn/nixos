@@ -263,6 +263,19 @@ in
           proxyWebsockets = true;
         };
       };
+      "attic.basn.se" = {
+        enableACME = true;
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://192.168.180.10:8081";
+          recommendedProxySettings = true;
+          extraConfig = ''
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+            proxy_request_buffering off;
+          '';
+        };
+      };
       "network.basn.se" = authentikConfig // {
         enableACME = true;
         forceSSL = true;

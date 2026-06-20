@@ -50,7 +50,7 @@ Clone this repository in the installer, mount the datasets under `/mnt`, and
 install the declared configuration:
 
 ```sh
-sudo nixos-install --flake github:basn/nixos#hermes
+sudo nixos-install --flake git+https://codeberg.org/basn/nixos#hermes
 ```
 
 ## Required interactive bootstrap

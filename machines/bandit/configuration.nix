@@ -11,6 +11,8 @@
     ./services/sonarr.nix
     ./services/radarr.nix
     ./services/prowlarr.nix
+    ./services/attic.nix
+    ./services/ci-runner.nix
     ./services/nginx.nix
     ./services/bittorrent.nix
     ./services/unpackerr.nix
@@ -122,6 +124,10 @@
       device = "data/torrent";
       fsType = "zfs";
       encrypted.keyFile = "/root/zfs-data2.key";
+    };
+    "/data/attic" = {
+      device = "data/attic";
+      fsType = "zfs";
     };
     "/boot1" = {
       device = "/dev/disk/by-uuid/7821-EDA9";
@@ -308,7 +314,7 @@
   system = {
     stateVersion = "24.05";
     autoUpgrade = {
-      flake = "github:basn/nixos";
+      flake = "git+https://codeberg.org/basn/nixos";
       enable = true;
     };
   };

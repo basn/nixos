@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
   imports = [
@@ -90,7 +90,7 @@
   system = {
     stateVersion = "23.11";
     autoUpgrade = {
-      flake = "github:basn/nixos";
+      flake = "git+https://codeberg.org/basn/nixos";
       enable = true;
     };
   };
@@ -99,8 +99,10 @@
   };
   nix = {
     settings = {
-      substituters = [ "https://nix-community.cachix.org" ];
-      trusted-public-keys = [ "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" ];
+      substituters = lib.mkAfter [ "https://nix-community.cachix.org" ];
+      trusted-public-keys = lib.mkAfter [
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      ];
     };
   };
 }

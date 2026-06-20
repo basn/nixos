@@ -159,7 +159,7 @@ in
   system = {
     stateVersion = "24.05";
     autoUpgrade = {
-      flake = "github:basn/nixos";
+      flake = "git+https://codeberg.org/basn/nixos";
       enable = true;
     };
   };

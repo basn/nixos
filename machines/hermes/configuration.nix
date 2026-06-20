@@ -354,7 +354,7 @@ in
     stateVersion = "26.05";
     autoUpgrade = {
       enable = true;
-      flake = "github:basn/nixos";
+      flake = "git+https://codeberg.org/basn/nixos";
       randomizedDelaySec = "30m";
     };
   };
