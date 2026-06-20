@@ -11,7 +11,7 @@
     ./services/pykms.nix
     ./services/vaultwarden.nix
     ./services/ac.nix
-    #    ./services/teslamate.nix
+    ./services/monitoring.nix
     ./services/authentik.nix
     ./services/freshrss.nix
     ./services/searx.nix

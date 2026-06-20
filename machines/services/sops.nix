@@ -6,14 +6,11 @@
       keyFile = "/home/basn/.config/sops/age/keys.txt";
     };
     secrets = {
-      teslamate = {
-        sopsFile = ./secrets/teslamate.env;
-        format = "dotenv";
-      };
       authentik = {
         sopsFile = ./secrets/authentik.env;
         format = "dotenv";
       };
+      grafana-secret-key.restartUnits = [ "grafana.service" ];
       freshrss-password = { 
         owner = config.services.freshrss.user;
       };

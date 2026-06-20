@@ -10,6 +10,7 @@
     ./fish.nix
     ./openssh.nix
     ./netbird.nix
+    ./monitoring-exporters.nix
     ../modules/nixos-upgrade-notify.nix
   ];
   time = {

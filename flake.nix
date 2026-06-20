@@ -24,9 +24,6 @@
       url = "github:notashelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    teslamate = {
-      url = "github:teslamate-org/teslamate/main";
-    };
     authentik-nix = {
       url = "github:nix-community/authentik-nix";
     };
@@ -118,7 +115,6 @@
           modules = [
             inputs.sops_nix.nixosModules.sops
             ./machines/services/configuration.nix
-            inputs.teslamate.nixosModules.default
             inputs.authentik-nix.nixosModules.default
             inputs.nvf.nixosModules.default
           ];

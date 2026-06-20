@@ -212,15 +212,6 @@ in
           proxyPass = "http://10.0.1.11";
         };
       };
-      "tesla.basn.se" = authentikConfig // {
-        enableACME = true;
-        forceSSL = true;
-        locations."/" = authentikAuth // {
-          proxyPass = "http://127.0.0.1:4000";
-          recommendedProxySettings = false;
-          proxyWebsockets = true;
-        };
-      };
       "grafana.basn.se" = authentikConfig // {
         enableACME = true;
         forceSSL = true;
