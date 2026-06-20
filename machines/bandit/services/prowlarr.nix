@@ -32,10 +32,17 @@ in
   # The upstream module uses DynamicUser and otherwise resets a custom data
   # directory to root:root during activation. A static account keeps ownership
   # stable across upgrades while retaining the module's bind-mount layout.
-  systemd.tmpfiles.settings."10-prowlarr".${dataDir}.d = {
-    user = lib.mkForce "prowlarr";
-    group = lib.mkForce "prowlarr";
-    mode = lib.mkForce "0700";
+  systemd.tmpfiles.settings."10-prowlarr".${dataDir} = {
+    d = {
+      user = lib.mkForce "prowlarr";
+      group = lib.mkForce "prowlarr";
+      mode = lib.mkForce "0700";
+    };
+    Z = {
+      user = "prowlarr";
+      group = "prowlarr";
+      mode = "-";
+    };
   };
 
   systemd.services.prowlarr.serviceConfig = {
