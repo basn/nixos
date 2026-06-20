@@ -22,12 +22,19 @@ fi
 mkdir -p .ci
 base_paths_file=".ci/base-paths"
 candidate_paths_file=".ci/candidate-paths"
+host_report_dir=".ci/host-reports"
 report_file=".ci/flake-update-report.md"
 : > "$base_paths_file"
 : > "$candidate_paths_file"
+rm -rf "$host_report_dir"
+mkdir -p "$host_report_dir"
 
-echo "# Flake update package changes" > "$report_file"
-echo >> "$report_file"
+{
+  echo "# Flake update package changes"
+  echo
+  echo "Nightly flake input update. The report below is generated from NixOS host system closure diffs."
+  echo
+} > "$report_file"
 
 for host in "${hosts[@]}"; do
   echo "Building current closure for $host"
@@ -45,6 +52,7 @@ fi
 
 for i in "${!hosts[@]}"; do
   host="${hosts[$i]}"
+  host_report="$host_report_dir/$host.md"
   echo "Building candidate closure for $host"
   candidate_path="$(
     nix build ".#nixosConfigurations.$host.config.system.build.toplevel" --no-link --print-out-paths
@@ -53,17 +61,26 @@ for i in "${!hosts[@]}"; do
 
   base_path="$(sed -n "$((i + 1))p" "$base_paths_file")"
 
-  echo "## $host" >> "$report_file"
-  echo >> "$report_file"
-  if nvd diff "$base_path" "$candidate_path" >> "$report_file"; then
+  echo "Comparing package closure for $host"
+  if nvd diff "$base_path" "$candidate_path" | tee "$host_report"; then
     :
   else
-    echo "nvd diff failed for $host" >> "$report_file"
+    echo "nvd diff failed for $host" | tee -a "$host_report"
   fi
-  echo >> "$report_file"
+
+  if [ -s "$host_report" ]; then
+    {
+      echo "## $host"
+      echo
+      echo '```text'
+      cat "$host_report"
+      echo '```'
+      echo
+    } >> "$report_file"
+  fi
 done
 
-if ! rg -q '=>|->|added|removed|upgraded|downgraded|Version changes' "$report_file"; then
+if ! find "$host_report_dir" -type f -size +0c | grep -q .; then
   git checkout -- flake.lock
   echo "changed=false" >> "${GITHUB_OUTPUT:-/dev/null}"
   echo "flake.lock changed but host package closure report was empty"
