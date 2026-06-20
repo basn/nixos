@@ -10,8 +10,11 @@
         sopsFile = ./secrets/authentik.env;
         format = "dotenv";
       };
-      grafana-secret-key.restartUnits = [ "grafana.service" ];
-      freshrss-password = { 
+      grafana-secret-key = {
+        owner = "grafana";
+        restartUnits = [ "grafana.service" ];
+      };
+      freshrss-password = {
         owner = config.services.freshrss.user;
       };
       searx = {
