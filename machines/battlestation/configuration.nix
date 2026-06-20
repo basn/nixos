@@ -64,7 +64,10 @@ let
 in
 
 {
-  imports = [ ./opencode.nix ];
+  imports = [
+    ./cachyos-proton.nix
+    ./opencode.nix
+  ];
 
   swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
   boot = {
