@@ -28,6 +28,7 @@ report_file=".ci/flake-update-report.md"
 : > "$candidate_paths_file"
 rm -rf "$host_report_dir"
 mkdir -p "$host_report_dir"
+useful_hosts=0
 
 {
   echo "# Flake update package changes"
@@ -69,21 +70,26 @@ for i in "${!hosts[@]}"; do
   fi
 
   if [ -s "$host_report" ]; then
-    {
-      echo "## $host"
-      echo
-      echo '```text'
-      cat "$host_report"
-      echo '```'
-      echo
-    } >> "$report_file"
+    if rg -q '^No version or selection state changes\.$' "$host_report"; then
+      echo "No package version or selection changes for $host"
+    else
+      useful_hosts=$((useful_hosts + 1))
+      {
+        echo "## $host"
+        echo
+        echo '```text'
+        cat "$host_report"
+        echo '```'
+        echo
+      } >> "$report_file"
+    fi
   fi
 done
 
-if ! find "$host_report_dir" -type f -size +0c | grep -q .; then
+if [ "$useful_hosts" -eq 0 ]; then
   git checkout -- flake.lock
   echo "changed=false" >> "${GITHUB_OUTPUT:-/dev/null}"
-  echo "flake.lock changed but host package closure report was empty"
+  echo "flake.lock changed but no host had package version or selection changes"
   exit 0
 fi
 

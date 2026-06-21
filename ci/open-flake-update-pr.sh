@@ -61,6 +61,7 @@ if [ -n "${GITHUB_OUTPUT:-}" ]; then
 fi
 
 if [ -n "${HOME_ASSISTANT_WEBHOOK_URL:-}" ]; then
+  echo "Sending Home Assistant webhook notification"
   curl -fsS \
     -X POST \
     -H "Content-Type: application/json" \
@@ -84,6 +85,7 @@ if [ -n "${HOME_ASSISTANT_WEBHOOK_URL:-}" ]; then
     )" \
     "$HOME_ASSISTANT_WEBHOOK_URL" \
     >/dev/null
+  echo "Home Assistant webhook notification sent"
 else
   echo "HOME_ASSISTANT_WEBHOOK_URL is not set; skipping Home Assistant notification" >&2
 fi
