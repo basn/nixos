@@ -9,6 +9,50 @@ trap 'rm -rf "$base_dir"' EXIT
 
 git archive HEAD | tar -x -C "$base_dir"
 
+is_meaningful_change() {
+  local host="$1"
+  local report_file="$2"
+
+  if [ ! -s "$report_file" ]; then
+    return 1
+  fi
+
+  if rg -q '^No version or selection state changes\.$' "$report_file"; then
+    return 1
+  fi
+
+  if rg -q '^nvd diff failed for ' "$report_file"; then
+    return 1
+  fi
+
+  # Extract the derivation names from the diff and keep only real package changes.
+  # `nixpkgs` can re-pin without changing package sets we care about; ignore only
+  # machine build outputs to avoid false positives when just system version changes.
+  local ignore_pattern
+  ignore_pattern="^nixos-system-${host//\//-}-"
+  local has_meaningful=0
+
+  mapfile -t changed_derivations < <(
+    rg -o "/nix/store/[a-z0-9]{32}-[^[:space:]]+" "$report_file" \
+      | sed -E 's#/nix/store/[a-z0-9]{32}-##' \
+      | sort -u
+  )
+
+  if [ "${#changed_derivations[@]}" -eq 0 ]; then
+    return 1
+  fi
+
+  for derivation in "${changed_derivations[@]}"; do
+    if [[ "$derivation" =~ $ignore_pattern ]] || [[ "$derivation" == "nixos-system" ]]; then
+      continue
+    fi
+    has_meaningful=1
+    break
+  done
+
+  [ "$has_meaningful" -eq 1 ]
+}
+
 mapfile -t hosts < <(
   nix eval --json "$base_dir#nixosConfigurations" --apply 'configs: builtins.attrNames configs' \
     | jq -r '.[] | select(test("Iso$") | not)'
@@ -69,20 +113,18 @@ for i in "${!hosts[@]}"; do
     echo "nvd diff failed for $host" | tee -a "$host_report"
   fi
 
-  if [ -s "$host_report" ]; then
-    if rg -q '^No version or selection state changes\.$' "$host_report"; then
-      echo "No package version or selection changes for $host"
-    else
-      useful_hosts=$((useful_hosts + 1))
-      {
-        echo "## $host"
-        echo
-        echo '```text'
-        cat "$host_report"
-        echo '```'
-        echo
-      } >> "$report_file"
-    fi
+  if is_meaningful_change "$host" "$host_report"; then
+    useful_hosts=$((useful_hosts + 1))
+    {
+      echo "## $host"
+      echo
+      echo '```text'
+      cat "$host_report"
+      echo '```'
+      echo
+    } >> "$report_file"
+  else
+    echo "No package-level changes for $host"
   fi
 done
 

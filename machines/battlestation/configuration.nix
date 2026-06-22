@@ -61,6 +61,56 @@ let
     ];
     passthru.providedSessions = [ "mango-noctalia" ];
   };
+
+  baseUdevRules = ''
+    # Prevent autosuspend on Fosi Audio K7 USB DAC to avoid audio crackle/dropouts.
+    ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="152a", ATTR{idProduct}=="889b", TEST=="power/control", ATTR{power/control}="on"
+    ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="152a", ATTR{idProduct}=="889b", TEST=="power/autosuspend_delay_ms", ATTR{power/autosuspend_delay_ms}="-1"
+    # Prevent autosuspend on Elgato Wave XLR to avoid mute/unmute wakeup glitches.
+    ACTION=="add|change", SUBSYSTEM=="usb", ATTRS{product}=="Wave XLR", TEST=="power/control", ATTR{power/control}="on"
+    ACTION=="add|change", SUBSYSTEM=="usb", ATTRS{product}=="Wave XLR", TEST=="power/autosuspend_delay_ms", ATTR{power/autosuspend_delay_ms}="-1"
+  '';
+
+  vrKernelPatches = [
+    {
+      name = "pimax-non-desktop-edid-quirks";
+      patch = pkgs.fetchurl {
+        url = "https://gist.githubusercontent.com/TayouVR/60e3ee5f95375827a66a8898bea02bec/raw/c85135c8d8821ebb2fa85629d837a41de57e12ef/pimax.patch";
+        hash = "sha256-xD8mUZne3MDFDt4jstsBv5bG7fWSejV4LEAKB3GWdAY=";
+      };
+    }
+    {
+      name = "pimax-edid-checksum-fixup";
+      patch = pkgs.fetchurl {
+        url = "https://gist.githubusercontent.com/Coreforge/59ed3548427c999273ec012002461eab/raw/f70df3afd5cccbfc6fb34ef805db41d00dbf4770/ps0002-drm-edid-fix-checksum-errors-in-Pimax-HMD-EDIDs.patch";
+        hash = "sha256-faggU9KLVydvdQR8m9V7SUQnwtXs+h9IpNv9BS64qZU=";
+      };
+    }
+  ];
+
+  vrUdevRules = ''
+    # Allow Monado's Pimax driver to access P2-series headset control HID.
+    SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="0101", MODE="0660", GROUP="input"
+    KERNEL=="hidraw*", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="0101", MODE="0660", GROUP="input"
+  '';
+
+  vrOpenvrConfig = pkgs.writeText "openvrpaths.vrpath" (
+    builtins.toJSON {
+      version = 1;
+      jsonid = "vrpathreg";
+      external_drivers = null;
+      config = [ "/home/basn/.local/share/Steam/config" ];
+      log = [ "/home/basn/.local/share/Steam/logs" ];
+      runtime = [ "${pkgs.xrizer}/lib/xrizer" ];
+    }
+  );
+
+  vrSteamPackage = pkgs.steam.override {
+    extraProfile = ''
+      export PRESSURE_VESSEL_IMPORT_OPENXR_1_RUNTIMES=1
+      unset TZ
+    '';
+  };
 in
 
 {
@@ -101,22 +151,6 @@ in
     kernelModules = [
       "kvm-intel"
       "ntsync"
-    ];
-    kernelPatches = [
-      {
-        name = "pimax-non-desktop-edid-quirks";
-        patch = pkgs.fetchurl {
-          url = "https://gist.githubusercontent.com/TayouVR/60e3ee5f95375827a66a8898bea02bec/raw/c85135c8d8821ebb2fa85629d837a41de57e12ef/pimax.patch";
-          hash = "sha256-xD8mUZne3MDFDt4jstsBv5bG7fWSejV4LEAKB3GWdAY=";
-        };
-      }
-      {
-        name = "pimax-edid-checksum-fixup";
-        patch = pkgs.fetchurl {
-          url = "https://gist.githubusercontent.com/Coreforge/59ed3548427c999273ec012002461eab/raw/f70df3afd5cccbfc6fb34ef805db41d00dbf4770/ps0002-drm-edid-fix-checksum-errors-in-Pimax-HMD-EDIDs.patch";
-          hash = "sha256-faggU9KLVydvdQR8m9V7SUQnwtXs+h9IpNv9BS64qZU=";
-        };
-      }
     ];
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v3;
     kernelParams = [
@@ -171,25 +205,10 @@ in
       enable = true;
     };
     udev = {
-      extraRules = ''
-        # Prevent autosuspend on Fosi Audio K7 USB DAC to avoid audio crackle/dropouts.
-        ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="152a", ATTR{idProduct}=="889b", TEST=="power/control", ATTR{power/control}="on"
-        ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="152a", ATTR{idProduct}=="889b", TEST=="power/autosuspend_delay_ms", ATTR{power/autosuspend_delay_ms}="-1"
-        # Prevent autosuspend on Elgato Wave XLR to avoid mute/unmute wakeup glitches.
-        ACTION=="add|change", SUBSYSTEM=="usb", ATTRS{product}=="Wave XLR", TEST=="power/control", ATTR{power/control}="on"
-        ACTION=="add|change", SUBSYSTEM=="usb", ATTRS{product}=="Wave XLR", TEST=="power/autosuspend_delay_ms", ATTR{power/autosuspend_delay_ms}="-1"
-        # Allow Monado's Pimax driver to access P2-series headset control HID.
-        SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="0101", MODE="0660", GROUP="input"
-        KERNEL=="hidraw*", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="0101", MODE="0660", GROUP="input"
-      '';
+      extraRules = baseUdevRules;
     };
     pcscd = {
       enable = true;
-    };
-    monado = {
-      enable = true;
-      package = monadoPimax;
-      defaultRuntime = true;
     };
     displayManager = {
       sddm = {
@@ -320,24 +339,30 @@ in
     };
     displayManager.sessionPackages = [ mangoNoctaliaSession ];
   };
-  systemd.user.services.monado.environment = {
-    STEAMVR_LH_ENABLE = "1";
-    IPC_EXIT_WHEN_IDLE = "1";
-    PIMAX_HID_RETRY_COUNT = "10";
+  specialisation.vr = {
+    configuration = {
+      boot = {
+        kernelPatches = vrKernelPatches;
+      };
+      services = {
+        monado = {
+          enable = true;
+          package = monadoPimax;
+          defaultRuntime = true;
+        };
+        udev.extraRules = baseUdevRules + vrUdevRules;
+      };
+      systemd.user.services.monado.environment = {
+        STEAMVR_LH_ENABLE = "1";
+        IPC_EXIT_WHEN_IDLE = "1";
+        PIMAX_HID_RETRY_COUNT = "10";
+      };
+      hjem.users.basn.files.".config/openvr/openvrpaths.vrpath".source = vrOpenvrConfig;
+      hjem.users.basn.files.".config/pimax/meshes".source = "${pimaxDistortion}/meshes";
+      environment.systemPackages = with pkgs; [ xrizer ];
+      programs.steam.package = vrSteamPackage;
+    };
   };
-  hjem.users.basn.files.".config/openvr/openvrpaths.vrpath".source =
-    pkgs.writeText "openvrpaths.vrpath"
-      (
-        builtins.toJSON {
-          version = 1;
-          jsonid = "vrpathreg";
-          external_drivers = null;
-          config = [ "/home/basn/.local/share/Steam/config" ];
-          log = [ "/home/basn/.local/share/Steam/logs" ];
-          runtime = [ "${pkgs.xrizer}/lib/xrizer" ];
-        }
-      );
-  hjem.users.basn.files.".config/pimax/meshes".source = "${pimaxDistortion}/meshes";
   security = {
     rtkit = {
       enable = true;
@@ -365,7 +390,6 @@ in
       rocmPackages.rocm-smi
       rocmPackages.rocminfo
       mangohud
-      xrizer
       protontricks
     ];
     variables = {
@@ -411,12 +435,6 @@ in
     mangowc.enable = true;
     steam = {
       enable = true;
-      package = pkgs.steam.override {
-        extraProfile = ''
-          export PRESSURE_VESSEL_IMPORT_OPENXR_1_RUNTIMES=1
-          unset TZ
-        '';
-      };
       gamescopeSession = {
         enable = true;
       };
