@@ -101,6 +101,4 @@
     };
   };
   documentation.man.cache.enable = false;
-  # make a symlink of flake within the generation (e.g. /run/current-system/src) thanks iynaix (i am stealing this with pride)
-  system.systemBuilderCommands = "ln -s ${self.sourceInfo.outPath} $out/src";
 }
