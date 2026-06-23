@@ -18,6 +18,10 @@ let
   );
 in
 {
+  imports = [
+    ../../common/zfs.nix
+  ];
+
   boot = {
     kernelPackages = latestKernelPackage;
     supportedFilesystems = [ "zfs" ];

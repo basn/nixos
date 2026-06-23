@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ../../common/zfs.nix
     ./hardware-configuration.nix
     ./sops.nix
     ./services/podman.nix

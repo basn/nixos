@@ -1,6 +1,7 @@
 { lib, ... }:
 {
   imports = [
+    ../../common/zfs.nix
     ./netbird.nix
     ./sops.nix
   ];

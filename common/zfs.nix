@@ -1,5 +1,11 @@
 { pkgs, ... }:
 {
+  sops.secrets.zfs = {
+    format = "yaml";
+    sopsFile = ../secrets/zfs.yaml;
+    key = "password";
+  };
+
   programs = {
     msmtp = {
       enable = true;

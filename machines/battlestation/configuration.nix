@@ -115,6 +115,7 @@ in
 
 {
   imports = [
+    ../../common/zfs.nix
     ./cachyos-proton.nix
     ./opencode.nix
   ];

@@ -12,11 +12,6 @@
         format = "binary";
         sopsFile = ./secrets/wg.conf;
       };
-      zfs = {
-        format = "yaml";
-        sopsFile = ../../secrets/zfs.yaml;
-        key = "password";
-      };
       atticd-env = {
         sopsFile = ./secrets/bandit.yaml;
         key = "atticd-env";

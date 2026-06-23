@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ../../common/zfs.nix
     ./hardware-configuration.nix
     ./services/kuma.nix
     ./services/nginx.nix
