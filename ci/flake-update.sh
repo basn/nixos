@@ -25,32 +25,23 @@ is_meaningful_change() {
     return 1
   fi
 
-  # Extract the derivation names from the diff and keep only real package changes.
-  # `nixpkgs` can re-pin without changing package sets we care about; ignore only
-  # machine build outputs to avoid false positives when just system version changes.
-  local ignore_pattern
-  ignore_pattern="^nixos-system-${host//\//-}-"
-  local has_meaningful=0
+  # nvd emits package changes as table rows, not store paths. Keep only real
+  # package rows and ignore the host system generation itself.
+  local ignored_system_package
+  ignored_system_package="nixos-system-${host//\//-}"
 
-  mapfile -t changed_derivations < <(
-    rg -o "/nix/store/[a-z0-9]{32}-[^[:space:]]+" "$report_file" \
-      | sed -E 's#/nix/store/[a-z0-9]{32}-##' \
-      | sort -u
-  )
+  awk -v ignored_system_package="$ignored_system_package" '
+    /^\[[^]]+\][[:space:]]+#[0-9]+[[:space:]]+/ {
+      package = $3
+      if (package != ignored_system_package && package != "nixos-system") {
+        found = 1
+      }
+    }
 
-  if [ "${#changed_derivations[@]}" -eq 0 ]; then
-    return 1
-  fi
-
-  for derivation in "${changed_derivations[@]}"; do
-    if [[ "$derivation" =~ $ignore_pattern ]] || [[ "$derivation" == "nixos-system" ]]; then
-      continue
-    fi
-    has_meaningful=1
-    break
-  done
-
-  [ "$has_meaningful" -eq 1 ]
+    END {
+      exit found ? 0 : 1
+    }
+  ' "$report_file"
 }
 
 mapfile -t hosts < <(
