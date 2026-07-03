@@ -1,4 +1,22 @@
-{ pkgs, unstableSmall, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  zfsCompatibleKernelPackages = lib.filterAttrs (
+    name: kernelPackages:
+    (builtins.match "linux_[0-9]+_[0-9]+" name) != null
+    && (builtins.tryEval kernelPackages).success
+    && (!kernelPackages.${config.boot.zfs.package.kernelModuleAttribute}.meta.broken)
+  ) pkgs.linuxKernel.packages;
+  latestKernelPackage = lib.last (
+    lib.sort (a: b: (lib.versionOlder a.kernel.version b.kernel.version)) (
+      builtins.attrValues zfsCompatibleKernelPackages
+    )
+  );
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -15,7 +33,7 @@
       };
     };
     zfs = {
-      package = unstableSmall.zfs_unstable;
+      package = pkgs.zfs_2_4;
       requestEncryptionCredentials = true;
       forceImportRoot = false;
     };
@@ -23,7 +41,7 @@
       supportedFilesystems = [ "zfs" ];
     };
     supportedFilesystems = [ "zfs" ];
-    kernelPackages = unstableSmall.linuxPackages_zen;
+    kernelPackages = latestKernelPackage;
   };
   networking = {
     hostName = "laptop";

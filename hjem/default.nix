@@ -35,7 +35,6 @@ in
         packages = with pkgs; [
           spotify
           discord
-          vesktop
           equibop
           signal-desktop
           orcaSlicer
