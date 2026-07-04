@@ -439,9 +439,9 @@
         "lockCommand": "",
         "lockTimeout": 660,
         "resumeLockCommand": "",
-        "resumeScreenOffCommand": "",
+        "resumeScreenOffCommand": "mmsg get all-monitors | tr '{' '\\n' | sed -n 's/.*\"name\":\"\\([^\"]*\\)\".*/\\1/p' | while read -r monitor; do mmsg dispatch enable_monitor,\"$monitor\"; done",
         "resumeSuspendCommand": "",
-        "screenOffCommand": "",
+        "screenOffCommand": "mmsg get all-monitors | tr '{' '\\n' | sed -n 's/.*\"name\":\"\\([^\"]*\\)\".*/\\1/p' | while read -r monitor; do mmsg dispatch disable_monitor,\"$monitor\"; done",
         "screenOffTimeout": 600,
         "suspendCommand": "",
         "suspendTimeout": 0
