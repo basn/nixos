@@ -28,6 +28,8 @@ let
     hash = "sha256-33cimiRQgJkL9xj7Y7cJgiCdRXGqFG9qqdNvx4gm5i8=";
   };
 
+  mangoPackage = pkgs.mango or pkgs.mangowc;
+
   mangoNoctaliaLauncher = pkgs.writeShellScriptBin "mango-noctalia-session" ''
     set -eu
     export XDG_CURRENT_DESKTOP=mango:wlroots
@@ -41,9 +43,9 @@ let
 
     cfg="$HOME/.config/mangowc/mangowc.conf"
     if [ -f "$cfg" ]; then
-      exec ${pkgs.mangowc}/bin/mango -c "$cfg" -s ${pkgs.noctalia-shell}/bin/noctalia-shell
+      exec ${mangoPackage}/bin/mango -c "$cfg" -s ${pkgs.noctalia-shell}/bin/noctalia-shell
     else
-      exec ${pkgs.mangowc}/bin/mango -s ${pkgs.noctalia-shell}/bin/noctalia-shell
+      exec ${mangoPackage}/bin/mango -s ${pkgs.noctalia-shell}/bin/noctalia-shell
     fi
   '';
 
@@ -433,7 +435,10 @@ in
     };
   };
   programs = {
-    mangowc.enable = true;
+    mangowc = {
+      enable = true;
+      package = mangoPackage;
+    };
     steam = {
       enable = true;
       gamescopeSession = {
