@@ -337,6 +337,7 @@ in
     fwupd = {
       enable = true; # plasma
     };
+    gnome.gnome-keyring.enable = true;
     lact = {
       enable = true;
     };
