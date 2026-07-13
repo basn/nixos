@@ -1,4 +1,9 @@
-{ pkgs, config, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 let
   monitorConfigFile =
     if config.networking.hostName == "laptop" then
@@ -14,6 +19,8 @@ let
   mangoPackage = pkgs.mango or pkgs.mangowc;
 in
 {
+  services.gnome.gnome-keyring.enable = lib.mkIf config.programs.mangowc.enable true;
+
   hjem = {
     users = {
       basn = {
