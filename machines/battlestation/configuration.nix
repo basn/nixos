@@ -1,10 +1,13 @@
 {
   config,
+  lib,
   pkgs,
   unstableSmall,
   ...
 }:
 let
+  enableVrSpecialisation = false;
+
   monadoPimax = pkgs.monado.overrideAttrs (oldAttrs: {
     version = "25.1.0-pimax-16792a6";
     src = pkgs.fetchFromGitLab {
@@ -155,7 +158,7 @@ in
       "kvm-intel"
       "ntsync"
     ];
-    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v3;
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto-x86_64-v3;
     kernelParams = [
       "split_lock_detect=off"
       "intel_iommu=on"
@@ -342,28 +345,30 @@ in
     };
     displayManager.sessionPackages = [ mangoNoctaliaSession ];
   };
-  specialisation.vr = {
-    configuration = {
-      boot = {
-        kernelPatches = vrKernelPatches;
-      };
-      services = {
-        monado = {
-          enable = true;
-          package = monadoPimax;
-          defaultRuntime = true;
+  specialisation = lib.mkIf enableVrSpecialisation {
+    vr = {
+      configuration = {
+        boot = {
+          kernelPatches = vrKernelPatches;
         };
-        udev.extraRules = baseUdevRules + vrUdevRules;
+        services = {
+          monado = {
+            enable = true;
+            package = monadoPimax;
+            defaultRuntime = true;
+          };
+          udev.extraRules = baseUdevRules + vrUdevRules;
+        };
+        systemd.user.services.monado.environment = {
+          STEAMVR_LH_ENABLE = "1";
+          IPC_EXIT_WHEN_IDLE = "1";
+          PIMAX_HID_RETRY_COUNT = "10";
+        };
+        hjem.users.basn.files.".config/openvr/openvrpaths.vrpath".source = vrOpenvrConfig;
+        hjem.users.basn.files.".config/pimax/meshes".source = "${pimaxDistortion}/meshes";
+        environment.systemPackages = with pkgs; [ xrizer ];
+        programs.steam.package = vrSteamPackage;
       };
-      systemd.user.services.monado.environment = {
-        STEAMVR_LH_ENABLE = "1";
-        IPC_EXIT_WHEN_IDLE = "1";
-        PIMAX_HID_RETRY_COUNT = "10";
-      };
-      hjem.users.basn.files.".config/openvr/openvrpaths.vrpath".source = vrOpenvrConfig;
-      hjem.users.basn.files.".config/pimax/meshes".source = "${pimaxDistortion}/meshes";
-      environment.systemPackages = with pkgs; [ xrizer ];
-      programs.steam.package = vrSteamPackage;
     };
   };
   security = {
