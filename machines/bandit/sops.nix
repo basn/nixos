@@ -22,6 +22,11 @@
         key = "gitea-actions-runner-env";
         restartUnits = [ "gitea-runner-codeberg.service" ];
       };
+      seedport = {
+        sopsFile = ./secrets/bandit.yaml;
+        key = "seedport";
+        restartUnits = [ "qbittorrent.service" ];
+      };
     };
   };
 }
