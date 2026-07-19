@@ -121,12 +121,12 @@
       fsType = "zfs";
     };
     "/data2/files" = {
-      device = "data/torrent";
+      device = "data2/files";
       fsType = "zfs";
       encrypted.keyFile = "/root/zfs-data2.key";
     };
     "/data/attic" = {
-      device = "data/attic";
+      device = "data2/attic";
       fsType = "zfs";
     };
     "/boot1" = {
