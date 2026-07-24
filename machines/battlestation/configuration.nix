@@ -398,6 +398,7 @@ in
       rocmPackages.rocm-smi
       rocmPackages.rocminfo
       mangohud
+      vkbasalt
       protontricks
     ];
     variables = {
