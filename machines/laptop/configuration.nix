@@ -112,7 +112,6 @@ in
       "networkmanager"
       "wheel"
     ];
-    packages = with pkgs; [ ];
   };
   environment.systemPackages = with pkgs; [ neovim ];
   fonts.packages = with pkgs; [ meslo-lgs-nf ];

@@ -235,9 +235,6 @@ in
       plasma6 = {
         enable = true;
       };
-      cosmic = {
-        enable = false;
-      };
     };
     xserver = {
       enable = true;

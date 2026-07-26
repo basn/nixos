@@ -98,7 +98,7 @@
           };
           utility = {
             nvim-biscuits = {
-              enable = false; # troubleshoot this?
+              enable = true;
             };
           };
           visuals = {
