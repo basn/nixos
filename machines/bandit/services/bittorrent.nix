@@ -8,6 +8,7 @@
 }:
 let
   seedportFile = config.sops.secrets.seedport.path;
+  azirePortforwardTokenFile = config.sops.secrets.azire-portforward-token.path;
   configureSeedPort = pkgs.writeShellScript "qbittorrent-configure-seedport" ''
     set -euo pipefail
 
@@ -39,6 +40,42 @@ let
     ${pkgs.iptables}/bin/iptables -A qbittorrent-incoming -p tcp --dport "$seedport" -j ACCEPT
     ${pkgs.iptables}/bin/iptables -A qbittorrent-incoming -p udp --dport "$seedport" -j ACCEPT
   '';
+  azirePortforward = pkgs.writeShellApplication {
+    name = "azire-portforward";
+    runtimeInputs = with pkgs; [
+      curl
+      gawk
+      iproute2
+    ];
+    text = ''
+      set -euo pipefail
+
+      if [ "$(id -u)" -ne 0 ]; then
+        echo "Run this command with sudo: sudo azire-portforward" >&2
+        exit 1
+      fi
+
+      token="$(tr -d '[:space:]' < ${azirePortforwardTokenFile})"
+      if [ -z "$token" ]; then
+        echo "AzireVPN port-forwarding token is empty" >&2
+        exit 1
+      fi
+
+      mapfile -t internal_ipv4s < <(
+        ip netns exec wg ip -4 -o addr show dev wg0 scope global |
+          awk '{ sub(/\/.*/, "", $4); print $4 }'
+      )
+      if [ "''${#internal_ipv4s[@]}" -ne 1 ]; then
+        echo "Expected exactly one IPv4 address on wg0 in the wg namespace" >&2
+        exit 1
+      fi
+
+      exec ip netns exec wg curl --fail-with-body --noproxy "*" \
+        https://api.azirevpn.com/v3/portforwardings \
+        -H "Authorization: Bearer $token" \
+        --json "{\"internal_ipv4\": \"''${internal_ipv4s[0]}\", \"hidden\": false, \"expires_in\": 0}"
+    '';
+  };
 in
 {
   disabledModules = [ "services/torrent/qbittorrent.nix" ];
@@ -59,6 +96,7 @@ in
     vpnNamespace = "wg";
   };
   systemd.services.qbittorrent.serviceConfig.ExecStartPre = lib.mkAfter [ "!${configureSeedPort}" ];
+  environment.systemPackages = [ azirePortforward ];
   services = {
     qbittorrent = {
       enable = true;

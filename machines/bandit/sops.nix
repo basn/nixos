@@ -27,6 +27,11 @@
         key = "seedport";
         restartUnits = [ "qbittorrent.service" ];
       };
+      azire-portforward-token = {
+        sopsFile = ./secrets/bandit.yaml;
+        key = "azire-portforward-token";
+        mode = "0400";
+      };
     };
   };
 }
