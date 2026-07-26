@@ -42,6 +42,9 @@ in
     };
     supportedFilesystems = [ "zfs" ];
     kernelPackages = latestKernelPackage;
+    # Linux 6.18's hid_alps path duplicates this touchpad with the reliable
+    # PS/2 device; retain the latter through psmouse.
+    kernelParams = [ "module_blacklist=hid_alps" ];
   };
   networking = {
     hostName = "laptop";
