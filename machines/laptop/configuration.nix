@@ -113,7 +113,6 @@ in
       "wheel"
     ];
   };
-  environment.systemPackages = with pkgs; [ neovim ];
   fonts.packages = with pkgs; [ meslo-lgs-nf ];
   powerManagement = {
     enable = true;

@@ -32,6 +32,12 @@
         key = "azire-portforward-token";
         mode = "0400";
       };
+      unpackerr-env = {
+        sopsFile = ./secrets/bandit.yaml;
+        key = "unpackerr-env";
+        mode = "0400";
+        restartUnits = [ "unpackerr.service" ];
+      };
     };
   };
 }

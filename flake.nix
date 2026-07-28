@@ -12,6 +12,7 @@
     };
     sops_nix = {
       url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     vpn-confinement = {
       url = "github:Maroka-chan/VPN-Confinement";
@@ -26,6 +27,7 @@
     };
     authentik-nix = {
       url = "github:nix-community/authentik-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-cachyos-kernel = {
       url = "github:xddxdd/nix-cachyos-kernel";
@@ -55,6 +57,8 @@
           nixpkgsLib ? lib,
           modules,
           includeCommon ? true,
+          includeNetbird ? true,
+          includeMonitoring ? true,
           extraSpecialArgs ? { },
         }:
         nixpkgsLib.nixosSystem {
@@ -63,6 +67,8 @@
             { boot.zfs.forceImportRoot = false; }
           ]
           ++ lib.optionals includeCommon [ ./common/common.nix ]
+          ++ lib.optionals (includeCommon && includeNetbird) [ ./common/netbird.nix ]
+          ++ lib.optionals (includeCommon && includeMonitoring) [ ./common/monitoring-exporters.nix ]
           ++ modules;
           specialArgs = {
             inherit

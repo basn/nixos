@@ -391,8 +391,6 @@ in
     '';
   environment = {
     systemPackages = with pkgs; [
-      neovim
-      nh
       protonup-ng
       sddm-astronaut
       playerctl

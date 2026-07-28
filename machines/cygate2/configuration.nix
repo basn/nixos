@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -60,8 +59,6 @@
       ];
     };
   };
-  environment.systemPackages = with pkgs; [ ];
-
   services = {
     openssh.enable = true;
     zfs.autoScrub.enable = true;
