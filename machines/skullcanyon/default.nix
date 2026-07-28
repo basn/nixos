@@ -1,29 +1,15 @@
 {
   lib,
   pkgs,
-  config,
   ...
 }:
-let
-  zfsCompatibleKernelPackages = lib.filterAttrs (
-    name: kernelPackages:
-    (builtins.match "linux_[0-9]+_[0-9]+" name) != null
-    && (builtins.tryEval kernelPackages).success
-    && (!kernelPackages.${config.boot.zfs.package.kernelModuleAttribute}.meta.broken)
-  ) pkgs.linuxKernel.packages;
-  latestKernelPackage = lib.last (
-    lib.sort (a: b: (lib.versionOlder a.kernel.version b.kernel.version)) (
-      builtins.attrValues zfsCompatibleKernelPackages
-    )
-  );
-in
 {
   imports = [
-    ../../common/zfs.nix
   ];
 
+  basn.boot.useLatestZfsCompatibleKernel = true;
+
   boot = {
-    kernelPackages = latestKernelPackage;
     supportedFilesystems = [ "zfs" ];
     zfs = {
       package = pkgs.zfs_2_4;
@@ -140,7 +126,6 @@ in
     };
   };
   services = {
-    openssh.enable = true;
     sanoid = {
       enable = true;
       templates.hermes = {
@@ -152,7 +137,6 @@ in
       };
       datasets."osdisk/vms/hermes".useTemplate = [ "hermes" ];
     };
-    zfs.autoScrub.enable = true;
   };
   programs.nh.clean = {
     enable = true;
@@ -160,11 +144,5 @@ in
     extraArgs = lib.mkForce "--keep-since 14d --keep 10";
   };
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  system = {
-    stateVersion = "24.05";
-    autoUpgrade = {
-      flake = "git+https://codeberg.org/basn/nixos";
-      enable = true;
-    };
-  };
+  system.stateVersion = "24.05";
 }

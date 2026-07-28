@@ -1,27 +1,11 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-let
-  zfsCompatibleKernelPackages = lib.filterAttrs (
-    name: kernelPackages:
-    (builtins.match "linux_[0-9]+_[0-9]+" name) != null
-    && (builtins.tryEval kernelPackages).success
-    && (!kernelPackages.${config.boot.zfs.package.kernelModuleAttribute}.meta.broken)
-  ) pkgs.linuxKernel.packages;
-  latestKernelPackage = lib.last (
-    lib.sort (a: b: (lib.versionOlder a.kernel.version b.kernel.version)) (
-      builtins.attrValues zfsCompatibleKernelPackages
-    )
-  );
-in
+{ pkgs, ... }:
 {
   imports = [
     ./hardware-configuration.nix
     ./plasma6.nix
   ];
+
+  basn.boot.useLatestZfsCompatibleKernel = true;
 
   boot = {
     loader = {
@@ -41,7 +25,6 @@ in
       supportedFilesystems = [ "zfs" ];
     };
     supportedFilesystems = [ "zfs" ];
-    kernelPackages = latestKernelPackage;
     # Linux 6.18's hid_alps path duplicates this touchpad with the reliable
     # PS/2 device; retain the latter through psmouse.
     kernelParams = [ "module_blacklist=hid_alps" ];

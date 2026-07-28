@@ -1,7 +1,6 @@
 { ... }:
 {
   imports = [
-    ../../common/zfs.nix
     ./hardware-configuration.nix
     ./services/kuma.nix
     ./services/nginx.nix
@@ -63,16 +62,6 @@
       internalInterfaces = [ "wt0" ];
     };
   };
-  services = {
-    openssh.enable = true;
-    zfs.autoScrub.enable = true;
-  };
   virtualisation.vmware.guest.enable = true;
-  system = {
-    stateVersion = "24.05";
-    autoUpgrade = {
-      flake = "git+https://codeberg.org/basn/nixos";
-      enable = true;
-    };
-  };
+  system.stateVersion = "24.05";
 }

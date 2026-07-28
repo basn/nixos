@@ -19,7 +19,6 @@
     ./rclone/rclone.nix
     ./services/jellyfin.nix
     ./sops.nix
-    ../../common/zfs.nix
     ./services/immich.nix
     inputs.sops_nix.nixosModules.sops
   ];
@@ -264,28 +263,16 @@
     irqbalance = {
       enable = true;
     };
-    openssh = {
-      enable = true;
-    };
     zfs = {
-      autoScrub = {
-        enable = true;
-      };
       trim = {
         enable = true;
       };
     };
-    smartd = {
+    smartd.notifications.mail = {
+      sender = "bandit@basn.se";
+      recipient = "basn@lan2k.org";
+      mailer = "${pkgs.msmtp}/bin/msmtp";
       enable = true;
-      autodetect = true;
-      notifications = {
-        mail = {
-          sender = "bandit@basn.se";
-          recipient = "basn@lan2k.org";
-          mailer = "${pkgs.msmtp}/bin/msmtp";
-          enable = true;
-        };
-      };
     };
   };
   powerManagement = {
@@ -311,11 +298,5 @@
       };
     };
   };
-  system = {
-    stateVersion = "24.05";
-    autoUpgrade = {
-      flake = "git+https://codeberg.org/basn/nixos";
-      enable = true;
-    };
-  };
+  system.stateVersion = "24.05";
 }

@@ -2,7 +2,6 @@
 
 {
   imports = [
-    ../../common/zfs.nix
     ./hardware-configuration.nix
     ./sops.nix
     ./services/podman.nix
@@ -60,13 +59,7 @@
     timeServers = [ "ntp1.sp.se" ];
   };
   services = {
-    openssh = {
-      enable = true;
-    };
     zfs = {
-      autoScrub = {
-        enable = true;
-      };
       trim = {
         enable = true;
         interval = "weekly";
@@ -86,13 +79,7 @@
       allowedUDPPorts = [ 53 ];
     };
   };
-  system = {
-    stateVersion = "23.11";
-    autoUpgrade = {
-      flake = "git+https://codeberg.org/basn/nixos";
-      enable = true;
-    };
-  };
+  system.stateVersion = "23.11";
   environment = {
     systemPackages = with pkgs; [ cachix ];
   };

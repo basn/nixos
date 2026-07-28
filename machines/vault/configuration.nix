@@ -1,37 +1,22 @@
 {
   inputs,
   pkgs,
-  lib,
-  config,
   ...
 }:
-let
-  zfsCompatibleKernelPackages = lib.filterAttrs (
-    name: kernelPackages:
-    (builtins.match "linux_[0-9]+_[0-9]+" name) != null
-    && (builtins.tryEval kernelPackages).success
-    && (!kernelPackages.${config.boot.zfs.package.kernelModuleAttribute}.meta.broken)
-  ) pkgs.linuxKernel.packages;
-  latestKernelPackage = lib.last (
-    lib.sort (a: b: (lib.versionOlder a.kernel.version b.kernel.version)) (
-      builtins.attrValues zfsCompatibleKernelPackages
-    )
-  );
-in
 {
   imports = [
     inputs.sops_nix.nixosModules.sops
-    ../../common/zfs.nix
     ./services/samba.nix
     ./services/rsync.nix
     ./services/znapzend.nix
     ./services/backupuser.nix
     ./sops.nix
   ];
+
+  basn.boot.useLatestZfsCompatibleKernel = true;
   boot = {
     kernelModules = [ "kvm-intel" ];
     kernelParams = [ "pcie_aspm=off" ];
-    kernelPackages = latestKernelPackage;
     supportedFilesystems = [ "zfs" ];
     initrd = {
       kernelModules = [ ];
@@ -145,20 +130,10 @@ in
     systemPackages = with pkgs; [ rclone ];
   };
   services = {
-    openssh = {
-      enable = true;
-    };
     zfs = {
-      autoScrub = {
-        enable = true;
-      };
       trim = {
         enable = true;
       };
-    };
-    smartd = {
-      enable = true;
-      autodetect = true;
     };
   };
   powerManagement = {
@@ -184,11 +159,5 @@ in
       };
     };
   };
-  system = {
-    stateVersion = "24.05";
-    autoUpgrade = {
-      flake = "git+https://codeberg.org/basn/nixos";
-      enable = true;
-    };
-  };
+  system.stateVersion = "24.05";
 }

@@ -126,7 +126,6 @@ in
 
   services = {
     netbird.enable = lib.mkForce false;
-    openssh.enable = true;
     qemuGuest.enable = true;
     zfs = {
       autoScrub.enable = true;
@@ -353,8 +352,6 @@ in
   system = {
     stateVersion = "26.05";
     autoUpgrade = {
-      enable = true;
-      flake = "git+https://codeberg.org/basn/nixos";
       randomizedDelaySec = "30m";
     };
   };

@@ -1,7 +1,6 @@
 { lib, ... }:
 {
   imports = [
-    ../../common/zfs.nix
     ./netbird.nix
     ./sops.nix
   ];
@@ -88,8 +87,6 @@
   };
   services = {
     netbird.enable = lib.mkForce false;
-    openssh.enable = true;
-    zfs.autoScrub.enable = true;
   };
   systemd.services.netbird-management = {
     unitConfig.ConditionPathExists = [
@@ -100,11 +97,5 @@
   };
   virtualisation.vmware.guest.enable = true;
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  system = {
-    stateVersion = "24.05";
-    autoUpgrade = {
-      flake = "git+https://codeberg.org/basn/nixos";
-      enable = true;
-    };
-  };
+  system.stateVersion = "24.05";
 }

@@ -59,16 +59,24 @@
           includeCommon ? true,
           includeNetbird ? true,
           includeMonitoring ? true,
+          includeZfsRole ? false,
+          includeAutoUpgradeRole ? false,
+          includeSmartdRole ? false,
           extraSpecialArgs ? { },
         }:
         nixpkgsLib.nixosSystem {
           inherit system;
           modules = [
             { boot.zfs.forceImportRoot = false; }
+            ./common/openssh.nix
+            ./modules/zfs-compatible-kernel.nix
           ]
           ++ lib.optionals includeCommon [ ./common/common.nix ]
           ++ lib.optionals (includeCommon && includeNetbird) [ ./common/netbird.nix ]
           ++ lib.optionals (includeCommon && includeMonitoring) [ ./common/monitoring-exporters.nix ]
+          ++ lib.optionals includeZfsRole [ ./common/zfs.nix ]
+          ++ lib.optionals includeAutoUpgradeRole [ ./common/auto-upgrade.nix ]
+          ++ lib.optionals includeSmartdRole [ ./common/smartd.nix ]
           ++ modules;
           specialArgs = {
             inherit
@@ -87,6 +95,9 @@
     {
       nixosConfigurations = {
         bandit = mkHost {
+          includeZfsRole = true;
+          includeAutoUpgradeRole = true;
+          includeSmartdRole = true;
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = baseModules ++ [
             inputs.vpn-confinement.nixosModules.default
@@ -94,6 +105,9 @@
           ];
         };
         vault = mkHost {
+          includeZfsRole = true;
+          includeAutoUpgradeRole = true;
+          includeSmartdRole = true;
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = baseModules ++ [ ./machines/vault/configuration.nix ];
         };
@@ -108,6 +122,9 @@
         };
         battlestation = mkHost {
           nixpkgsLib = inputs.nixpkgs-unstable.lib;
+          includeZfsRole = true;
+          includeAutoUpgradeRole = true;
+          includeSmartdRole = true;
           extraSpecialArgs = { inherit unstableSmall; };
           modules = baseModules ++ [
             ./machines/battlestation/configuration.nix
@@ -117,6 +134,8 @@
           ];
         };
         services = mkHost {
+          includeZfsRole = true;
+          includeAutoUpgradeRole = true;
           extraSpecialArgs = { inherit unstablePkgs unstableSmall; };
           modules = [
             inputs.sops_nix.nixosModules.sops
@@ -126,15 +145,20 @@
           ];
         };
         nixos-sov = mkHost {
+          includeZfsRole = true;
+          includeAutoUpgradeRole = true;
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = baseModules ++ [ ./machines/cygate/configuration.nix ];
         };
         nixos-sov2 = mkHost {
+          includeZfsRole = true;
+          includeAutoUpgradeRole = true;
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = baseModules ++ [ ./machines/cygate2/configuration.nix ];
         };
         hermes = mkHost {
           nixpkgsLib = inputs.nixpkgs-unstable.lib;
+          includeAutoUpgradeRole = true;
           modules = [
             inputs.hermes-agent.nixosModules.default
             inputs.nvf.nixosModules.default
@@ -143,6 +167,8 @@
           ];
         };
         netbird = mkHost {
+          includeZfsRole = true;
+          includeAutoUpgradeRole = true;
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = [
             ./machines/netbird/default.nix
@@ -151,6 +177,8 @@
           ];
         };
         skullcanyon = mkHost {
+          includeZfsRole = true;
+          includeAutoUpgradeRole = true;
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = [
             ./modules/vlan-bridges.nix
@@ -161,6 +189,8 @@
           ];
         };
         lenovo = mkHost {
+          includeZfsRole = true;
+          includeAutoUpgradeRole = true;
           extraSpecialArgs = { inherit unstablePkgs; };
           modules = [
             ./modules/vlan-bridges.nix

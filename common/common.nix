@@ -9,7 +9,6 @@
     ./users.nix
     ./neovim.nix
     ./fish.nix
-    ./openssh.nix
     ../modules/nixos-upgrade-notify.nix
   ];
   time = {

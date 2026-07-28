@@ -120,7 +120,6 @@ in
 
 {
   imports = [
-    ../../common/zfs.nix
     ./cachyos-proton.nix
     ./opencode.nix
   ];
@@ -323,16 +322,9 @@ in
       };
     };
     zfs = {
-      autoScrub = {
-        enable = true;
-      };
       trim = {
         enable = true;
       };
-    };
-    smartd = {
-      enable = true;
-      autodetect = true;
     };
     fwupd = {
       enable = true; # plasma
@@ -468,13 +460,7 @@ in
     fontDir.enable = true;
     packages = with pkgs; [ meslo-lgs-nf ];
   };
-  system = {
-    autoUpgrade = {
-      flake = "git+https://codeberg.org/basn/nixos";
-      enable = true;
-    };
-    stateVersion = "25.05";
-  };
+  system.stateVersion = "25.05";
   nix = {
     package = unstableSmall.nix;
   };
