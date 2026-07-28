@@ -254,6 +254,14 @@ in
         forceSSL = true;
         locations."/" = authentikAuth;
       };
+      "tube.basn.se" = authentikConfig // {
+        enableACME = true;
+        forceSSL = true;
+        locations."/" = authentikAuth // {
+          proxyPass = "http://127.0.0.1:18082";
+          proxyWebsockets = true;
+        };
+      };
       "uptime.basn.se" = {
         enableACME = true;
         forceSSL = true;
