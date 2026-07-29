@@ -25,6 +25,16 @@
         sopsFile = ./secrets/typetype.env;
         format = "dotenv";
       };
+      typetype-s3-access-key = {
+        sopsFile = ./secrets/typetype.env;
+        format = "dotenv";
+        key = "DOWNLOADER_S3_ACCESS_KEY";
+      };
+      typetype-s3-secret-key = {
+        sopsFile = ./secrets/typetype.env;
+        format = "dotenv";
+        key = "DOWNLOADER_S3_SECRET_KEY";
+      };
       zfs-kuma-vaultwarden-replication = {
         sopsFile = ./secrets/zfs-kuma.yaml;
         key = "vaultwarden-replication";

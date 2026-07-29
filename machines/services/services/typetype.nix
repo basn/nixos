@@ -6,6 +6,7 @@
 }:
 let
   typetypeSecrets = config.sops.secrets.typetype.path;
+  typetypeDownloaderEnv = config.sops.templates.typetype-downloader-env.path;
   typetypeNginx = pkgs.writeText "typetype-nginx.conf" ''
     map $http_upgrade $connection_upgrade {
       default upgrade;
@@ -105,6 +106,14 @@ let
   '';
 in
 {
+  sops.templates.typetype-downloader-env = {
+    content = ''
+      S3_ACCESS_KEY=${config.sops.placeholder.typetype-s3-access-key}
+      S3_SECRET_KEY=${config.sops.placeholder.typetype-s3-secret-key}
+    '';
+    mode = "0400";
+  };
+
   systemd.tmpfiles.rules = [
     "d /docker/typetype 0750 root root - -"
     "d /docker/typetype/postgres 0750 root root - -"
@@ -154,10 +163,10 @@ in
         sleep 1
       done
       if ! podman exec -e PGPASSWORD="$POSTGRES_PASSWORD" typetype-postgres \
-        psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc \
+        psql -U typetype -d "$POSTGRES_DB" -tAc \
         "SELECT 1 FROM pg_database WHERE datname='typetype_downloader'" | grep -qx 1; then
         podman exec -e PGPASSWORD="$POSTGRES_PASSWORD" typetype-postgres \
-          psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c \
+          psql -U typetype -d "$POSTGRES_DB" -c \
           "CREATE DATABASE typetype_downloader"
       fi
     '';
@@ -258,7 +267,10 @@ in
           S3_BUCKET = "typetype-downloads";
           S3_ARTIFACT_TTL_SECONDS = "7200";
         };
-        environmentFiles = [ typetypeSecrets ];
+        environmentFiles = [
+          typetypeSecrets
+          typetypeDownloaderEnv
+        ];
         dependsOn = [
           "typetype-dragonfly"
           "typetype-garage"
