@@ -109,6 +109,10 @@
       device = "osdisk/vms";
       fsType = "zfs";
     };
+    "/var/lib/libvirt/images/hermes" = {
+      device = "osdisk/vms/hermes";
+      fsType = "zfs";
+    };
     "/home" = {
       device = "osdisk/home";
       fsType = "zfs";
@@ -121,6 +125,38 @@
         "dmask=0022"
       ];
     };
+  };
+
+  services.sanoid = {
+    enable = true;
+    templates.hermes = {
+      hourly = 24;
+      daily = 14;
+      monthly = 3;
+      autoprune = true;
+      autosnap = true;
+    };
+    datasets."osdisk/vms/hermes".useTemplate = [ "hermes" ];
+  };
+
+  environment.etc."libvirt/domains/hermes.xml".source = ./hermes.xml;
+
+  systemd.services.libvirt-hermes-domain = {
+    description = "Define the Hermes libvirt domain";
+    wantedBy = [ "multi-user.target" ];
+    after = [
+      "local-fs.target"
+      "virtqemud.service"
+      "libvirt-default-storage-pool.service"
+    ];
+    requires = [ "virtqemud.service" ];
+    unitConfig.RequiresMountsFor = "/var/lib/libvirt/images/hermes";
+    path = [ pkgs.libvirt ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      virsh -c qemu:///system define /etc/libvirt/domains/hermes.xml
+      virsh -c qemu:///system autostart hermes
+    '';
   };
 
   programs.nh.clean = {
