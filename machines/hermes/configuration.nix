@@ -157,6 +157,7 @@ in
         pkgs.chromium
         pkgs.docker
         pkgs.jq
+        pkgs."mcp-nixos"
       ];
       environment = {
         AGENT_BROWSER_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
@@ -226,6 +227,11 @@ in
           cron_mode = "deny";
           mcp_reload_confirm = true;
           destructive_slash_confirm = true;
+        };
+        mcp_servers.nixos = {
+          command = "${pkgs."mcp-nixos"}/bin/mcp-nixos";
+          timeout = 120;
+          connect_timeout = 60;
         };
         security = {
           redact_secrets = true;
