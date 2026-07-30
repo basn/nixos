@@ -269,7 +269,7 @@ in
             self_hosted = {
               issuer = "https://auth.basn.se/application/o/hermes/";
               client_id = "hermes-dashboard";
-              scopes = "openid profile email";
+              scopes = "openid profile email offline_access";
             };
           };
         };
