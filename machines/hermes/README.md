@@ -26,7 +26,7 @@ nix build .#nixosConfigurations.hermes.config.system.build.toplevel --no-link
 
 ## VM definition
 
-Create the storage dataset and blank disk on `lenovo`:
+Create the storage dataset and blank disk on `skullcanyon`:
 
 ```sh
 sudo zfs create \

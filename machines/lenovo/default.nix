@@ -109,10 +109,6 @@
       device = "osdisk/vms";
       fsType = "zfs";
     };
-    "/var/lib/libvirt/images/hermes" = {
-      device = "osdisk/vms/hermes";
-      fsType = "zfs";
-    };
     "/home" = {
       device = "osdisk/home";
       fsType = "zfs";
@@ -125,18 +121,6 @@
         "dmask=0022"
       ];
     };
-  };
-
-  services.sanoid = {
-    enable = true;
-    templates.hermes = {
-      hourly = 24;
-      daily = 14;
-      monthly = 3;
-      autoprune = true;
-      autosnap = true;
-    };
-    datasets."osdisk/vms/hermes".useTemplate = [ "hermes" ];
   };
 
   programs.nh.clean = {
