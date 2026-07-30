@@ -23,7 +23,7 @@ in
     ./ghostty.nix
     ./fastfetch.nix
     ./mangohud.nix
-    ./mangowc.nix
+    ./mango.nix
     ./noctalia.nix
     ./git.nix
   ];
