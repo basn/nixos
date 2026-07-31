@@ -193,13 +193,15 @@ in
       until node_id=$(g node id | head -n1 | cut -d@ -f1); do
         sleep 1
       done
-      if ! g layout show | grep -Eiq 'version[[:space:]]+[0-9]+'; then
+      if ! g layout show | grep -Eiq 'version:?[[:space:]]+[0-9]+'; then
         g layout assign -z dc1 -c 50GB "$node_id"
         g layout apply --version 1
       fi
       g bucket info typetype-downloads || g bucket create typetype-downloads
-      g key import --yes -n typetype-downloader \
-        "$DOWNLOADER_S3_ACCESS_KEY" "$DOWNLOADER_S3_SECRET_KEY"
+      if ! g key info "$DOWNLOADER_S3_ACCESS_KEY" >/dev/null 2>&1; then
+        g key import --yes -n typetype-downloader \
+          "$DOWNLOADER_S3_ACCESS_KEY" "$DOWNLOADER_S3_SECRET_KEY"
+      fi
       g bucket allow --read --write --owner \
         --key "$DOWNLOADER_S3_ACCESS_KEY" typetype-downloads
     '';
