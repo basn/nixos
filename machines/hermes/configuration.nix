@@ -170,8 +170,36 @@ in
         _config_version = 27;
         model = {
           provider = "openai-codex";
-          default = "gpt-5.4";
+          default = "gpt-5.5";
           openai_runtime = "auto";
+        };
+        auxiliary = {
+          # Keep the agent loop, tool routing, and vision on GPT-5.5. These
+          # narrow background tasks do not need the default model's capability.
+          approval = {
+            provider = "openai-codex";
+            model = "gpt-5.4-mini";
+          };
+          compression = {
+            provider = "openai-codex";
+            model = "gpt-5.4-mini";
+          };
+          curator = {
+            provider = "openai-codex";
+            model = "gpt-5.4-mini";
+          };
+          skills_hub = {
+            provider = "openai-codex";
+            model = "gpt-5.4-mini";
+          };
+          title_generation = {
+            provider = "openai-codex";
+            model = "gpt-5.4-mini";
+          };
+          web_extract = {
+            provider = "openai-codex";
+            model = "gpt-5.4-mini";
+          };
         };
         timezone = "Europe/Stockholm";
         terminal = {
