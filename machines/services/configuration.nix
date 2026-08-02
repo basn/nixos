@@ -1,6 +1,11 @@
 { lib, pkgs, ... }:
 
 {
+  fileSystems."/var/lib/dayzweb" = {
+    device = "tank/dayzweb";
+    fsType = "zfs";
+  };
+
   imports = [
     ./hardware-configuration.nix
     ./sops.nix
@@ -16,6 +21,7 @@
     ./services/freshrss.nix
     ./services/searx.nix
     ./services/typetype.nix
+    ./services/dayzweb.nix
     ./services/network-optimizer.nix
     ./services/znapzend.nix
   ];
