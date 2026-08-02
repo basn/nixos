@@ -151,7 +151,6 @@ in
       addToSystemPackages = true;
       stateDir = "/var/lib/hermes";
       workingDirectory = "/var/lib/hermes/workspace";
-      environmentFiles = [ "/var/lib/hermes/secrets.env" ];
       extraPackages = [
         agentBrowser
         pkgs.chromium
@@ -308,6 +307,18 @@ in
 
   basn.nixosUpgradeNotify.enable = false;
 
+  sops = {
+    defaultSopsFile = ./secrets/hermes.env;
+    defaultSopsFormat = "dotenv";
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    secrets.hermes-env = {
+      owner = "hermes";
+      group = "hermes";
+      mode = "0400";
+      restartUnits = [ "hermes-agent.service" ];
+    };
+  };
+
   users.users.hermes.extraGroups = [ "docker" ];
   users.users.basn.extraGroups = [
     "docker"
@@ -330,6 +341,9 @@ in
         HOME = "/var/lib/hermes";
         HERMES_HOME = "/var/lib/hermes/.hermes";
         HERMES_MANAGED = "true";
+        # Hermes 0.16 otherwise sends its default OIDC scopes and receives no
+        # refresh token, which logs dashboard users out after token expiry.
+        HERMES_DASHBOARD_OIDC_SCOPES = "openid profile email offline_access";
       };
       path = [
         hermesPackage
@@ -359,7 +373,10 @@ in
         HERMES_HOME = "/var/lib/hermes/.hermes";
         HERMES_MANAGED = "true";
       };
-      serviceConfig.TimeoutStopSec = 210;
+      serviceConfig = {
+        EnvironmentFile = config.sops.secrets.hermes-env.path;
+        TimeoutStopSec = 210;
+      };
     };
   };
 
