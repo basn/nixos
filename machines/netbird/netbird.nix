@@ -1,18 +1,6 @@
 { config, unstablePkgs, ... }:
 let
   ClientID = "YevEd2xwJurQd4uDuZIIBrYI1pyXuJ8qNltPzRl5";
-  # NOTE (2026-04-28): NetBird management and signal both hardcode pprof on
-  # 127.0.0.1:6060 in v0.69.0, which causes netbird-signal to crash with:
-  # "pprof server failed: listen tcp 127.0.0.1:6060: bind: address already in use"
-  # and then nginx returns 502 for /signalexchange.SignalExchange/*.
-  # Keep this override until upstream exposes a configurable pprof address
-  # (or removes the conflicting hardcoded listener).
-  patchedNetbirdSignal = unstablePkgs.netbird-signal.overrideAttrs (old: {
-    postPatch = (old.postPatch or "") + ''
-      substituteInPlace signal/cmd/run.go \
-        --replace-fail '127.0.0.1:6060' '127.0.0.1:6061'
-    '';
-  });
 in
 {
   security.acme = {
@@ -135,7 +123,7 @@ in
         signal = {
           port = 8012;
           enable = true;
-          package = patchedNetbirdSignal;
+          package = unstablePkgs.netbird-signal;
         };
       };
     };
