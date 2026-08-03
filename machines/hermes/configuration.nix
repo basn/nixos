@@ -511,8 +511,8 @@ in
           ];
           ports = [ "127.0.0.1:3002:3002" ];
           extraOptions = [
-            "--memory=2g"
-            "--memory-swap=2g"
+            "--memory=4g"
+            "--memory-swap=4g"
             "--cpus=1.5"
           ];
           environmentFiles = [ config.sops.secrets.firecrawl-env.path ];
