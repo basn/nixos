@@ -7,7 +7,9 @@
 }:
 let
   agentBrowser = import ./agent-browser.nix { inherit pkgs; };
-  hermesPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  hermesPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+    extraDependencyGroups = [ "firecrawl" ];
+  };
 in
 {
   boot = {
