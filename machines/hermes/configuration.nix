@@ -341,40 +341,6 @@ in
       "d /var/lib/firecrawl/redis 0750 999 999 - -"
       "d /var/lib/firecrawl/rabbitmq 0750 999 999 - -"
     ];
-    services.firecrawl-network = {
-      description = "Firecrawl private Docker network";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "docker.service" ];
-      requires = [ "docker.service" ];
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-      };
-      script = ''
-        ${pkgs.docker}/bin/docker network inspect firecrawl >/dev/null 2>&1 || \
-          ${pkgs.docker}/bin/docker network create firecrawl >/dev/null
-      '';
-    };
-    services.docker-firecrawl-redis = {
-      after = [ "firecrawl-network.service" ];
-      requires = [ "firecrawl-network.service" ];
-    };
-    services.docker-firecrawl-rabbitmq = {
-      after = [ "firecrawl-network.service" ];
-      requires = [ "firecrawl-network.service" ];
-    };
-    services.docker-firecrawl-postgres = {
-      after = [ "firecrawl-network.service" ];
-      requires = [ "firecrawl-network.service" ];
-    };
-    services.docker-firecrawl-playwright = {
-      after = [ "firecrawl-network.service" ];
-      requires = [ "firecrawl-network.service" ];
-    };
-    services.docker-firecrawl-api = {
-      after = [ "firecrawl-network.service" ];
-      requires = [ "firecrawl-network.service" ];
-    };
     services.hermes-dashboard = {
       description = "Hermes Agent Dashboard";
       wantedBy = [ "multi-user.target" ];
@@ -439,9 +405,8 @@ in
       containers = {
         firecrawl-redis = {
           image = "redis:alpine";
-          networks = [ "firecrawl" ];
           extraOptions = [
-            "--network-alias=redis"
+            "--network=host"
             "--memory=256m"
             "--memory-swap=256m"
             "--cpus=0.5"
@@ -452,25 +417,24 @@ in
             "--appendonly"
             "yes"
             "--bind"
-            "0.0.0.0"
+            "127.0.0.1"
           ];
         };
         firecrawl-rabbitmq = {
           image = "rabbitmq:3-management";
-          networks = [ "firecrawl" ];
           extraOptions = [
-            "--network-alias=rabbitmq"
+            "--network=host"
             "--memory=512m"
             "--memory-swap=512m"
             "--cpus=0.5"
           ];
           volumes = [ "/var/lib/firecrawl/rabbitmq:/var/lib/rabbitmq" ];
+          environment.RABBITMQ_NODE_IP_ADDRESS = "127.0.0.1";
         };
         firecrawl-postgres = {
           image = "ghcr.io/firecrawl/nuq-postgres:latest";
-          networks = [ "firecrawl" ];
           extraOptions = [
-            "--network-alias=nuq-postgres"
+            "--network=host"
             "--memory=512m"
             "--memory-swap=512m"
             "--cpus=0.5"
@@ -481,12 +445,16 @@ in
             POSTGRES_DB = "postgres";
           };
           volumes = [ "/var/lib/firecrawl/postgres:/var/lib/postgresql/data" ];
+          cmd = [
+            "postgres"
+            "-c"
+            "listen_addresses=127.0.0.1"
+          ];
         };
         firecrawl-playwright = {
           image = "ghcr.io/firecrawl/playwright-service:latest";
-          networks = [ "firecrawl" ];
           extraOptions = [
-            "--network-alias=playwright-service"
+            "--network=host"
             "--memory=1536m"
             "--memory-swap=1536m"
             "--cpus=1.0"
@@ -502,27 +470,26 @@ in
         };
         firecrawl-api = {
           image = "ghcr.io/firecrawl/firecrawl:latest";
-          networks = [ "firecrawl" ];
           dependsOn = [
             "firecrawl-redis"
             "firecrawl-rabbitmq"
             "firecrawl-postgres"
             "firecrawl-playwright"
           ];
-          ports = [ "127.0.0.1:3002:3002" ];
           extraOptions = [
+            "--network=host"
             "--memory=4g"
             "--memory-swap=4g"
             "--cpus=1.5"
           ];
           environmentFiles = [ config.sops.secrets.firecrawl-env.path ];
           environment = {
-            REDIS_URL = "redis://redis:6379";
-            REDIS_RATE_LIMIT_URL = "redis://redis:6379";
-            PLAYWRIGHT_MICROSERVICE_URL = "http://playwright-service:3000/scrape";
+            REDIS_URL = "redis://127.0.0.1:6379";
+            REDIS_RATE_LIMIT_URL = "redis://127.0.0.1:6379";
+            PLAYWRIGHT_MICROSERVICE_URL = "http://127.0.0.1:3000/scrape";
             POSTGRES_USER = "postgres";
             POSTGRES_DB = "postgres";
-            POSTGRES_HOST = "nuq-postgres";
+            POSTGRES_HOST = "127.0.0.1";
             POSTGRES_PORT = "5432";
             USE_DB_AUTHENTICATION = "false";
             NUM_WORKERS_PER_QUEUE = "1";
@@ -534,7 +501,7 @@ in
             PORT = "3002";
             EXTRACT_WORKER_PORT = "3004";
             WORKER_PORT = "3005";
-            NUQ_RABBITMQ_URL = "amqp://rabbitmq:5672";
+            NUQ_RABBITMQ_URL = "amqp://127.0.0.1:5672";
             HARNESS_STARTUP_TIMEOUT_MS = "120000";
             ENV = "local";
           };
