@@ -163,6 +163,7 @@ in
         AGENT_BROWSER_ENGINE = "chrome";
         HASS_URL = "https://hass.basn.se";
         HERMES_DOCKER_BINARY = "${pkgs.docker}/bin/docker";
+        FIRECRAWL_API_URL = "http://127.0.0.1:3002";
         SEARXNG_URL = "https://search.basn.se";
       };
       settings = {
@@ -240,6 +241,7 @@ in
         web = {
           backend = "searxng";
           search_backend = "searxng";
+          extract_backend = "firecrawl";
         };
         browser = {
           engine = "chrome";
@@ -317,6 +319,12 @@ in
       mode = "0400";
       restartUnits = [ "hermes-agent.service" ];
     };
+    secrets.firecrawl-env = {
+      sopsFile = ./secrets/firecrawl.env;
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
   };
 
   users.users.hermes.extraGroups = [ "docker" ];
@@ -328,7 +336,45 @@ in
   systemd = {
     tmpfiles.rules = [
       "d /var/lib/hermes/output 2770 hermes hermes - -"
+      "d /var/lib/firecrawl 0750 root root - -"
+      "d /var/lib/firecrawl/postgres 0700 999 999 - -"
+      "d /var/lib/firecrawl/redis 0750 999 999 - -"
+      "d /var/lib/firecrawl/rabbitmq 0750 999 999 - -"
     ];
+    services.firecrawl-network = {
+      description = "Firecrawl private Docker network";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "docker.service" ];
+      requires = [ "docker.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      script = ''
+        ${pkgs.docker}/bin/docker network inspect firecrawl >/dev/null 2>&1 || \
+          ${pkgs.docker}/bin/docker network create firecrawl >/dev/null
+      '';
+    };
+    services.docker-firecrawl-redis = {
+      after = [ "firecrawl-network.service" ];
+      requires = [ "firecrawl-network.service" ];
+    };
+    services.docker-firecrawl-rabbitmq = {
+      after = [ "firecrawl-network.service" ];
+      requires = [ "firecrawl-network.service" ];
+    };
+    services.docker-firecrawl-postgres = {
+      after = [ "firecrawl-network.service" ];
+      requires = [ "firecrawl-network.service" ];
+    };
+    services.docker-firecrawl-playwright = {
+      after = [ "firecrawl-network.service" ];
+      requires = [ "firecrawl-network.service" ];
+    };
+    services.docker-firecrawl-api = {
+      after = [ "firecrawl-network.service" ];
+      requires = [ "firecrawl-network.service" ];
+    };
     services.hermes-dashboard = {
       description = "Hermes Agent Dashboard";
       wantedBy = [ "multi-user.target" ];
@@ -386,6 +432,117 @@ in
       autoPrune = {
         enable = true;
         dates = "weekly";
+      };
+    };
+    oci-containers = {
+      backend = "docker";
+      containers = {
+        firecrawl-redis = {
+          image = "redis:alpine";
+          networks = [ "firecrawl" ];
+          extraOptions = [
+            "--network-alias=redis"
+            "--memory=256m"
+            "--memory-swap=256m"
+            "--cpus=0.5"
+          ];
+          volumes = [ "/var/lib/firecrawl/redis:/data" ];
+          cmd = [
+            "redis-server"
+            "--appendonly"
+            "yes"
+            "--bind"
+            "0.0.0.0"
+          ];
+        };
+        firecrawl-rabbitmq = {
+          image = "rabbitmq:3-management";
+          networks = [ "firecrawl" ];
+          extraOptions = [
+            "--network-alias=rabbitmq"
+            "--memory=512m"
+            "--memory-swap=512m"
+            "--cpus=0.5"
+          ];
+          volumes = [ "/var/lib/firecrawl/rabbitmq:/var/lib/rabbitmq" ];
+        };
+        firecrawl-postgres = {
+          image = "ghcr.io/firecrawl/nuq-postgres:latest";
+          networks = [ "firecrawl" ];
+          extraOptions = [
+            "--network-alias=nuq-postgres"
+            "--memory=512m"
+            "--memory-swap=512m"
+            "--cpus=0.5"
+          ];
+          environmentFiles = [ config.sops.secrets.firecrawl-env.path ];
+          environment = {
+            POSTGRES_USER = "postgres";
+            POSTGRES_DB = "postgres";
+          };
+          volumes = [ "/var/lib/firecrawl/postgres:/var/lib/postgresql/data" ];
+        };
+        firecrawl-playwright = {
+          image = "ghcr.io/firecrawl/playwright-service:latest";
+          networks = [ "firecrawl" ];
+          extraOptions = [
+            "--network-alias=playwright-service"
+            "--memory=1536m"
+            "--memory-swap=1536m"
+            "--cpus=1.0"
+            "--cap-drop=ALL"
+            "--security-opt=no-new-privileges:true"
+            "--tmpfs=/tmp/.cache:noexec,nosuid,size=512m"
+          ];
+          environment = {
+            PORT = "3000";
+            MAX_CONCURRENT_PAGES = "1";
+            BLOCK_MEDIA = "true";
+          };
+        };
+        firecrawl-api = {
+          image = "ghcr.io/firecrawl/firecrawl:latest";
+          networks = [ "firecrawl" ];
+          dependsOn = [
+            "firecrawl-redis"
+            "firecrawl-rabbitmq"
+            "firecrawl-postgres"
+            "firecrawl-playwright"
+          ];
+          ports = [ "127.0.0.1:3002:3002" ];
+          extraOptions = [
+            "--memory=2g"
+            "--memory-swap=2g"
+            "--cpus=1.5"
+          ];
+          environmentFiles = [ config.sops.secrets.firecrawl-env.path ];
+          environment = {
+            REDIS_URL = "redis://redis:6379";
+            REDIS_RATE_LIMIT_URL = "redis://redis:6379";
+            PLAYWRIGHT_MICROSERVICE_URL = "http://playwright-service:3000/scrape";
+            POSTGRES_USER = "postgres";
+            POSTGRES_DB = "postgres";
+            POSTGRES_HOST = "nuq-postgres";
+            POSTGRES_PORT = "5432";
+            USE_DB_AUTHENTICATION = "false";
+            NUM_WORKERS_PER_QUEUE = "1";
+            CRAWL_CONCURRENT_REQUESTS = "1";
+            MAX_CONCURRENT_JOBS = "1";
+            BROWSER_POOL_SIZE = "1";
+            HOST = "0.0.0.0";
+            PORT = "3002";
+            EXTRACT_WORKER_PORT = "3004";
+            WORKER_PORT = "3005";
+            NUQ_RABBITMQ_URL = "amqp://rabbitmq:5672";
+            HARNESS_STARTUP_TIMEOUT_MS = "120000";
+            ENV = "local";
+          };
+          cmd = [
+            "node"
+            "dist/src/harness.js"
+            "--start-docker"
+          ];
+        };
       };
     };
     vmVariant.virtualisation = {
