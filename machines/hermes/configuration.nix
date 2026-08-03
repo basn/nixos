@@ -526,6 +526,7 @@ in
             POSTGRES_PORT = "5432";
             USE_DB_AUTHENTICATION = "false";
             NUM_WORKERS_PER_QUEUE = "1";
+            NUQ_WORKER_COUNT = "1";
             CRAWL_CONCURRENT_REQUESTS = "1";
             MAX_CONCURRENT_JOBS = "1";
             BROWSER_POOL_SIZE = "1";
