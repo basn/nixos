@@ -29,7 +29,7 @@
       url = "github:xddxdd/nix-cachyos-kernel";
     };
     hermes-agent = {
-      url = "github:NousResearch/hermes-agent/v2026.6.5";
+      url = "github:NousResearch/hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
   };
