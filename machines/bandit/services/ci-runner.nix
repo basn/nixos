@@ -46,7 +46,8 @@
       config.nix.package
     ];
     settings = {
-      runner.capacity = 8;
+      # Nix builds are memory-intensive on this host; serialize CI workloads.
+      runner.capacity = 1;
     };
   };
 
