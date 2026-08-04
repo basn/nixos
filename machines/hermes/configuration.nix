@@ -172,35 +172,35 @@ in
         _config_version = 27;
         model = {
           provider = "openai-codex";
-          default = "gpt-5.5";
+          default = "gpt-5.6-sol";
           openai_runtime = "auto";
         };
         auxiliary = {
-          # Keep the agent loop, tool routing, and vision on GPT-5.5. These
+          # Keep the agent loop, tool routing, and vision on GPT-5.6 Luna. These
           # narrow background tasks do not need the default model's capability.
           approval = {
             provider = "openai-codex";
-            model = "gpt-5.4-mini";
+            model = "gpt-5.6-luna";
           };
           compression = {
             provider = "openai-codex";
-            model = "gpt-5.4-mini";
+            model = "gpt-5.6-luna";
           };
           curator = {
             provider = "openai-codex";
-            model = "gpt-5.4-mini";
+            model = "gpt-5.6-luna";
           };
           skills_hub = {
             provider = "openai-codex";
-            model = "gpt-5.4-mini";
+            model = "gpt-5.6-luna";
           };
           title_generation = {
             provider = "openai-codex";
-            model = "gpt-5.4-mini";
+            model = "gpt-5.6-luna";
           };
           web_extract = {
             provider = "openai-codex";
-            model = "gpt-5.4-mini";
+            model = "gpt-5.6-luna";
           };
         };
         timezone = "Europe/Stockholm";
