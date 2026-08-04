@@ -1,26 +1,142 @@
-{ ... }:
+{ config, ... }:
+let
+  authentikSecrets = config.sops.secrets.authentik.path;
+  authentikImage = "ghcr.io/goauthentik/server:2026.5.6";
+in
 {
-  services.authentik = {
-    enable = true;
-    environmentFile = "/run/secrets/authentik";
-    settings = {
-      email = {
-        host = "virtmx.lan2k.org";
-        port = 587;
-        username = "authentik@basn.se";
-        use_tls = true;
-        use_ssl = false;
-        from = "authentik@basn.se";
+  # Use the upstream images so flake updates do not build Authentik's Node/V8
+  # web assets locally.  The native PostgreSQL 14 data remains untouched as a
+  # rollback source; the restore unit imports its pre-cutover dump once.
+  systemd.tmpfiles.rules = [
+    "d /docker/authentik 0750 root root - -"
+    "d /docker/authentik/backups 0700 root root - -"
+    "d /docker/authentik/postgres 0700 root root - -"
+    "d /docker/authentik/redis 0700 root root - -"
+    "d /docker/authentik/media 0750 root root - -"
+  ];
+
+  systemd.services.authentik-network = {
+    description = "Authentik Podman network";
+    wantedBy = [ "multi-user.target" ];
+    before = [
+      "podman-authentik-postgres.service"
+      "podman-authentik-redis.service"
+      "podman-authentik-server.service"
+      "podman-authentik-worker.service"
+    ];
+    path = [ config.virtualisation.podman.package ];
+    serviceConfig.Type = "oneshot";
+    script = "podman network create --ignore authentik";
+  };
+
+  virtualisation.oci-containers = {
+    backend = "podman";
+    containers = {
+      authentik-postgres = {
+        image = "docker.io/library/postgres:17";
+        pull = "newer";
+        networks = [ "authentik" ];
+        environment = {
+          POSTGRES_DB = "authentik";
+          POSTGRES_USER = "authentik";
+        };
+        environmentFiles = [ authentikSecrets ];
+        volumes = [ "/docker/authentik/postgres:/var/lib/postgresql/data:U" ];
       };
-      disable_startup_analytics = true;
-      avatars = "initials";
-      postgresql.host = "/run/postgresql";
-      nginx = {
-        enable = true;
-        enableACME = true;
-        host = "auth.basn.se";
+
+      authentik-redis = {
+        image = "docker.io/library/redis:7-alpine";
+        pull = "newer";
+        networks = [ "authentik" ];
+        cmd = [
+          "redis-server"
+          "--appendonly"
+          "yes"
+          "--save"
+          "60"
+          "1"
+        ];
+        volumes = [ "/docker/authentik/redis:/data:U" ];
+      };
+
+      authentik-server = {
+        image = authentikImage;
+        pull = "newer";
+        cmd = [ "server" ];
+        networks = [ "authentik" ];
+        dependsOn = [
+          "authentik-postgres"
+          "authentik-redis"
+        ];
+        ports = [
+          "127.0.0.1:9000:9000"
+          "127.0.0.1:9443:9443"
+        ];
+        environment = {
+          AUTHENTIK_AVATARS = "initials";
+          AUTHENTIK_DISABLE_STARTUP_ANALYTICS = "true";
+          AUTHENTIK_EMAIL__FROM = "authentik@basn.se";
+          AUTHENTIK_EMAIL__HOST = "virtmx.lan2k.org";
+          AUTHENTIK_EMAIL__PORT = "587";
+          AUTHENTIK_EMAIL__USERNAME = "authentik@basn.se";
+          AUTHENTIK_EMAIL__USE_SSL = "false";
+          AUTHENTIK_EMAIL__USE_TLS = "true";
+          AUTHENTIK_LISTEN__HTTP = "0.0.0.0:9000";
+          AUTHENTIK_LISTEN__HTTPS = "0.0.0.0:9443";
+          AUTHENTIK_POSTGRESQL__HOST = "authentik-postgres";
+          AUTHENTIK_POSTGRESQL__NAME = "authentik";
+          AUTHENTIK_POSTGRESQL__PASSWORD = "env://POSTGRES_PASSWORD";
+          AUTHENTIK_POSTGRESQL__USER = "authentik";
+          AUTHENTIK_REDIS__HOST = "authentik-redis";
+        };
+        environmentFiles = [ authentikSecrets ];
+        volumes = [ "/docker/authentik/media:/media:U" ];
+      };
+
+      authentik-worker = {
+        image = authentikImage;
+        pull = "newer";
+        cmd = [ "worker" ];
+        networks = [ "authentik" ];
+        dependsOn = [
+          "authentik-postgres"
+          "authentik-redis"
+        ];
+        environment = {
+          AUTHENTIK_AVATARS = "initials";
+          AUTHENTIK_DISABLE_STARTUP_ANALYTICS = "true";
+          AUTHENTIK_EMAIL__FROM = "authentik@basn.se";
+          AUTHENTIK_EMAIL__HOST = "virtmx.lan2k.org";
+          AUTHENTIK_EMAIL__PORT = "587";
+          AUTHENTIK_EMAIL__USERNAME = "authentik@basn.se";
+          AUTHENTIK_EMAIL__USE_SSL = "false";
+          AUTHENTIK_EMAIL__USE_TLS = "true";
+          AUTHENTIK_POSTGRESQL__HOST = "authentik-postgres";
+          AUTHENTIK_POSTGRESQL__NAME = "authentik";
+          AUTHENTIK_POSTGRESQL__PASSWORD = "env://POSTGRES_PASSWORD";
+          AUTHENTIK_POSTGRESQL__USER = "authentik";
+          AUTHENTIK_REDIS__HOST = "authentik-redis";
+        };
+        environmentFiles = [ authentikSecrets ];
+        volumes = [ "/docker/authentik/media:/media:U" ];
       };
     };
   };
 
+  systemd.services.podman-authentik-postgres = {
+    requires = [ "authentik-network.service" ];
+    after = [ "authentik-network.service" ];
+  };
+  systemd.services.podman-authentik-redis = {
+    requires = [ "authentik-network.service" ];
+    after = [ "authentik-network.service" ];
+  };
+  systemd.services.podman-authentik-server = {
+    requires = [ "authentik-network.service" ];
+    after = [ "authentik-network.service" ];
+  };
+  systemd.services.podman-authentik-worker = {
+    requires = [ "authentik-network.service" ];
+    after = [ "authentik-network.service" ];
+  };
 }

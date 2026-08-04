@@ -25,10 +25,6 @@
       url = "github:notashelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    authentik-nix = {
-      url = "github:nix-community/authentik-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nix-cachyos-kernel = {
       url = "github:xddxdd/nix-cachyos-kernel";
     };
@@ -140,7 +136,6 @@
           modules = [
             inputs.sops_nix.nixosModules.sops
             ./machines/services/configuration.nix
-            inputs.authentik-nix.nixosModules.default
             inputs.nvf.nixosModules.default
           ];
         };
