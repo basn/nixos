@@ -285,7 +285,7 @@ in
           orchestrator_enabled = true;
         };
         platforms.homeassistant = {
-          enabled = false;
+          enabled = true;
           extra = {
             watch_all = false;
             watch_domains = [
