@@ -311,7 +311,10 @@ in
         image = "docker.dragonflydb.io/dragonflydb/dragonfly:latest";
         pull = "newer";
         networks = [ "typetype" ];
-        extraOptions = [ "--ulimit=memlock=-1" ];
+        extraOptions = [
+          "--ulimit=memlock=-1"
+          "--health-start-period=10s"
+        ];
       };
 
       typetype-garage = {

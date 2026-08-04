@@ -95,6 +95,7 @@
       "/run/secrets/coturn"
     ];
   };
+  systemd.services.netbird-signal.serviceConfig.RuntimeDirectory = lib.mkForce "netbird-signal";
   virtualisation.vmware.guest.enable = true;
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "24.05";
