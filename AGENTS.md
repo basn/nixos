@@ -89,8 +89,11 @@ nix shell nixpkgs#usbutils -c lsusb -t
 - Do not add diagnostic packages to `environment.systemPackages` unless the
   user explicitly wants them permanently available.
 - Do not execute untrusted or arbitrary third-party flakes for diagnostics.
-- When a remote login shell is Fish, use `bash -lc` for Bash-only loops,
-  assignments, or compound commands.
+- Remote hosts use Fish as their login shell. For any remote command beyond a
+  single simple executable invocation—including loops, assignments,
+  conditionals, redirections, pipelines, or multiple commands—wrap the
+  complete remote script in `bash -lc '...'` on the first attempt. Never send
+  Bash syntax directly through SSH and retry after Fish rejects it.
 
 ## Validation
 
