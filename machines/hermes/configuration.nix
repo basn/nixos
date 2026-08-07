@@ -319,7 +319,10 @@ in
       owner = "hermes";
       group = "hermes";
       mode = "0400";
-      restartUnits = [ "hermes-agent.service" ];
+      restartUnits = [
+        "hermes-agent.service"
+        "hermes-dashboard.service"
+      ];
     };
     secrets.firecrawl-env = {
       sopsFile = ./secrets/firecrawl.env;
@@ -355,6 +358,7 @@ in
         HOME = "/var/lib/hermes";
         HERMES_HOME = "/var/lib/hermes/.hermes";
         HERMES_MANAGED = "true";
+        HASS_URL = "https://hass.basn.se";
         # Hermes 0.16 otherwise sends its default OIDC scopes and receives no
         # refresh token, which logs dashboard users out after token expiry.
         HERMES_DASHBOARD_OIDC_SCOPES = "openid profile email offline_access";
@@ -368,6 +372,7 @@ in
       serviceConfig = {
         User = "hermes";
         Group = "hermes";
+        EnvironmentFile = config.sops.secrets.hermes-env.path;
         WorkingDirectory = "/var/lib/hermes/workspace";
         ExecStart = "${hermesPackage}/bin/hermes dashboard --host 0.0.0.0 --port 9119 --no-open";
         Restart = "always";
