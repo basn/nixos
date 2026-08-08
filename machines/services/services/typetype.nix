@@ -211,8 +211,7 @@ in
     backend = "podman";
     containers = {
       typetype = {
-        image = "ghcr.io/typetype-video/typetype:latest";
-        pull = "newer";
+        image = "ghcr.io/typetype-video/typetype:1.3.1@sha256:4da200fb96d858cfa3bc2a8cbb98a9682a560f40a055b9c407f3e173a28dcf82";
         networks = [ "typetype" ];
         ports = [ "127.0.0.1:18082:80" ];
         volumes = [ "${typetypeNginx}:/etc/nginx/conf.d/default.conf:ro" ];
@@ -220,8 +219,7 @@ in
       };
 
       typetype-server = {
-        image = "ghcr.io/typetype-video/typetype-server:latest";
-        pull = "newer";
+        image = "ghcr.io/typetype-video/typetype-server:1.3.1@sha256:f1ad7fd31e5c1cb994601f714df82e8207c3769d759df232e21a3876751a8faf";
         networks = [ "typetype" ];
         environment = {
           ALLOWED_ORIGINS = "https://tube.basn.se";
@@ -246,8 +244,7 @@ in
       };
 
       typetype-downloader = {
-        image = "ghcr.io/typetype-video/typetype-downloader:latest";
-        pull = "newer";
+        image = "ghcr.io/typetype-video/typetype-downloader:1.3.0@sha256:b0cbedf49a50bee533d91a0e1f2b67e075c55fd25a4914be774db7d73a1baef1";
         networks = [ "typetype" ];
         environment = {
           HTTP_PORT = "18093";
@@ -281,8 +278,8 @@ in
       };
 
       typetype-token = {
-        image = "ghcr.io/typetype-video/typetype-token:latest";
-        pull = "newer";
+        # Upstream publishes this image from its unversioned main branch.
+        image = "ghcr.io/typetype-video/typetype-token@sha256:8dfcc6d84cc09c33d18add0ec807093c2182be10857a021a4c61ace9a3f561d5";
         networks = [ "typetype" ];
         extraOptions = [ "--ipc=host" ];
         environment = {
@@ -296,8 +293,7 @@ in
       };
 
       typetype-postgres = {
-        image = "postgres:17";
-        pull = "newer";
+        image = "docker.io/library/postgres:17.10@sha256:a426e44bac0b759c95894d68e1a0ac03ecc20b619f498a91aae373bf06d8508d";
         networks = [ "typetype" ];
         environment = {
           POSTGRES_DB = "typetype";
@@ -308,8 +304,7 @@ in
       };
 
       typetype-dragonfly = {
-        image = "docker.dragonflydb.io/dragonflydb/dragonfly:latest";
-        pull = "newer";
+        image = "docker.dragonflydb.io/dragonflydb/dragonfly:v1.40.0@sha256:18228a84e2305d60de390f972f9622ec252120834b22c12b9e5025144b0b37fe";
         networks = [ "typetype" ];
         extraOptions = [
           "--ulimit=memlock=-1"
@@ -318,8 +313,7 @@ in
       };
 
       typetype-garage = {
-        image = "dxflrs/garage:v2.2.0";
-        pull = "newer";
+        image = "docker.io/dxflrs/garage:v2.2.0@sha256:45a61ce3f7c9c24fc23d9ed2b09b27ed560ab87b34605d175d5c588f539c24e4";
         networks = [ "typetype" ];
         environmentFiles = [ typetypeSecrets ];
         volumes = [

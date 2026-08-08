@@ -1,7 +1,7 @@
 { config, ... }:
 let
   authentikSecrets = config.sops.secrets.authentik.path;
-  authentikImage = "ghcr.io/goauthentik/server:2026.5.6";
+  authentikImage = "ghcr.io/goauthentik/server:2026.5.6@sha256:ed120caf710ccf82ef0026f0bc74e51615bc95ebff228a7a2d6fc60c441c3868";
 in
 {
   # Use the upstream images so flake updates do not build Authentik's Node/V8
@@ -33,8 +33,7 @@ in
     backend = "podman";
     containers = {
       authentik-postgres = {
-        image = "docker.io/library/postgres:17";
-        pull = "newer";
+        image = "docker.io/library/postgres:17.10@sha256:a426e44bac0b759c95894d68e1a0ac03ecc20b619f498a91aae373bf06d8508d";
         networks = [ "authentik" ];
         environment = {
           POSTGRES_DB = "authentik";
@@ -45,8 +44,7 @@ in
       };
 
       authentik-redis = {
-        image = "docker.io/library/redis:7-alpine";
-        pull = "newer";
+        image = "docker.io/library/redis:7.4.10-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2";
         networks = [ "authentik" ];
         cmd = [
           "redis-server"
@@ -61,7 +59,6 @@ in
 
       authentik-server = {
         image = authentikImage;
-        pull = "newer";
         cmd = [ "server" ];
         networks = [ "authentik" ];
         dependsOn = [
@@ -95,7 +92,6 @@ in
 
       authentik-worker = {
         image = authentikImage;
-        pull = "newer";
         cmd = [ "worker" ];
         networks = [ "authentik" ];
         dependsOn = [
