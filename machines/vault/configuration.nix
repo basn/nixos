@@ -78,6 +78,10 @@
       device = "storage/nas";
       fsType = "zfs";
     };
+    "/storage/home-assistant-backups" = {
+      device = "storage/home-assistant-backups";
+      fsType = "zfs";
+    };
     "/berget" = {
       device = "storage/berget";
       fsType = "zfs";

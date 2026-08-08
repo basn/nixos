@@ -24,6 +24,17 @@
           "force user" = "basn";
           "force group" = "users";
         };
+        home-assistant-backups = {
+          path = "/storage/home-assistant-backups";
+          browseable = true;
+          writable = true;
+          "guest ok" = false;
+          "valid users" = "basn";
+          "create mask" = "0644";
+          "directory mask" = "0755";
+          "force user" = "basn";
+          "force group" = "users";
+        };
       };
     };
   };
