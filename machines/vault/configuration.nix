@@ -111,6 +111,8 @@
       ];
     };
   };
+  # Persistent swap on a ZFS zvol; provisioned as storage/swap.
+  swapDevices = [ { device = "/dev/zvol/storage/swap"; } ];
   networking = {
     interfaces = {
       enp1s0 = {
