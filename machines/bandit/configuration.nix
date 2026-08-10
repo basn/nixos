@@ -124,6 +124,10 @@
       fsType = "zfs";
       encrypted.keyFile = "/root/zfs-data2.key";
     };
+    "/data2/rclone-cache" = {
+      device = "data2/rclone-cache";
+      fsType = "zfs";
+    };
     "/data/attic" = {
       device = "data2/attic";
       fsType = "zfs";

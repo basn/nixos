@@ -5,7 +5,7 @@ let
   rcloneConfigPath = "/root/.config/rclone/rclone.conf";
   logFile = "/var/log/rclone-log.txt";
   mountPoint = "/mnt/telia";
-  cacheDir = "/mnt/cache";
+  cacheDir = "/data2/rclone-cache";
   bwlimit = "50M";
   vfsCacheMaxSize = "185G";
   vfsCacheMaxAge = "438300h";
@@ -16,6 +16,7 @@ in
   systemd.services.rclone = {
     description = "Telia Crypt (rclone)";
     after = [ "network.target" ];
+    unitConfig.RequiresMountsFor = [ cacheDir ];
 
     serviceConfig = {
       ExecStart = ''
