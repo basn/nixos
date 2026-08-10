@@ -119,6 +119,10 @@
       device = "data/immich";
       fsType = "zfs";
     };
+    "/var/lib/plex" = {
+      device = "data/plex";
+      fsType = "zfs";
+    };
     "/data2/files" = {
       device = "data2/files";
       fsType = "zfs";
