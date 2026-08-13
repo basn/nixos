@@ -33,7 +33,7 @@ in
     backend = "podman";
     containers = {
       authentik-postgres = {
-        image = "docker.io/library/postgres:17.10@sha256:a426e44bac0b759c95894d68e1a0ac03ecc20b619f498a91aae373bf06d8508d";
+        image = "docker.io/library/postgres:17.10@sha256:7958605b474b3d264a969cb3a123d6aa00ad1e1fe9da8a69984dabb704d93317";
         networks = [ "authentik" ];
         environment = {
           POSTGRES_DB = "authentik";
