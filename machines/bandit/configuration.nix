@@ -12,7 +12,6 @@
     ./services/radarr.nix
     ./services/prowlarr.nix
     ./services/attic.nix
-    ./services/ci-runner.nix
     ./services/nginx.nix
     ./services/bittorrent.nix
     ./services/unpackerr.nix

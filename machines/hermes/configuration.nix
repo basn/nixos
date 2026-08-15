@@ -236,6 +236,7 @@ in
           "clarify"
           "code_execution"
           "delegation"
+          "kanban"
           "cronjob"
           "todo"
           "homeassistant"

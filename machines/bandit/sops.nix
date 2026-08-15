@@ -17,11 +17,6 @@
         key = "atticd-env";
         restartUnits = [ "atticd.service" ];
       };
-      gitea-actions-runner-env = {
-        sopsFile = ./secrets/bandit.yaml;
-        key = "gitea-actions-runner-env";
-        restartUnits = [ "gitea-runner-codeberg.service" ];
-      };
       seedport = {
         sopsFile = ./secrets/bandit.yaml;
         key = "seedport";

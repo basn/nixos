@@ -72,7 +72,7 @@
         enable = true;
         extraArgs = "--keep-since 4d --keep 3";
       };
-      flake = "git+https://codeberg.org/basn/nixos";
+      flake = "git+https://github.com/basn/nixos";
     };
   };
   nix = {

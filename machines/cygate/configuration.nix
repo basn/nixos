@@ -63,5 +63,7 @@
     };
   };
   virtualisation.vmware.guest.enable = true;
+  # Provisioned as the dedicated osdisk/swap ZFS zvol.
+  swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
   system.stateVersion = "24.05";
 }

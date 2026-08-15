@@ -2,6 +2,6 @@
 {
   system.autoUpgrade = {
     enable = true;
-    flake = "git+https://codeberg.org/basn/nixos";
+    flake = "git+https://github.com/basn/nixos";
   };
 }
