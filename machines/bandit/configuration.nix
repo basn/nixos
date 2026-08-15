@@ -72,41 +72,42 @@
     zfs = {
       devNodes = "/dev/disk/by-id";
       forceImportRoot = false;
+      requestEncryptionCredentials = true;
     };
     loader = {
-      grub = {
+      efi = {
+        canTouchEfiVariables = true;
+        efiSysMountPoint = "/boot";
+      };
+      systemd-boot = {
         enable = true;
-        zfsSupport = true;
-        efiSupport = true;
-        efiInstallAsRemovable = true;
-        mirroredBoots = [
-          {
-            devices = [ "nodev" ];
-            path = "/boot1";
-          }
-          {
-            devices = [ "nodev" ];
-            path = "/boot2";
-          }
-        ];
+        editor = false;
+        configurationLimit = 16;
+        # systemd-boot has one authoritative ESP. Keep an identical copy on
+        # the other member of the osdata mirror for independent EFI booting.
+        extraInstallCommands = ''
+          if ${pkgs.util-linux}/bin/findmnt -rn --target /boot2 >/dev/null; then
+            ${pkgs.rsync}/bin/rsync -rlt --delete /boot/ /boot2/
+          fi
+        '';
       };
     };
   };
   fileSystems = {
     "/" = {
-      device = "osdisk/root";
+      device = "osdata/root";
       fsType = "zfs";
     };
     "/nix" = {
-      device = "osdisk/nix";
+      device = "osdata/nix";
       fsType = "zfs";
     };
     "/var" = {
-      device = "osdisk/var";
+      device = "osdata/var";
       fsType = "zfs";
     };
     "/home" = {
-      device = "osdisk/home";
+      device = "osdata/home";
       fsType = "zfs";
       neededForBoot = true;
     };
@@ -136,20 +137,18 @@
       device = "data2/attic";
       fsType = "zfs";
     };
-    "/boot1" = {
-      device = "/dev/disk/by-uuid/7821-EDA9";
+    "/boot" = {
+      device = "/dev/disk/by-label/BANDIT_EFI1";
       fsType = "vfat";
-      options = [
-        "fmask=0022"
-        "dmask=0022"
-      ];
+      options = [ "umask=0077" ];
     };
     "/boot2" = {
-      device = "/dev/disk/by-uuid/7824-6948";
+      device = "/dev/disk/by-label/BANDIT_EFI2";
       fsType = "vfat";
       options = [
-        "fmask=0022"
-        "dmask=0022"
+        "umask=0077"
+        "nofail"
+        "x-systemd.device-timeout=3s"
       ];
     };
   };
@@ -288,8 +287,8 @@
       enable = true;
     };
   };
-  # Persistent swap on a ZFS zvol; the zvol is provisioned as osdisk/swap.
-  swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
+  # Persistent swap on a ZFS zvol; the zvol is provisioned as osdata/swap.
+  swapDevices = [ { device = "/dev/zvol/osdata/swap"; } ];
   nix.settings = {
     # Prevent large C++ builds from exhausting Bandit's 31 GiB RAM.
     max-jobs = 4;
