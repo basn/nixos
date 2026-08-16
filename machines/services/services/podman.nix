@@ -21,7 +21,7 @@
     containers = {
       redbot = {
         # Upstream publishes this image from its unversioned master branch.
-        image = "docker.io/phasecorex/red-discordbot@sha256:30eec16a72b307996f08e3f8bbf130436c3d437d7e797f16c47b4d1978d6e0d3";
+        image = "docker.io/phasecorex/red-discordbot@sha256:034aba0c83961a20b00a5318696d3bbdacfb00958154ff52c1d6705fb36cf64f";
         volumes = [
           "/etc/localtime:/etc/localtime:ro"
           "/docker/redbot/:/data"

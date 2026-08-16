@@ -292,7 +292,7 @@ in
       };
 
       typetype-postgres = {
-        image = "docker.io/library/postgres:17.10@sha256:7958605b474b3d264a969cb3a123d6aa00ad1e1fe9da8a69984dabb704d93317";
+        image = "docker.io/library/postgres:17.11@sha256:a65e6a841f6c4dbc4abda3d67fa3bc21824e9611064fcd82e87ea67aad60a0c3";
         networks = [ "typetype" ];
         environment = {
           POSTGRES_DB = "typetype";
