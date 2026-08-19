@@ -78,6 +78,13 @@ in
       systemd-boot = {
         enable = true;
         configurationLimit = 3;
+        # systemd-boot has one authoritative ESP. Keep an identical copy on
+        # the second member of the osdisk mirror for independent EFI booting.
+        extraInstallCommands = ''
+          if ${pkgs.util-linux}/bin/findmnt -rn --target /boot2 >/dev/null; then
+            ${pkgs.rsync}/bin/rsync -rlt --delete /boot/ /boot2/
+          fi
+        '';
       };
       efi = {
         canTouchEfiVariables = true;
@@ -108,6 +115,16 @@ in
       options = [
         "fmask=0077"
         "dmask=0077"
+      ];
+    };
+    "/boot2" = {
+      device = "/dev/disk/by-label/boot2";
+      fsType = "vfat";
+      options = [
+        "fmask=0077"
+        "dmask=0077"
+        "nofail"
+        "x-systemd.device-timeout=3s"
       ];
     };
     "/" = {
