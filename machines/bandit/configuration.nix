@@ -120,7 +120,7 @@
       fsType = "zfs";
     };
     "/var/lib/plex" = {
-      device = "data/plex";
+      device = "osdata/plex";
       fsType = "zfs";
     };
     "/data2/files" = {
