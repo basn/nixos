@@ -156,9 +156,6 @@ in
         OLLAMA_NO_CLOUD = "1";
       };
     };
-    thermald = {
-      enable = true;
-    };
     udev = {
       extraRules = baseUdevRules;
     };

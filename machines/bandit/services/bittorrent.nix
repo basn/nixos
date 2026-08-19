@@ -91,9 +91,13 @@ in
       }
     ];
   };
-  systemd.services.qbittorrent.vpnConfinement = {
-    enable = true;
-    vpnNamespace = "wg";
+  systemd.services.qbittorrent = {
+    after = [ "nscd.service" ];
+    requires = [ "nscd.service" ];
+    vpnConfinement = {
+      enable = true;
+      vpnNamespace = "wg";
+    };
   };
   systemd.services.qbittorrent.serviceConfig.ExecStartPre = lib.mkAfter [ "!${configureSeedPort}" ];
   environment.systemPackages = [ azirePortforward ];
