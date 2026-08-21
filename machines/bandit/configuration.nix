@@ -292,8 +292,6 @@
       enable = true;
     };
   };
-  # Persistent swap on a ZFS zvol; the zvol is provisioned as osdata/swap.
-  swapDevices = [ { device = "/dev/zvol/osdata/swap"; } ];
   nix.settings = {
     # Prevent large C++ builds from exhausting Bandit's 31 GiB RAM.
     max-jobs = 4;
