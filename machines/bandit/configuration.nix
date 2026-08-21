@@ -29,6 +29,12 @@
       "drivetemp"
     ];
     kernelParams = [ "ip=dhcp" ];
+    # Preserve a vmcore after an NMI or soft-lockup panic so recurring host
+    # freezes can be diagnosed before the machine is rebooted.
+    crashDump = {
+      enable = true;
+      reservedMemory = "256M";
+    };
     supportedFilesystems = [ "zfs" ];
     initrd = {
       kernelModules = [ "r8169" ];
