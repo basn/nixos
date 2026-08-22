@@ -6,10 +6,12 @@ let
   logFile = "/var/log/rclone-log.txt";
   mountPoint = "/mnt/telia";
   cacheDir = "/data2/rclone-cache";
-  bwlimit = "50M";
+  bwlimit = "50M:off";
   vfsCacheMaxSize = "185G";
   vfsCacheMaxAge = "438300h";
+  vfsReadChunkSize = "16M";
   vfsReadChunkSizeLimit = "1G";
+  vfsReadChunkStreams = 4;
 in
 
 {
@@ -34,7 +36,9 @@ in
           --dir-cache-time=10000h \
           --buffer-size 100M \
           --vfs-cache-mode full \
+          --vfs-read-chunk-size ${vfsReadChunkSize} \
           --vfs-read-chunk-size-limit ${vfsReadChunkSizeLimit} \
+          --vfs-read-chunk-streams ${toString vfsReadChunkStreams} \
           --vfs-cache-max-age ${vfsCacheMaxAge} \
           --vfs-cache-max-size ${vfsCacheMaxSize} \
           --umask=0000 encrypted:/files/ ${mountPoint} \
