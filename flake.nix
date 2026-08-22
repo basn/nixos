@@ -236,6 +236,7 @@
         nodes = {
           vault = {
             hostname = "vault";
+            groups = [ "automatic" ];
             sshUser = "deploy";
             fastConnection = false;
             autoRollback = true;
@@ -247,6 +248,7 @@
           };
           services = {
             hostname = "services";
+            groups = [ "automatic" ];
             sshUser = "deploy";
             fastConnection = false;
             autoRollback = true;
@@ -258,6 +260,7 @@
           };
           hermes = {
             hostname = "hermes";
+            groups = [ "automatic" ];
             sshUser = "deploy";
             fastConnection = false;
             autoRollback = true;
@@ -269,6 +272,7 @@
           };
           netbird = {
             hostname = "netbird";
+            groups = [ "automatic" ];
             sshUser = "deploy";
             fastConnection = false;
             autoRollback = true;
@@ -280,6 +284,7 @@
           };
           nixos-sov2 = {
             hostname = "nixos-sov2";
+            groups = [ "automatic" ];
             sshUser = "deploy";
             fastConnection = false;
             autoRollback = true;
@@ -291,6 +296,7 @@
           };
           skullcanyon = {
             hostname = "skullcanyon";
+            groups = [ "automatic" ];
             sshUser = "deploy";
             fastConnection = false;
             autoRollback = true;
@@ -302,6 +308,7 @@
           };
           lenovo = {
             hostname = "lenovo";
+            groups = [ "automatic" ];
             sshUser = "deploy";
             fastConnection = false;
             autoRollback = true;
@@ -313,6 +320,7 @@
           };
           battlestation = {
             hostname = "battlestation";
+            groups = [ "manual" ];
             sshUser = "deploy";
             fastConnection = false;
             autoRollback = true;
@@ -324,6 +332,7 @@
           };
           laptop = {
             hostname = "laptop";
+            groups = [ "manual" ];
             sshUser = "deploy";
             fastConnection = false;
             autoRollback = true;
@@ -335,6 +344,7 @@
           };
           nixos-sov = {
             hostname = "nixos-sov";
+            groups = [ "controller" ];
             sshUser = "deploy";
             fastConnection = false;
             autoRollback = true;
@@ -346,6 +356,7 @@
           };
           bandit = {
             hostname = "bandit";
+            groups = [ "infrastructure" ];
             sshUser = "deploy";
             fastConnection = false;
             autoRollback = true;
@@ -355,21 +366,6 @@
               path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.bandit;
             };
           };
-        };
-        groups = {
-          automatic = [
-            "vault"
-            "services"
-            "hermes"
-            "netbird"
-            "nixos-sov2"
-            "skullcanyon"
-            "lenovo"
-            "battlestation"
-          ];
-          manual = [ "laptop" ];
-          controller = [ "nixos-sov" ];
-          infrastructure = [ "bandit" ];
         };
       };
       checks = builtins.mapAttrs (
