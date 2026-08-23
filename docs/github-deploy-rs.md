@@ -25,17 +25,25 @@ triggers to the deployment workflow.
 
 ## First deployment and rollout policy
 
-The first live deploy-rs activation must target `nixos-sov2`, not `services`.
-Verify its activation, post-deployment health checks, and rollback behavior
-before relying on the automatic group. This workflow's automatic group includes
-`services`, so do not merge or enable automatic main deployments until that
-initial `nixos-sov2` proof has been completed through a separately authorized,
-trusted operation.
+Follow this sequence exactly:
 
-`battlestation` and `laptop` are selected individually through
-`workflow_dispatch`. `bandit` is separate infrastructure. `nixos-sov` is a
-manual, isolated controller deployment and must be last; no other job may rely
-on the runner while it activates.
+1. Merge the workflow while the repository variable
+   `ENABLE_AUTOMATIC_DEPLOY` is unset or set to `false`. Only the exact value
+   `true` enables automatic deployment from a push to `main`; pushes always
+   validate and build regardless.
+2. Verify the persistent runner and the Actions secrets described above.
+3. Run the main-only validation workflow.
+4. Dispatch the workflow from `main` with the `nixos-sov2` scope. A dispatch
+   selects a deployment target only; it cannot select another source revision.
+5. Verify activation, post-deployment health, deploy-rs magic rollback, and an
+   explicit rollback before expanding the rollout.
+6. Only after that proof succeeds, set `ENABLE_AUTOMATIC_DEPLOY=true`.
+7. Deploy `nixos-sov` separately through the existing trusted external method,
+   and always last. It is the GitHub runner/controller, so this workflow never
+   deploys it; self-deployment could terminate the job before deploy-rs
+   confirms magic rollback and before credential cleanup. A future deployment
+   path needs a separate trusted controller.
 
-Keep `system.autoUpgrade` enabled for now. Remove it only in a later change,
-after deploy-rs has been proven live.
+`battlestation`, `laptop`, and `bandit` are also selected individually through
+main-only `workflow_dispatch`. Keep `system.autoUpgrade` enabled until
+deploy-rs has been proven live.
