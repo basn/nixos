@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -63,6 +63,24 @@
     };
   };
   virtualisation.vmware.guest.enable = true;
+  sops = {
+    defaultSopsFile = ./secrets/runner.yaml;
+    secrets.github-actions-runner-token = {
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
+  };
+  services.github-runners.nixos-sov = {
+    enable = true;
+    url = "https://github.com/basn/nixos";
+    tokenFile = config.sops.secrets.github-actions-runner-token.path;
+    tokenType = "access";
+    extraLabels = [
+      "nix-nightly"
+      "nixos"
+    ];
+  };
   # Provisioned as the dedicated osdisk/swap ZFS zvol.
   swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
   system.stateVersion = "24.05";

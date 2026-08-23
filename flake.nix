@@ -32,6 +32,10 @@
       url = "github:NousResearch/hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   outputs =
     inputs@{ self, ... }:
@@ -58,6 +62,7 @@
           includeZfsRole ? false,
           includeAutoUpgradeRole ? false,
           includeSmartdRole ? false,
+          includeDeployUser ? true,
           extraSpecialArgs ? { },
         }:
         nixpkgsLib.nixosSystem {
@@ -67,6 +72,7 @@
             ./common/openssh.nix
             ./modules/zfs-compatible-kernel.nix
           ]
+          ++ lib.optionals includeDeployUser [ ./modules/deploy-rs-user.nix ]
           ++ lib.optionals includeCommon [ ./common/common.nix ]
           ++ lib.optionals (includeCommon && includeNetbird) [ ./common/netbird.nix ]
           ++ lib.optionals (includeCommon && includeMonitoring) [ ./common/monitoring-exporters.nix ]
@@ -198,6 +204,7 @@
         # nix build .#nixosConfigurations.minimalIso.config.system.build.isoImage
         minimalIso = mkHost {
           includeCommon = false;
+          includeDeployUser = false;
           modules = [
             (
               { pkgs, modulesPath, ... }:
@@ -212,6 +219,7 @@
         };
         graphicalIso = mkHost {
           includeCommon = false;
+          includeDeployUser = false;
           modules = [
             inputs.nvf.nixosModules.default
             (
@@ -224,5 +232,144 @@
           ];
         };
       };
+      deploy = {
+        nodes = {
+          vault = {
+            hostname = "vault";
+            groups = [ "automatic" ];
+            sshUser = "deploy";
+            fastConnection = false;
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.vault;
+            };
+          };
+          services = {
+            hostname = "services";
+            groups = [ "automatic" ];
+            sshUser = "deploy";
+            fastConnection = false;
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.services;
+            };
+          };
+          hermes = {
+            hostname = "hermes";
+            groups = [ "automatic" ];
+            sshUser = "deploy";
+            fastConnection = false;
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.hermes;
+            };
+          };
+          netbird = {
+            hostname = "netbird";
+            groups = [ "automatic" ];
+            sshUser = "deploy";
+            fastConnection = false;
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.netbird;
+            };
+          };
+          nixos-sov2 = {
+            hostname = "nixos-sov2";
+            groups = [ "automatic" ];
+            sshUser = "deploy";
+            fastConnection = false;
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.nixos-sov2;
+            };
+          };
+          skullcanyon = {
+            hostname = "skullcanyon";
+            groups = [ "automatic" ];
+            sshUser = "deploy";
+            fastConnection = false;
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.skullcanyon;
+            };
+          };
+          lenovo = {
+            hostname = "lenovo";
+            groups = [ "automatic" ];
+            sshUser = "deploy";
+            fastConnection = false;
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.lenovo;
+            };
+          };
+          battlestation = {
+            hostname = "battlestation";
+            groups = [ "manual" ];
+            sshUser = "deploy";
+            fastConnection = false;
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.battlestation;
+            };
+          };
+          laptop = {
+            hostname = "laptop";
+            groups = [ "manual" ];
+            sshUser = "deploy";
+            fastConnection = false;
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.laptop;
+            };
+          };
+          nixos-sov = {
+            hostname = "nixos-sov";
+            groups = [ "controller" ];
+            sshUser = "deploy";
+            fastConnection = false;
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.nixos-sov;
+            };
+          };
+          bandit = {
+            hostname = "bandit";
+            groups = [ "infrastructure" ];
+            sshUser = "deploy";
+            fastConnection = false;
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.bandit;
+            };
+          };
+        };
+      };
+      checks = builtins.mapAttrs (
+        system: deployLib: deployLib.deployChecks self.deploy
+      ) inputs.deploy-rs.lib;
     };
 }
