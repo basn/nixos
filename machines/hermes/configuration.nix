@@ -93,6 +93,7 @@ in
             ct state established,related accept
             ip daddr 10.1.1.8 udp dport 53 accept
             ip daddr 10.1.1.8 tcp dport { 53, 443 } accept
+            ip daddr 100.64.0.0/10 accept
             ip daddr 10.0.0.0/8 reject
             ip daddr 172.16.0.0/12 reject
             ip daddr 192.168.0.0/16 reject
@@ -105,6 +106,7 @@ in
 
             iifname "docker0" ip daddr 10.1.1.8 udp dport 53 accept
             iifname "docker0" ip daddr 10.1.1.8 tcp dport { 53, 443 } accept
+            iifname "docker0" ip daddr 100.64.0.0/10 accept
 
             iifname "docker0" ip daddr 10.0.0.0/8 reject
             iifname "docker0" ip daddr 172.16.0.0/12 reject
