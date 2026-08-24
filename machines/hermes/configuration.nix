@@ -127,7 +127,6 @@ in
   };
 
   services = {
-    netbird.enable = lib.mkForce false;
     qemuGuest.enable = true;
     zfs = {
       autoScrub.enable = true;
