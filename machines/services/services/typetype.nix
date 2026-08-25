@@ -116,7 +116,9 @@ in
 
   systemd.tmpfiles.rules = [
     "d /docker/typetype 0750 root root - -"
-    "d /docker/typetype/postgres 0750 root root - -"
+    # PostgreSQL's container user is UID 999.  Keep the bind-mount root
+    # traversable across activation, rather than resetting it to root:root.
+    "d /docker/typetype/postgres 0700 999 root - -"
     "d /docker/typetype/garage-meta 0750 root root - -"
     "d /docker/typetype/garage-data 0750 root root - -"
   ];
