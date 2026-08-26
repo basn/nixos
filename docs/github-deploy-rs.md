@@ -12,7 +12,7 @@ triggers to the deployment workflow.
 2. Confirm `github-runner-nixos-sov.service` is active.
 3. In GitHub **Settings -> Actions -> Runners**, confirm `nixos-sov` is online
    with `self-hosted`, `nixos`, and `nix-nightly` labels.
-4. Create the GitHub Actions secret `DEPLOY_SSH_PRIVATE_KEY` from the private
+4. Create the GitHub Actions secret `DEPLOY_SSH_KEY` from the private
    key corresponding to the `deploy` public key in
    `modules/deploy-rs-user.nix`. Do not place that private key in the runner
    checkout or in Nix configuration.
@@ -27,12 +27,12 @@ triggers to the deployment workflow.
 
 Follow this sequence exactly:
 
-1. Merge the workflow while the repository variable
-   `ENABLE_AUTOMATIC_DEPLOY` is unset or set to `false`. Only the exact value
-   `true` enables automatic deployment from a push to `main`; pushes always
-   validate and build regardless.
-2. Verify the persistent runner and the Actions secrets described above.
-3. Run the main-only validation workflow.
+1. Keep the repository variable `ENABLE_AUTOMATIC_DEPLOY` unset or set to
+   `false`. Only the exact value `true` enables automatic deployment from a
+   push to `main`; pushes always validate and build regardless.
+2. Merge the workflow to `main`.
+3. Confirm that the resulting push validates and builds successfully while
+   deployment is skipped. There is no validation-only manual dispatch.
 4. Dispatch the workflow from `main` with the `nixos-sov2` scope. A dispatch
    selects a deployment target only; it cannot select another source revision.
 5. Verify activation, post-deployment health, deploy-rs magic rollback, and an

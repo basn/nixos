@@ -115,14 +115,22 @@ jobs:
       - name: Configure deployment SSH
         shell: bash
         env:
-          DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
         run: |
           set -euo pipefail
+          if [ -z "${DEPLOY_SSH_KEY:-}" ]; then
+            echo '::error::Missing required GitHub Actions secret: DEPLOY_SSH_KEY' >&2
+            exit 1
+          fi
+          if [ -z "${DEPLOY_KNOWN_HOSTS:-}" ]; then
+            echo '::error::Missing required GitHub Actions secret: DEPLOY_KNOWN_HOSTS' >&2
+            exit 1
+          fi
           ssh_home="$RUNNER_TEMP/nixos-deploy-home"
           ssh_dir="$ssh_home/.ssh"
           install -d -m 0700 "$ssh_dir"
-          printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" > "$ssh_dir/id_ed25519"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$ssh_dir/id_ed25519"
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$ssh_dir/known_hosts"
           printf '%s\n' \
             'Host *' \
@@ -133,6 +141,8 @@ jobs:
             '  StrictHostKeyChecking yes' \
             '  BatchMode yes' > "$ssh_dir/config"
           chmod 0600 "$ssh_dir/id_ed25519" "$ssh_dir/known_hosts" "$ssh_dir/config"
+          ssh-keygen -y -f "$ssh_dir/id_ed25519" >/dev/null
+          ssh-keygen -l -f "$ssh_dir/known_hosts" >/dev/null
           printf 'HOME=%s\n' "$ssh_home" >> "$GITHUB_ENV"
           printf 'NIX_SSHOPTS=-F %s/config -o BatchMode=yes -o StrictHostKeyChecking=yes\n' "$ssh_dir" >> "$GITHUB_ENV"
       - name: Validate deployment SSH access
