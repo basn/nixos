@@ -1,0 +1,189 @@
+name: Build and deploy NixOS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: Deployment scope
+        required: true
+        default: automatic
+        type: choice
+        options:
+          - automatic
+          - bandit
+          - battlestation
+          - laptop
+          - nixos-sov2
+
+permissions:
+  contents: read
+
+# A deployment must finish (including deploy-rs rollback confirmation) before
+# another workflow run can start changing the fleet.
+concurrency:
+  group: nixos-fleet-deployment
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    # Dispatches must use protected main; a scope never selects source code.
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, nixos, nix-nightly]
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Check flake
+        run: nix flake check --show-trace
+      - name: Check deploy-rs schema
+        run: nix build .#checks.x86_64-linux.deploy-schema
+      - name: Check deploy-rs activation definitions
+        run: nix build .#checks.x86_64-linux.deploy-activate
+      - name: Build selected deployment targets
+        shell: bash
+        env:
+          DEPLOY_SCOPE: ${{ github.event_name == 'push' && 'automatic' || inputs.scope }}
+        run: |
+          set -euo pipefail
+          case "$DEPLOY_SCOPE" in
+            automatic)
+              targets=(vault services hermes netbird nixos-sov2 skullcanyon lenovo)
+              ;;
+            bandit|battlestation|laptop|nixos-sov2)
+              targets=("$DEPLOY_SCOPE")
+              ;;
+            *)
+              echo "Unsupported deployment scope: $DEPLOY_SCOPE" >&2
+              exit 1
+              ;;
+          esac
+          for host in "${targets[@]}"; do
+            nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" --no-link
+          done
+
+  deploy-selected:
+    needs: validate
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      ((github.event_name == 'push' && vars.ENABLE_AUTOMATIC_DEPLOY == 'true') ||
+      (github.event_name == 'workflow_dispatch' &&
+      (inputs.scope == 'automatic' || inputs.scope == 'bandit' ||
+      inputs.scope == 'battlestation' || inputs.scope == 'laptop' ||
+      inputs.scope == 'nixos-sov2')))
+    runs-on: [self-hosted, nixos, nix-nightly]
+    timeout-minutes: 90
+    # Deployment credentials are intentionally confined to this job.
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Select trusted deployment targets
+        shell: bash
+        env:
+          DEPLOY_SCOPE: ${{ github.event_name == 'push' && 'automatic' || inputs.scope }}
+        run: |
+          set -euo pipefail
+          case "$DEPLOY_SCOPE" in
+            automatic)
+              targets=(vault services hermes netbird nixos-sov2 skullcanyon lenovo)
+              ;;
+            bandit)
+              targets=(bandit)
+              ;;
+            battlestation)
+              targets=(battlestation)
+              ;;
+            laptop)
+              targets=(laptop)
+              ;;
+            nixos-sov2)
+              targets=(nixos-sov2)
+              ;;
+            *)
+              echo "Unsupported deployment scope: $DEPLOY_SCOPE" >&2
+              exit 1
+              ;;
+          esac
+          printf '%s\n' "${targets[@]}" > "$RUNNER_TEMP/deploy-targets"
+      - name: Configure deployment SSH
+        shell: bash
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DEPLOY_SSH_KEY:-}" ]; then
+            echo '::error::Missing required GitHub Actions secret: DEPLOY_SSH_KEY' >&2
+            exit 1
+          fi
+          if [ -z "${DEPLOY_KNOWN_HOSTS:-}" ]; then
+            echo '::error::Missing required GitHub Actions secret: DEPLOY_KNOWN_HOSTS' >&2
+            exit 1
+          fi
+          ssh_home="$RUNNER_TEMP/nixos-deploy-home"
+          ssh_dir="$ssh_home/.ssh"
+          install -d -m 0700 "$ssh_dir"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$ssh_dir/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$ssh_dir/known_hosts"
+          printf '%s\n' \
+            'Host *' \
+            "  IdentityFile $ssh_dir/id_ed25519" \
+            '  IdentitiesOnly yes' \
+            "  UserKnownHostsFile $ssh_dir/known_hosts" \
+            '  GlobalKnownHostsFile /dev/null' \
+            '  StrictHostKeyChecking yes' \
+            '  BatchMode yes' > "$ssh_dir/config"
+          chmod 0600 "$ssh_dir/id_ed25519" "$ssh_dir/known_hosts" "$ssh_dir/config"
+          ssh-keygen -y -f "$ssh_dir/id_ed25519" >/dev/null
+          ssh-keygen -l -f "$ssh_dir/known_hosts" >/dev/null
+          printf 'HOME=%s\n' "$ssh_home" >> "$GITHUB_ENV"
+          printf 'NIX_SSHOPTS=-F %s/config -o BatchMode=yes -o StrictHostKeyChecking=yes\n' "$ssh_dir" >> "$GITHUB_ENV"
+      - name: Validate deployment SSH access
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r host; do
+            getent ahosts "$host" >/dev/null
+            ssh -n -o BatchMode=yes -o StrictHostKeyChecking=yes "deploy@$host" true
+          done < "$RUNNER_TEMP/deploy-targets"
+      - name: Deploy automatic group
+        if: github.event_name == 'push' || inputs.scope == 'automatic'
+        run: nix run .#deploy-rs -- . --groups automatic
+      - name: Deploy Bandit infrastructure host
+        if: github.event_name == 'workflow_dispatch' && inputs.scope == 'bandit'
+        run: nix run .#deploy-rs -- .#bandit
+      - name: Deploy Battlestation
+        if: github.event_name == 'workflow_dispatch' && inputs.scope == 'battlestation'
+        run: nix run .#deploy-rs -- .#battlestation
+      - name: Deploy laptop
+        if: github.event_name == 'workflow_dispatch' && inputs.scope == 'laptop'
+        run: nix run .#deploy-rs -- .#laptop
+      - name: Deploy nixos-sov2 rollout target
+        if: github.event_name == 'workflow_dispatch' && inputs.scope == 'nixos-sov2'
+        run: nix run .#deploy-rs -- .#nixos-sov2
+      - name: Verify deployment health
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r host; do
+            ssh -n -o BatchMode=yes -o StrictHostKeyChecking=yes "deploy@$host" \
+              "bash -lc 'failed_units=\"\$(systemctl --failed --no-legend --plain)\"; if [ -n \"\$failed_units\" ]; then printf \"%s\\n\" \"\$failed_units\" >&2; exit 1; fi'"
+          done < "$RUNNER_TEMP/deploy-targets"
+
+          if grep -qx services "$RUNNER_TEMP/deploy-targets"; then
+            ssh -n -o BatchMode=yes -o StrictHostKeyChecking=yes deploy@services \
+              'systemctl is-active nginx.service podman-authentik-server.service podman-authentik-worker.service dayzweb.service'
+            curl --fail --location --silent --show-error --max-time 20 \
+              --output /dev/null https://auth.basn.se/
+          fi
+      - name: Remove deployment SSH material
+        if: ${{ always() }}
+        shell: bash
+        run: rm -rf "$RUNNER_TEMP/nixos-deploy-home" "$RUNNER_TEMP/deploy-targets"
