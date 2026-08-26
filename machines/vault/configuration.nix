@@ -154,7 +154,6 @@
       extraPackages = with pkgs; [
         intel-media-driver
         vpl-gpu-rt
-        intel-ocl
         libva-vdpau-driver
         intel-compute-runtime
       ];
