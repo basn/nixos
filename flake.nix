@@ -342,18 +342,6 @@
               path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.laptop;
             };
           };
-          nixos-sov = {
-            hostname = "nixos-sov";
-            groups = [ "controller" ];
-            sshUser = "deploy";
-            fastConnection = false;
-            autoRollback = true;
-            magicRollback = true;
-            profiles.system = {
-              user = "root";
-              path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.nixos-sov;
-            };
-          };
           bandit = {
             hostname = "bandit";
             groups = [ "infrastructure" ];
