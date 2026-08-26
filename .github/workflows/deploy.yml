@@ -20,6 +20,10 @@ on:
 permissions:
   contents: read
 
+env:
+  NIX_CONFIG: |
+    access-tokens = github.com=${{ github.token }}
+
 # A deployment must finish (including deploy-rs rollback confirmation) before
 # another workflow run can start changing the fleet.
 concurrency:
