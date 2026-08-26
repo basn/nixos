@@ -10,7 +10,9 @@ in
   systemd.tmpfiles.rules = [
     "d /docker/authentik 0750 root root - -"
     "d /docker/authentik/backups 0700 root root - -"
-    "d /docker/authentik/postgres 0700 root root - -"
+    # PostgreSQL's container user is UID 999. Keep the bind-mount root
+    # accessible to it across activation, rather than resetting it to root.
+    "d /docker/authentik/postgres 0700 999 root - -"
     "d /docker/authentik/redis 0700 root root - -"
     "d /docker/authentik/media 0750 root root - -"
   ];
