@@ -22,6 +22,42 @@ triggers to the deployment workflow.
 6. Protect GitHub `main`: require pull requests and checks, and block force
    pushes and branch deletion.
 7. Never approve public fork code to run on the persistent runner.
+8. Create an `ATTIC_TOKEN` Actions secret with only pull/push access to the
+   `nixos` cache at `https://attic.basn.se/`. Its value is supplied only to
+   trusted selected-target build jobs; never put it in the repository or Nix
+   configuration.
+
+## Validation, builds, and cache population
+
+The ordinary validation job evaluates the flake with `nix flake check
+--no-build --show-trace`. This deliberately evaluates checks without realizing
+every deploy-rs activation closure. The warning `unknown flake output 'deploy'`
+is expected: deploy-rs consumes that output even though it is not a standard
+flake output.
+
+The validation job also builds the deploy-rs schema check. Full
+`deploy-activate` validation realizes every deployment profile and is therefore
+intentionally separate from ordinary push CI; run it only in a specifically
+scheduled or manually approved, longer-running workflow.
+
+After evaluation, the workflow selects only the deployment targets for its
+scope and runs one serialized build/cache job for each target. Automatic pushes
+build `vault`, `services`, `hermes`, `netbird`, `nixos-sov2`, `skullcanyon`, and
+`lenovo`; they never build Battlestation. Manual scopes build only their single
+selected target. Each job builds the corresponding `deploy-<host>` package,
+which is the exact deploy-rs system activation closure, then pushes that output
+to the private `nixos` Attic cache only after the build succeeds.
+
+The first source build, notably Battlestation's pinned CachyOS ThinLTO kernel
+and ZFS module, can take several hours. Later matching builds should use the
+Attic cache. The manual Battlestation job has a six-hour timeout; ordinary
+automatic-host jobs have shorter per-host limits, so a slow host cannot consume
+one shared validation timeout.
+
+`nixos-sov` installs `attic-client` and constrains the actual Nix daemon to one
+job, eight build cores, 800% CPU, idle I/O priority, and 22/26 GiB soft/hard
+memory limits. These limits apply to Nix build subprocesses without adding or
+trusting the external CachyOS binary cache.
 
 ## First deployment and rollout policy
 

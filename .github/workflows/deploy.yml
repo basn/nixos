@@ -31,7 +31,9 @@ jobs:
     # Dispatches must use protected main; a scope never selects source code.
     if: github.ref == 'refs/heads/main'
     runs-on: [self-hosted, nixos, nix-nightly]
-    timeout-minutes: 120
+    timeout-minutes: 30
+    outputs:
+      build_matrix: ${{ steps.select-targets.outputs.matrix }}
     env:
       NIX_CONFIG: |
         access-tokens = github.com=${{ secrets.NIX_GITHUB_TOKEN }}
@@ -52,12 +54,11 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
       - name: Check flake
-        run: nix flake check --show-trace
+        run: nix flake check --no-build --show-trace
       - name: Check deploy-rs schema
-        run: nix build .#checks.x86_64-linux.deploy-schema
-      - name: Check deploy-rs activation definitions
-        run: nix build .#checks.x86_64-linux.deploy-activate
-      - name: Build selected deployment targets
+        run: nix build .#checks.x86_64-linux.deploy-schema --no-link
+      - name: Select trusted build targets
+        id: select-targets
         shell: bash
         env:
           DEPLOY_SCOPE: ${{ github.event_name == 'push' && 'automatic' || inputs.scope }}
@@ -65,22 +66,78 @@ jobs:
           set -euo pipefail
           case "$DEPLOY_SCOPE" in
             automatic)
-              targets=(vault services hermes netbird nixos-sov2 skullcanyon lenovo)
+              matrix='[{"host":"vault","timeout_minutes":90},{"host":"services","timeout_minutes":90},{"host":"hermes","timeout_minutes":90},{"host":"netbird","timeout_minutes":90},{"host":"nixos-sov2","timeout_minutes":90},{"host":"skullcanyon","timeout_minutes":90},{"host":"lenovo","timeout_minutes":90}]'
               ;;
-            bandit|battlestation|laptop|nixos-sov2)
-              targets=("$DEPLOY_SCOPE")
+            bandit)
+              matrix='[{"host":"bandit","timeout_minutes":120}]'
+              ;;
+            battlestation)
+              # A cache miss builds the pinned CachyOS ThinLTO kernel from source.
+              matrix='[{"host":"battlestation","timeout_minutes":360}]'
+              ;;
+            laptop)
+              matrix='[{"host":"laptop","timeout_minutes":120}]'
+              ;;
+            nixos-sov2)
+              matrix='[{"host":"nixos-sov2","timeout_minutes":90}]'
               ;;
             *)
               echo "Unsupported deployment scope: $DEPLOY_SCOPE" >&2
               exit 1
               ;;
           esac
-          for host in "${targets[@]}"; do
-            nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" --no-link
-          done
+          printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
+
+  build-selected:
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, nixos, nix-nightly]
+    timeout-minutes: ${{ matrix.timeout_minutes }}
+    strategy:
+      fail-fast: false
+      # The persistent runner may serialize this matrix; each host still gets
+      # its own timeout instead of consuming one shared workflow timeout.
+      max-parallel: 1
+      matrix:
+        include: ${{ fromJSON(needs.validate.outputs.build_matrix) }}
+    env:
+      NIX_CONFIG: |
+        access-tokens = github.com=${{ secrets.NIX_GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Log in to the Attic build cache
+        shell: bash
+        env:
+          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ATTIC_TOKEN:-}" ]; then
+            echo '::error::Missing required GitHub Actions secret: ATTIC_TOKEN' >&2
+            exit 1
+          fi
+          attic_config_dir="$RUNNER_TEMP/attic-${GITHUB_RUN_ID}-${{ matrix.host }}"
+          install -d -m 0700 "$attic_config_dir"
+          printf 'XDG_CONFIG_HOME=%s\n' "$attic_config_dir" >> "$GITHUB_ENV"
+          XDG_CONFIG_HOME="$attic_config_dir" attic login basn https://attic.basn.se/ "$ATTIC_TOKEN"
+      - name: Build and cache selected deployment activation
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$(
+            nix build ".#deploy-${{ matrix.host }}" --no-link --print-out-paths
+          )"
+          attic push nixos "$output"
+      - name: Remove Attic credentials
+        if: ${{ always() }}
+        shell: bash
+        run: rm -rf "$XDG_CONFIG_HOME"
 
   deploy-selected:
-    needs: validate
+    needs: [validate, build-selected]
     if: >-
       github.ref == 'refs/heads/main' &&
       ((github.event_name == 'push' && vars.ENABLE_AUTOMATIC_DEPLOY == 'true') ||

@@ -1,4 +1,9 @@
-{ config, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -80,6 +85,20 @@
       "nix-nightly"
       "nixos"
     ];
+  };
+  environment.systemPackages = [ pkgs.attic-client ];
+  nix.settings = {
+    max-jobs = 1;
+    cores = 8;
+  };
+  systemd.services.nix-daemon.serviceConfig = {
+    CPUQuota = "800%";
+    Nice = 10;
+    # nix-daemon.nix sets best-effort; intentionally lower build I/O priority.
+    IOSchedulingClass = lib.mkForce "idle";
+    MemoryHigh = "22G";
+    MemoryMax = "26G";
+    OOMPolicy = "stop";
   };
   # Provisioned as the dedicated osdisk/swap ZFS zvol.
   swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];

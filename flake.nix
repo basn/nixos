@@ -359,6 +359,11 @@
       checks = builtins.mapAttrs (
         system: deployLib: deployLib.deployChecks self.deploy
       ) inputs.deploy-rs.lib;
-      packages.${system}.deploy-rs = inputs.deploy-rs.packages.${system}.default;
+      packages.${system} = {
+        deploy-rs = inputs.deploy-rs.packages.${system}.default;
+      }
+      // lib.mapAttrs' (
+        name: node: lib.nameValuePair "deploy-${name}" node.profiles.system.path
+      ) self.deploy.nodes;
     };
 }
