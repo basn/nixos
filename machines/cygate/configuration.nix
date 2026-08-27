@@ -85,8 +85,8 @@
       "nix-nightly"
       "nixos"
     ];
+    extraPackages = [ pkgs.attic-client ];
   };
-  environment.systemPackages = [ pkgs.attic-client ];
   nix.settings = {
     max-jobs = 1;
     cores = 8;

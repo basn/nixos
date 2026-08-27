@@ -119,6 +119,15 @@ jobs:
             -p CPUQuotaPerSecUSec \
             -p MemoryHigh \
             -p MemoryMax
+      - name: Add locked Attic client to job PATH
+        shell: bash
+        run: |
+          set -euo pipefail
+          attic_executable="$(
+            nix shell --inputs-from . nixpkgs#attic-client \
+              -c sh -c 'command -v attic'
+          )"
+          printf '%s\n' "${attic_executable%/*}" >> "$GITHUB_PATH"
       - name: Log in to the Attic build cache
         shell: bash
         env:
