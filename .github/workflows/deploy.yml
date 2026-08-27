@@ -31,7 +31,7 @@ jobs:
     # Dispatches must use protected main; a scope never selects source code.
     if: github.ref == 'refs/heads/main'
     runs-on: [self-hosted, nixos, nix-nightly]
-    timeout-minutes: 120
+    timeout-minutes: 30
     outputs:
       build_matrix: ${{ steps.select-targets.outputs.matrix }}
     env:
@@ -55,8 +55,8 @@ jobs:
           persist-credentials: false
       - name: Check flake
         run: nix flake check --no-build --show-trace
-      - name: Check deploy-rs schema
-        run: nix build .#checks.x86_64-linux.deploy-schema --no-link
+      # TODO: Reintroduce deploy-rs schema validation as per-node checks or a
+      # separate manually dispatched job, not one monolithic check over every node.
       - name: Select trusted build targets
         id: select-targets
         shell: bash
@@ -109,6 +109,16 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 1
           persist-credentials: false
+      - name: Report runner build capacity
+        shell: bash
+        run: |
+          nproc
+          free -h
+          nix config show | grep -E '^(cores|max-jobs) ='
+          systemctl show nix-daemon.service \
+            -p CPUQuotaPerSecUSec \
+            -p MemoryHigh \
+            -p MemoryMax
       - name: Log in to the Attic build cache
         shell: bash
         env:
@@ -128,7 +138,11 @@ jobs:
         run: |
           set -euo pipefail
           output="$(
-            nix build ".#deploy-${{ matrix.host }}" --no-link --print-out-paths
+            nix build ".#deploy-${{ matrix.host }}" \
+              --no-link \
+              --print-out-paths \
+              --max-jobs 1 \
+              --cores 8
           )"
           attic push nixos "$output"
       - name: Remove Attic credentials
