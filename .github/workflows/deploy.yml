@@ -100,15 +100,26 @@ jobs:
       max-parallel: 1
       matrix:
         include: ${{ fromJSON(needs.validate.outputs.build_matrix) }}
-    env:
-      NIX_CONFIG: |
-        access-tokens = github.com=${{ secrets.NIX_GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ github.sha }}
           fetch-depth: 1
           persist-credentials: false
+      - name: Add locked CI tools to job PATH
+        shell: bash
+        env:
+          NIX_CONFIG: |
+            access-tokens = github.com=${{ secrets.NIX_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # The nested shell expands these command substitutions.
+          # shellcheck disable=SC2016
+          nix shell --inputs-from . nixpkgs#attic-client nixpkgs#procps \
+            -c sh -c '
+              dirname "$(command -v attic)"
+              dirname "$(command -v free)"
+            ' >> "$GITHUB_PATH"
       - name: Report runner build capacity
         shell: bash
         run: |
@@ -119,15 +130,6 @@ jobs:
             -p CPUQuotaPerSecUSec \
             -p MemoryHigh \
             -p MemoryMax
-      - name: Add locked Attic client to job PATH
-        shell: bash
-        run: |
-          set -euo pipefail
-          attic_executable="$(
-            nix shell --inputs-from . nixpkgs#attic-client \
-              -c sh -c 'command -v attic'
-          )"
-          printf '%s\n' "${attic_executable%/*}" >> "$GITHUB_PATH"
       - name: Log in to the Attic build cache
         shell: bash
         env:
@@ -144,6 +146,9 @@ jobs:
           XDG_CONFIG_HOME="$attic_config_dir" attic login basn https://attic.basn.se/ "$ATTIC_TOKEN"
       - name: Build and cache selected deployment activation
         shell: bash
+        env:
+          NIX_CONFIG: |
+            access-tokens = github.com=${{ secrets.NIX_GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           output="$(
@@ -180,6 +185,19 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 1
           persist-credentials: false
+      - name: Add locked deployment tools to job PATH
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The nested shell expands these command substitutions.
+          # shellcheck disable=SC2016
+          nix shell --inputs-from . nixpkgs#curl nixpkgs#getent nixpkgs#openssh \
+            -c sh -c '
+              dirname "$(command -v curl)"
+              dirname "$(command -v getent)"
+              dirname "$(command -v ssh)"
+              command -v ssh-keygen >/dev/null
+            ' >> "$GITHUB_PATH"
       - name: Select trusted deployment targets
         shell: bash
         env:

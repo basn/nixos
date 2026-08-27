@@ -85,7 +85,14 @@
       "nix-nightly"
       "nixos"
     ];
-    extraPackages = [ pkgs.attic-client ];
+    # Workflow commands not already provided by the github-runners module.
+    extraPackages = [
+      pkgs.attic-client
+      pkgs.curl
+      pkgs.getent
+      pkgs.openssh
+      pkgs.procps
+    ];
   };
   nix.settings = {
     max-jobs = 1;
