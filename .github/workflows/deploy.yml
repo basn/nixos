@@ -265,7 +265,14 @@ jobs:
           set -euo pipefail
           while IFS= read -r host; do
             getent ahosts "$host" >/dev/null
-            ssh -n -o BatchMode=yes -o StrictHostKeyChecking=yes "deploy@$host" true
+            ssh-keygen -F "$host" -f "$HOME/.ssh/known_hosts" >/dev/null || {
+              echo "::error::Missing known_hosts mapping for $host" >&2
+              exit 1
+            }
+            ssh -F "$HOME/.ssh/config" -n \
+              -o BatchMode=yes \
+              -o StrictHostKeyChecking=yes \
+              "deploy@$host" true
           done < "$RUNNER_TEMP/deploy-targets"
       - name: Deploy automatic group
         if: github.event_name == 'push' || inputs.scope == 'automatic'
