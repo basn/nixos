@@ -258,7 +258,6 @@ jobs:
           ssh-keygen -y -f "$ssh_dir/id_ed25519" >/dev/null
           ssh-keygen -l -f "$ssh_dir/known_hosts" >/dev/null
           printf 'HOME=%s\n' "$ssh_home" >> "$GITHUB_ENV"
-          printf 'NIX_SSHOPTS=-F %s/config -o BatchMode=yes -o StrictHostKeyChecking=yes\n' "$ssh_dir" >> "$GITHUB_ENV"
       - name: Validate deployment SSH access
         shell: bash
         run: |
@@ -276,30 +275,30 @@ jobs:
           done < "$RUNNER_TEMP/deploy-targets"
       - name: Deploy automatic group
         if: github.event_name == 'push' || inputs.scope == 'automatic'
-        run: nix run .#deploy-rs -- . --groups automatic
+        run: nix run .#deploy-rs -- . --groups automatic --ssh-opts "-F $HOME/.ssh/config"
       - name: Deploy Bandit infrastructure host
         if: github.event_name == 'workflow_dispatch' && inputs.scope == 'bandit'
-        run: nix run .#deploy-rs -- .#bandit
+        run: nix run .#deploy-rs -- .#bandit --ssh-opts "-F $HOME/.ssh/config"
       - name: Deploy Battlestation
         if: github.event_name == 'workflow_dispatch' && inputs.scope == 'battlestation'
-        run: nix run .#deploy-rs -- .#battlestation
+        run: nix run .#deploy-rs -- .#battlestation --ssh-opts "-F $HOME/.ssh/config"
       - name: Deploy laptop
         if: github.event_name == 'workflow_dispatch' && inputs.scope == 'laptop'
-        run: nix run .#deploy-rs -- .#laptop
+        run: nix run .#deploy-rs -- .#laptop --ssh-opts "-F $HOME/.ssh/config"
       - name: Deploy nixos-sov2 rollout target
         if: github.event_name == 'workflow_dispatch' && inputs.scope == 'nixos-sov2'
-        run: nix run .#deploy-rs -- .#nixos-sov2
+        run: nix run .#deploy-rs -- .#nixos-sov2 --ssh-opts "-F $HOME/.ssh/config"
       - name: Verify deployment health
         shell: bash
         run: |
           set -euo pipefail
           while IFS= read -r host; do
-            ssh -n -o BatchMode=yes -o StrictHostKeyChecking=yes "deploy@$host" \
+            ssh -F "$HOME/.ssh/config" -n "deploy@$host" \
               "bash -lc 'failed_units=\"\$(systemctl --failed --no-legend --plain)\"; if [ -n \"\$failed_units\" ]; then printf \"%s\\n\" \"\$failed_units\" >&2; exit 1; fi'"
           done < "$RUNNER_TEMP/deploy-targets"
 
           if grep -qx services "$RUNNER_TEMP/deploy-targets"; then
-            ssh -n -o BatchMode=yes -o StrictHostKeyChecking=yes deploy@services \
+            ssh -F "$HOME/.ssh/config" -n deploy@services \
               'systemctl is-active nginx.service podman-authentik-server.service podman-authentik-worker.service dayzweb.service'
             curl --fail --location --silent --show-error --max-time 20 \
               --output /dev/null https://auth.basn.se/
