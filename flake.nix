@@ -271,7 +271,7 @@
             };
           };
           netbird = {
-            hostname = "netbird";
+            hostname = "netbird.basn.se";
             groups = [ "automatic" ];
             sshUser = "deploy";
             fastConnection = false;

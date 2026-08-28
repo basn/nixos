@@ -206,7 +206,7 @@ jobs:
           set -euo pipefail
           case "$DEPLOY_SCOPE" in
             automatic)
-              targets=(vault services hermes netbird nixos-sov2 skullcanyon lenovo)
+              targets=(vault services hermes netbird.basn.se nixos-sov2 skullcanyon lenovo)
               ;;
             bandit)
               targets=(bandit)
