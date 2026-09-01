@@ -1,0 +1,128 @@
+name: Build and cache NixOS systems
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# The persistent runner builds the fleet serially. Never overlap runs that
+# could contend for its constrained Nix daemon or Attic credentials.
+concurrency:
+  group: nixos-fleet-build-cache
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, nixos, nix-nightly]
+    timeout-minutes: 30
+    outputs:
+      build_matrix: ${{ steps.build-matrix.outputs.matrix }}
+    env:
+      NIX_CONFIG: |
+        access-tokens = github.com=${{ secrets.NIX_GITHUB_TOKEN }}
+    steps:
+      - name: Check Nix GitHub token
+        shell: bash
+        env:
+          NIX_GITHUB_TOKEN: ${{ secrets.NIX_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NIX_GITHUB_TOKEN:-}" ]; then
+            echo '::error::Missing required GitHub Actions secret: NIX_GITHUB_TOKEN' >&2
+            exit 1
+          fi
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Check flake
+        run: nix flake check --no-build --show-trace
+      - name: Generate machine build matrix
+        id: build-matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          matrix_path="$(
+            nix build .#machine-build-matrix \
+              --no-link \
+              --print-out-paths \
+              --max-jobs 1 \
+              --cores 8
+          )"
+          matrix="$(< "$matrix_path")"
+          if [ -z "$matrix" ]; then
+            echo '::error::The flake generated an empty machine build matrix' >&2
+            exit 1
+          fi
+          printf 'Machine build matrix: %s\n' "$matrix"
+          printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
+
+  build-and-cache:
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    name: Build and cache ${{ matrix.host }}
+    runs-on: [self-hosted, nixos, nix-nightly]
+    # Battlestation may need to build its CachyOS ThinLTO kernel and matching
+    # ZFS module from source when the private cache is cold.
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJSON(needs.validate.outputs.build_matrix) }}
+    env:
+      NIX_CONFIG: |
+        access-tokens = github.com=${{ secrets.NIX_GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Add locked Attic client to job PATH
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The nested shell expands this command substitution.
+          # shellcheck disable=SC2016
+          nix shell --inputs-from . nixpkgs#attic-client \
+            -c sh -c 'dirname "$(command -v attic)"' >> "$GITHUB_PATH"
+      - name: Log in to the Attic build cache
+        shell: bash
+        env:
+          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ATTIC_TOKEN:-}" ]; then
+            echo '::error::Missing required GitHub Actions secret: ATTIC_TOKEN' >&2
+            exit 1
+          fi
+          attic_config_dir="$RUNNER_TEMP/attic-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${{ matrix.host }}"
+          install -d -m 0700 "$attic_config_dir"
+          printf 'XDG_CONFIG_HOME=%s\n' "$attic_config_dir" >> "$GITHUB_ENV"
+          XDG_CONFIG_HOME="$attic_config_dir" \
+            attic login basn https://attic.basn.se/ "$ATTIC_TOKEN"
+      - name: Build and cache NixOS system closure
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$(
+            nix build ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel" \
+              --no-link \
+              --print-out-paths \
+              --max-jobs 1 \
+              --cores 8
+          )"
+          if [ -z "$output" ]; then
+            echo '::error::Nix did not return a system output path' >&2
+            exit 1
+          fi
+          attic push nixos "$output"
+      - name: Remove Attic credentials
+        if: ${{ always() }}
+        shell: bash
+        run: rm -rf -- "$RUNNER_TEMP/attic-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${{ matrix.host }}"

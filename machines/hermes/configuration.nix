@@ -534,12 +534,7 @@ in
     memoryPercent = 25;
   };
 
-  system = {
-    stateVersion = "26.05";
-    autoUpgrade = {
-      randomizedDelaySec = "30m";
-    };
-  };
+  system.stateVersion = "26.05";
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 }
