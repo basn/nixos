@@ -13,6 +13,9 @@
   ];
 
   boot = {
+    # Keep ARC bounded so runner builds cannot force the 32 GiB VM into
+    # recursive ZFS memory reclaim.
+    extraModprobeConfig = "options zfs zfs_arc_max=8589934592";
     zfs = {
       extraPools = [
         "osdisk"
@@ -107,7 +110,7 @@
     MemoryMax = "26G";
     OOMPolicy = "stop";
   };
-  # Provisioned as the dedicated osdisk/swap ZFS zvol.
-  swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
+  # Dedicated non-ZFS VMware disk, labelled during provisioning.
+  swapDevices = [ { device = "/dev/disk/by-label/nixos-sov-swap"; } ];
   system.stateVersion = "24.05";
 }
