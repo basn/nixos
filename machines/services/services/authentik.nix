@@ -1,7 +1,7 @@
 { config, ... }:
 let
   authentikSecrets = config.sops.secrets.authentik.path;
-  authentikImage = "ghcr.io/goauthentik/server:2026.8.0@sha256:5217eed4e86a3c6666ecf81c3430753ef958f97f93ac614070d458c10e0b2b33";
+  authentikImage = "ghcr.io/goauthentik/server:2026.8.1@sha256:d670ebbf308212c0c971649c4beb903bb7e0bc7fb0ec08b7fc78faa9188846da";
 in
 {
   # Use the upstream images so flake updates do not build Authentik's Node/V8
