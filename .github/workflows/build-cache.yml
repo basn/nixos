@@ -40,6 +40,13 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 1
           persist-credentials: false
+      - name: Prepare isolated Nix cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          nix_cache_dir="$RUNNER_TEMP/nix-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-validate"
+          install -d -m 0700 "$nix_cache_dir"
+          printf 'XDG_CACHE_HOME=%s\n' "$nix_cache_dir" >> "$GITHUB_ENV"
       - name: Check flake
         run: nix flake check --no-eval-cache --no-build --show-trace
       - name: Generate machine build matrix
@@ -62,6 +69,10 @@ jobs:
           fi
           printf 'Machine build matrix: %s\n' "$matrix"
           printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
+      - name: Remove temporary Nix cache
+        if: ${{ always() }}
+        shell: bash
+        run: rm -rf -- "$RUNNER_TEMP/nix-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-validate"
 
   build-and-cache:
     needs: validate
@@ -84,6 +95,13 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 1
           persist-credentials: false
+      - name: Prepare isolated Nix cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          nix_cache_dir="$RUNNER_TEMP/nix-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${{ matrix.host }}"
+          install -d -m 0700 "$nix_cache_dir"
+          printf 'XDG_CACHE_HOME=%s\n' "$nix_cache_dir" >> "$GITHUB_ENV"
       - name: Add locked Attic client to job PATH
         shell: bash
         run: |
@@ -124,7 +142,10 @@ jobs:
             exit 1
           fi
           attic push nixos "$output"
-      - name: Remove Attic credentials
+      - name: Remove temporary credentials and Nix cache
         if: ${{ always() }}
         shell: bash
-        run: rm -rf -- "$RUNNER_TEMP/attic-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${{ matrix.host }}"
+        run: |
+          rm -rf -- \
+            "$RUNNER_TEMP/attic-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${{ matrix.host }}" \
+            "$RUNNER_TEMP/nix-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${{ matrix.host }}"
