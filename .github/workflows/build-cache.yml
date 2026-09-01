@@ -47,8 +47,6 @@ jobs:
           nix_cache_dir="$RUNNER_TEMP/nix-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-validate"
           install -d -m 0700 "$nix_cache_dir"
           printf 'XDG_CACHE_HOME=%s\n' "$nix_cache_dir" >> "$GITHUB_ENV"
-      - name: Check flake
-        run: nix flake check --no-eval-cache --no-build --show-trace
       - name: Generate machine build matrix
         id: build-matrix
         shell: bash
@@ -69,6 +67,28 @@ jobs:
           fi
           printf 'Machine build matrix: %s\n' "$matrix"
           printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
+          printf 'matrix_path=%s\n' "$matrix_path" >> "$GITHUB_OUTPUT"
+      - name: Evaluate machine system derivations
+        shell: bash
+        run: |
+          set -euo pipefail
+          machine_names="$(
+            nix shell --inputs-from . nixpkgs#jq \
+              -c jq -r '.include[].host' "$matrix_path"
+          )"
+          if [ -z "$machine_names" ]; then
+            echo '::error::The flake generated no machine names to evaluate' >&2
+            exit 1
+          fi
+          while IFS= read -r host; do
+            nix eval --no-eval-cache --raw \
+              ".#nixosConfigurations.${host}.config.system.build.toplevel.drvPath" \
+              > /dev/null
+          done <<< "$machine_names"
+        env:
+          matrix_path: ${{ steps.build-matrix.outputs.matrix_path }}
+      - name: Check flake
+        run: nix flake check --no-eval-cache --no-build --show-trace
       - name: Remove temporary Nix cache
         if: ${{ always() }}
         shell: bash
