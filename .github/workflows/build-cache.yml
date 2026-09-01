@@ -41,7 +41,7 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
       - name: Check flake
-        run: nix flake check --no-build --show-trace
+        run: nix flake check --no-eval-cache --no-build --show-trace
       - name: Generate machine build matrix
         id: build-matrix
         shell: bash
@@ -49,6 +49,7 @@ jobs:
           set -euo pipefail
           matrix_path="$(
             nix build .#machine-build-matrix \
+              --no-eval-cache \
               --no-link \
               --print-out-paths \
               --max-jobs 1 \
@@ -112,6 +113,7 @@ jobs:
           set -euo pipefail
           output="$(
             nix build ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel" \
+              --no-eval-cache \
               --no-link \
               --print-out-paths \
               --max-jobs 1 \
