@@ -173,12 +173,12 @@ in
         _config_version = 27;
         model = {
           provider = "openai-codex";
-          default = "gpt-5.6-sol";
+          default = "gpt-6-astra";
           openai_runtime = "auto";
         };
         auxiliary = {
-          # Keep the agent loop, tool routing, and vision on GPT-5.6 Luna. These
-          # narrow background tasks do not need the default model's capability.
+          # Keep narrow background tasks on GPT-5.6 Luna; the agent loop,
+          # tool routing, and vision use the default model.
           approval = {
             provider = "openai-codex";
             model = "gpt-5.6-luna";
