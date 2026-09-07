@@ -232,7 +232,7 @@ in
           docker_image = "${terminalImage.imageName}:${terminalImage.imageTag}";
           # Use a new identity for this immutable image; activation must quiesce
           # the previous terminal sandbox before the new one shares its workspace.
-          docker_shared_container_key = "audit-${terminalImage.imageTag}-cron-output-v2";
+          docker_shared_container_key = "audit-${terminalImage.imageTag}-cron-output-v3";
           docker_extra_args = [
             "--dns=10.1.1.8"
             "--dns-search=."
@@ -240,6 +240,7 @@ in
           docker_forward_env = [ ];
           docker_volumes = [
             "/var/lib/hermes/output:/output"
+            "/var/lib/hermes/.hermes/cron/output:/cron-output:ro"
             "${config.sops.secrets.hermes-audit-ssh.path}:/run/hermes-audit/id_ed25519:ro"
           ];
           container_cpu = 2;
