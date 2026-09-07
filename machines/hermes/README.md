@@ -109,3 +109,124 @@ docker ps --filter label=hermes-agent=1
 zfs list osdisk/hermes
 zfs list -t snapshot -r osdisk/hermes
 ```
+
+## Flake and runtime audit tools
+
+`terminal-image.nix` builds the Docker **terminal backend** image, including
+Git, `gh`, `skopeo`, SSH, Python, Node, DNS tools, and `basn-audit`.
+`hermes-terminal-image.service` loads it before Hermes starts. The image includes
+its own runtime dependencies; it does not mount the host Nix store or Docker
+socket. Nix evaluation runs through the restricted SSH validator instead.
+
+The terminal sandbox explicitly uses `10.1.1.8` for DNS. Do not inherit the
+host's NetBird-local resolver: it is not reachable from the Docker bridge.
+Only TCP/22 to Services is added to the existing LAN egress exceptions.
+
+Run this through Hermes's **terminal tool**, after activation:
+
+```text
+terminal(command="basn-audit", background=true, notify_on_complete=true)
+```
+
+The command resolves GitHub and the configured registry domains, tests GitHub
+HTTPS, clones fresh public `basn/nixos` main into a unique
+`/workspace/nixos-audit.XXXXXXXX/repo`, and prints `CHECKOUT_COMMIT`. It never
+reuses `/workspace/nixos-update-check`. It inspects the PostgreSQL image from
+that fresh checkout with `skopeo`, reads runtime status, and requests validation
+of the same commit on nixos-sov. No registry image layers are pulled by skopeo.
+
+Individual access paths inside the terminal sandbox:
+
+```sh
+ssh -F /etc/ssh/audit_config audit-services health
+ssh -F /etc/ssh/audit_config audit-hermes health
+ssh -F /etc/ssh/audit_config audit-nixos-sov "validate <40-character-main-commit>"
+skopeo inspect --format '{{.Digest}}' docker://<configured-image-reference>
+```
+
+For an image containing both a tag and digest, remove the tag before passing it
+to skopeo. Git and these public registry reads do not require a GitHub token.
+`gh` is installed, but authenticated GitHub operations need separately scoped
+credentials; no general GitHub token is forwarded into this sandbox.
+
+`../../modules/hermes-audit.nix` supplies a dedicated account on the targets.
+There is no arbitrary shell, upload/SFTP, forwarding, PTY, Docker-group, or
+trusted-Nix-user access. Its only sudo command is a generated, argument-free
+health helper that reports selected systemd properties and container names,
+images, and status. It does not return service definitions, logs, or environment
+variables. Container unit names come from each target's OCI configuration.
+
+The validator accepts only a hexadecimal commit matching a newly fetched main
+from `https://github.com/basn/nixos.git`. It runs as the unprivileged audit user,
+serializes requests, uses an isolated cache and temporary checkout, and runs:
+
+```sh
+nix flake check --no-build --no-write-lock-file
+```
+
+`NIX_FLAKE_CHECK_EXIT` records the real Nix exit code, which is also returned over
+SSH. `VALIDATION_SSH_EXIT=255` means SSH failed, not that evaluation failed.
+`ENVIRONMENT_ERROR` identifies a clone failure; `REVISION_CHANGED` means main
+advanced between the two fetches and requires a new audit. Otherwise, classify
+Nix stderr: option/assertion/evaluation failures belong to the repository;
+DNS/fetch/daemon/permission/resource failures belong to the execution environment.
+The evaluator is capped at 12 GiB address space and 30 minutes. `--no-build`
+does not promise that evaluation will never need an import-from-derivation build.
+
+### Credentials and approvals
+
+The SSH private key is SOPS-encrypted in `secrets/audit-ssh.yaml` under the
+existing Hermes creation rule. SOPS installs it root-owned, mode 0400, and the
+sandbox receives a single read-only bind mount. It is never embedded in the
+terminal image. `audit-known-hosts` contains public host keys read over existing,
+strictly verified SSH connections; host-key checking remains mandatory.
+Replacing the SSH key requires rotating both the SOPS secret and the public key
+in `../../modules/hermes-audit-key.pub`, then recreating the sandbox's secret
+mount as part of an approved activation.
+
+Manual approvals remain enabled. The response window is 300 seconds; cron and
+unattended approval requests deny rather than wait for an absent operator.
+No Python, shell, or `execute_code` wildcard is allowlisted. In the dashboard's
+embedded TUI or terminal TUI, review the approval card and choose **Once**. In a
+messaging session, approve the pending request in that same conversation.
+An unanswered request or explicit denial must not be retried through another
+tool. A standalone Python import of a Hermes tool is not a complete interactive
+frontend: script approval needs the frontend's callback/transport.
+
+To verify the real approval flow, ask Hermes in its interactive interface to run
+this exact harmless `execute_code` script and choose **Once** on its prompt:
+
+```python
+print("HERMES_APPROVAL_PROBE_OK")
+```
+
+Success requires the marker in the tool result, a successful tool status, and
+no unanswered approval timeout. A dry-run verdict is not proof of that flow.
+
+### Activation boundary
+
+Building these configurations does not activate the audit access. Obtain explicit
+approval to activate the SSH accounts on the two remote targets and Hermes,
+reload Hermes's firewall/SSH configuration, and restart Hermes and its terminal
+sandbox. First check each target's auto-upgrade service/timer and compare the
+proposed generation with live application unit paths. Abort if activation would
+restart unrelated application containers.
+
+The image changes the sandbox identity, but the persistent workspace is retained.
+Quiesce Hermes and the old `hermes-agent=1` terminal sandbox before launching the
+replacement so two containers cannot write to that workspace concurrently.
+Preserve the stopped old container until verification succeeds. Changing image
+or DNS settings alone does not retrofit an already-running Docker container.
+
+After activation, run `basn-audit` and the approval probe through Hermes, confirm
+the active generations, and check failed units. Do not use host-side commands
+as substitutes for these backend acceptance tests.
+
+Offline security/exit-status tests, after building the nixos-sov output:
+
+```sh
+python3 tests/hermes-audit.py /nix/store/<built-dispatcher>/bin/hermes-audit-dispatch
+```
+
+Resolve the dispatcher path from the evaluated audit user's authorized key or
+the built SSH configuration; do not substitute an arbitrary user command.

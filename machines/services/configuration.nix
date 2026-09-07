@@ -7,6 +7,7 @@
   };
 
   imports = [
+    ../../modules/hermes-audit.nix
     ./hardware-configuration.nix
     ./sops.nix
     ./services/podman.nix
@@ -25,6 +26,10 @@
     ./services/network-optimizer.nix
     ./services/znapzend.nix
   ];
+  basn.hermesAudit = {
+    enable = true;
+    units = [ "nginx.service" ];
+  };
   boot = {
     zfs = {
       extraPools = [ "tank" ];

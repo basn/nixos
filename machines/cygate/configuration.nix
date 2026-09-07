@@ -6,11 +6,17 @@
 }:
 {
   imports = [
+    ../../modules/hermes-audit.nix
     ./hardware-configuration.nix
     ./services/kuma.nix
     ./services/nginx.nix
     ./services/syncoid.nix
   ];
+  basn.hermesAudit = {
+    enable = true;
+    validation = true;
+    units = [ "nix-daemon.service" ];
+  };
 
   boot = {
     # Keep ARC bounded so runner builds cannot force the 32 GiB VM into

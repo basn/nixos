@@ -1,0 +1,22 @@
+Host audit-services
+  HostName 10.1.1.8
+Host audit-hermes
+  HostName 10.1.1.10
+Host audit-nixos-sov
+  HostName 100.86.213.115
+
+Host audit-*
+  User hermes-audit
+  IdentityFile /run/hermes-audit/id_ed25519
+  UserKnownHostsFile /etc/ssh/audit_known_hosts
+  GlobalKnownHostsFile /dev/null
+  StrictHostKeyChecking yes
+  UpdateHostKeys no
+  IdentitiesOnly yes
+  BatchMode yes
+  ForwardAgent no
+  ClearAllForwardings yes
+  RequestTTY no
+  ConnectTimeout 10
+  ServerAliveInterval 30
+  ServerAliveCountMax 3

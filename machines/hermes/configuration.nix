@@ -7,11 +7,21 @@
 }:
 let
   agentBrowser = import ./agent-browser.nix { inherit pkgs; };
+  terminalImage = import ./terminal-image.nix { inherit pkgs; };
   hermesPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
     extraDependencyGroups = [ "firecrawl" ];
   };
 in
 {
+  imports = [ ../../modules/hermes-audit.nix ];
+  basn.hermesAudit = {
+    enable = true;
+    units = [
+      "hermes-agent.service"
+      "hermes-dashboard.service"
+      "docker.service"
+    ];
+  };
   boot = {
     initrd.availableKernelModules = [
       "ahci"
@@ -105,7 +115,7 @@ in
             type filter hook forward priority 10; policy accept;
 
             iifname "docker0" ip daddr 10.1.1.8 udp dport 53 accept
-            iifname "docker0" ip daddr 10.1.1.8 tcp dport { 53, 443 } accept
+            iifname "docker0" ip daddr 10.1.1.8 tcp dport { 22, 53, 443 } accept
             iifname "docker0" ip daddr 100.64.0.0/10 accept
 
             iifname "docker0" ip daddr 10.0.0.0/8 reject
@@ -209,10 +219,18 @@ in
           backend = "docker";
           cwd = "/workspace";
           timeout = 180;
-          docker_image = "nikolaik/python-nodejs:python3.11-nodejs20";
+          docker_image = "${terminalImage.imageName}:${terminalImage.imageTag}";
+          # Use a new identity for this immutable image; activation must quiesce
+          # the previous terminal sandbox before the new one shares its workspace.
+          docker_shared_container_key = "audit-${terminalImage.imageTag}";
+          docker_extra_args = [
+            "--dns=10.1.1.8"
+            "--dns-search=."
+          ];
           docker_forward_env = [ ];
           docker_volumes = [
             "/var/lib/hermes/output:/output"
+            "${config.sops.secrets.hermes-audit-ssh.path}:/run/hermes-audit/id_ed25519:ro"
           ];
           container_cpu = 2;
           container_memory = 6144;
@@ -256,8 +274,9 @@ in
         };
         approvals = {
           mode = "manual";
-          timeout = 120;
+          timeout = 300;
           cron_mode = "deny";
+          unattended_mode = "deny";
           mcp_reload_confirm = true;
           destructive_slash_confirm = true;
         };
@@ -317,6 +336,14 @@ in
     defaultSopsFile = ./secrets/hermes.env;
     defaultSopsFormat = "dotenv";
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    secrets.hermes-audit-ssh = {
+      sopsFile = ./secrets/audit-ssh.yaml;
+      format = "yaml";
+      key = "private_key";
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
     secrets.hermes-env = {
       owner = "hermes";
       group = "hermes";
@@ -341,6 +368,27 @@ in
   ];
 
   systemd = {
+    services.hermes-terminal-image = {
+      description = "Load the declarative Hermes terminal tool image";
+      requires = [ "docker.service" ];
+      after = [ "docker.service" ];
+      before = [
+        "hermes-agent.service"
+        "hermes-dashboard.service"
+      ];
+      requiredBy = [
+        "hermes-agent.service"
+        "hermes-dashboard.service"
+      ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      restartTriggers = [ terminalImage ];
+      script = ''
+        ${pkgs.docker}/bin/docker load --input ${terminalImage}
+      '';
+    };
     tmpfiles.rules = [
       "d /var/lib/hermes/output 2770 hermes hermes - -"
       "d /var/lib/firecrawl 0750 root root - -"
