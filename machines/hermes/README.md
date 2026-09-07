@@ -122,6 +122,21 @@ The terminal sandbox explicitly uses `10.1.1.8` for DNS. Do not inherit the
 host's NetBird-local resolver: it is not reachable from the Docker bridge.
 Only TCP/22 to Services is added to the existing LAN egress exceptions.
 
+The active Hermes profile's `cron/output` directory is available inside its
+Docker terminal sandbox at `/cron-output`, read-only. The mount source is
+resolved from the per-turn profile scope; it never exposes another profile or
+the rest of `.hermes` (credentials, session databases, and other state remain
+unmounted). For example, the latest saved report for a job can be inspected with:
+
+```sh
+ls -1 /cron-output/<job-id>
+sed -n '/^## Response/,$p' /cron-output/<job-id>/<timestamp>.md
+```
+
+Background `cronjob(action="run")` completions extract the final `## Response`
+section from the saved document, so the preview reports findings instead of
+spending its limit on the echoed prompt.
+
 Run this through Hermes's **terminal tool**, after activation:
 
 ```text

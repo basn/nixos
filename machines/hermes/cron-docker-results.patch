@@ -1,0 +1,85 @@
+diff --git a/tools/terminal_scope.py b/tools/terminal_scope.py
+index 0f56f78..7a31372 100644
+--- a/tools/terminal_scope.py
++++ b/tools/terminal_scope.py
+@@ -7,6 +7,7 @@ the profile's COMPLETE ``TERMINAL_*`` policy; while bound, ``terminal_env`` res
+ 
+ from __future__ import annotations
+ 
++import json
+ import logging
+ import os
+ from contextlib import contextmanager
+@@ -109,7 +110,10 @@ def build_profile_terminal_scope(hermes_home: "Any") -> Dict[str, str]:
+                 continue
+             env_var = TERMINAL_CONFIG_ENV_MAP.get(cfg_key)
+             if env_var:
+-                scope[env_var] = str(value)
++                # Container collection settings are consumed with json.loads().
++                # Python repr uses single quotes and makes the scoped terminal
++                # unavailable even though the same config works outside a scope.
++                scope[env_var] = json.dumps(value) if isinstance(value, (list, dict)) else str(value)
+ 
+     _apply({**_TOOL_LEVEL_DEFAULTS, **(DEFAULT_CONFIG.get("terminal") or {})})
+     env_path = home / ".env"
+@@ -139,6 +143,28 @@ def build_profile_terminal_scope(hermes_home: "Any") -> Dict[str, str]:
+         raw_terminal = raw.get("terminal") if isinstance(raw, dict) else None
+         if isinstance(raw_terminal, dict):
+             _apply(raw_terminal)
++
++    # Cron output is the only Hermes state exposed to terminal sandboxes. Resolve
++    # the source from this turn's profile home so multiplexed profiles cannot see
++    # one another's jobs, reports, credentials, or session databases.
++    if scope.get("TERMINAL_ENV") == "docker":
++        output_dir = (home / "cron" / "output").resolve()
++        if output_dir.is_dir():
++            try:
++                volumes = json.loads(scope.get("TERMINAL_DOCKER_VOLUMES", "[]"))
++            except (TypeError, ValueError, json.JSONDecodeError):
++                # Preserve the terminal backend's existing actionable error for
++                # malformed user configuration.
++                volumes = None
++            if isinstance(volumes, list):
++                destination_in_use = any(
++                    isinstance(volume, str)
++                    and (":/cron-output:" in volume or volume.endswith(":/cron-output"))
++                    for volume in volumes
++                )
++                if not destination_in_use:
++                    volumes.append(f"{output_dir}:/cron-output:ro")
++                    scope["TERMINAL_DOCKER_VOLUMES"] = json.dumps(volumes)
+     return scope
+ 
+ 
+diff --git a/tools/cronjob_tools.py b/tools/cronjob_tools.py
+index dbb77c1..39f58c0 100644
+--- a/tools/cronjob_tools.py
++++ b/tools/cronjob_tools.py
+@@ -335,8 +335,8 @@ def _run_claimed_job(job: Dict[str, Any], extra_prompt: Optional[str] = None) ->
+         return {"claimed": True, "success": False, "error": str(e)}
+ 
+ 
+-def _latest_job_output_excerpt(job_id: str, max_chars: int = 2000) -> Optional[str]:
+-    """Excerpt of the job's most recent saved output file for the background completion
++def _latest_job_output_excerpt(job_id: str, max_chars: int = 12000) -> Optional[str]:
++    """Final response from the job's most recent output file for the background completion
+     block (parent sees what the job produced). Never raises."""
+     try:
+         from cron.jobs import get_cron_output_dir
+@@ -344,8 +344,15 @@ def _latest_job_output_excerpt(job_id: str, max_chars: int = 2000) -> Optional[
+         text = files[-1].read_text(encoding="utf-8", errors="replace").strip() if files else ""
+         if not text:
+             return None
++        # Saved documents begin with the fully assembled prompt, which can be
++        # tens of kilobytes. Return the agent's report rather than exhausting
++        # the completion preview before reaching it.
++        response_marker = "\n## Response\n\n"
++        if response_marker in text:
++            text = text.split(response_marker, 1)[1].strip()
+         if len(text) > max_chars:
+-            text = text[:max_chars] + f"\n… (truncated; full output: {files[-1]})"
++            sandbox_path = f"/cron-output/{job_id}/{files[-1].name}"
++            text = text[:max_chars] + f"\n… (truncated; full output: {sandbox_path})"
+         return text
+     except Exception:
+         return None

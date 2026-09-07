@@ -8,8 +8,18 @@
 let
   agentBrowser = import ./agent-browser.nix { inherit pkgs; };
   terminalImage = import ./terminal-image.nix { inherit pkgs; };
+  hermesPatchedTools = pkgs.python312.pkgs.toPythonModule (
+    pkgs.runCommand "hermes-patched-tools" { nativeBuildInputs = [ pkgs.patch ]; } ''
+      site_packages="$out/${pkgs.python312.sitePackages}"
+      mkdir -p "$site_packages"
+      cp -R ${inputs.hermes-agent}/tools "$site_packages/tools"
+      chmod -R u+w "$site_packages/tools"
+      patch -d "$site_packages" -p1 < ${./cron-docker-results.patch}
+    ''
+  );
   hermesPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
     extraDependencyGroups = [ "firecrawl" ];
+    extraPythonPackages = [ hermesPatchedTools ];
   };
 in
 {
@@ -222,7 +232,7 @@ in
           docker_image = "${terminalImage.imageName}:${terminalImage.imageTag}";
           # Use a new identity for this immutable image; activation must quiesce
           # the previous terminal sandbox before the new one shares its workspace.
-          docker_shared_container_key = "audit-${terminalImage.imageTag}";
+          docker_shared_container_key = "audit-${terminalImage.imageTag}-cron-output-v1";
           docker_extra_args = [
             "--dns=10.1.1.8"
             "--dns-search=."
