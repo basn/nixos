@@ -6,24 +6,36 @@
   ...
 }:
 let
+  hermesUid = 999;
   agentBrowser = import ./agent-browser.nix { inherit pkgs; };
   terminalImage = import ./terminal-image.nix { inherit pkgs; };
-  hermesPatchedTools = pkgs.python312.pkgs.toPythonModule (
-    pkgs.runCommand "hermes-patched-tools" { nativeBuildInputs = [ pkgs.patch ]; } ''
+  hermesPatchedRuntime = pkgs.python312.pkgs.toPythonModule (
+    pkgs.runCommand "hermes-patched-runtime" { nativeBuildInputs = [ pkgs.patch ]; } ''
       site_packages="$out/${pkgs.python312.sitePackages}"
       mkdir -p "$site_packages"
-      cp -R ${inputs.hermes-agent}/tools "$site_packages/tools"
-      chmod -R u+w "$site_packages/tools"
+      cp -R \
+        ${inputs.hermes-agent}/cron \
+        ${inputs.hermes-agent}/hermes_cli \
+        ${inputs.hermes-agent}/tools \
+        "$site_packages/"
+      chmod -R u+w "$site_packages"
       patch -d "$site_packages" -p1 < ${./cron-docker-results.patch}
     ''
   );
   hermesPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
     extraDependencyGroups = [ "firecrawl" ];
-    extraPythonPackages = [ hermesPatchedTools ];
+    extraPythonPackages = [ hermesPatchedRuntime ];
   };
 in
 {
   imports = [ ../../modules/hermes-audit.nix ];
+  # Hermes launches cron workers in transient user scopes so they survive a
+  # gateway restart. Keep the existing on-disk UID stable and ensure its user
+  # manager and D-Bus socket exist without an interactive login.
+  users.users.hermes = {
+    uid = hermesUid;
+    linger = true;
+  };
   basn.hermesAudit = {
     enable = true;
     units = [
@@ -448,11 +460,15 @@ in
       };
     };
     services.hermes-agent = {
-      environment = lib.mkForce {
+      environment = {
+        DBUS_SESSION_BUS_ADDRESS = "unix:path=/run/user/${toString hermesUid}/bus";
         HOME = "/var/lib/hermes";
         HERMES_HOME = "/var/lib/hermes/.hermes";
         HERMES_MANAGED = "true";
+        XDG_RUNTIME_DIR = "/run/user/${toString hermesUid}";
       };
+      requires = [ "user@${toString hermesUid}.service" ];
+      after = [ "user@${toString hermesUid}.service" ];
       serviceConfig = {
         EnvironmentFile = config.sops.secrets.hermes-env.path;
         TimeoutStopSec = 210;

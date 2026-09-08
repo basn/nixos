@@ -51,6 +51,52 @@ index 0f56f78..7a31372 100644
      return scope
  
  
+diff --git a/cron/scheduler.py b/cron/scheduler.py
+index e833a41..659856a 100644
+--- a/cron/scheduler.py
++++ b/cron/scheduler.py
+@@ -3177,6 +3177,14 @@ def _launch_external_cron_worker(job: dict) -> bool:
+         inherit_profile_home=True,
+         extra={"HERMES_HOME": str(_get_hermes_home().resolve())},
+     )
++    # The child-environment sanitizer deliberately removes Hermes-owned
++    # PYTHONPATH entries. This packaged overlay is the cron runtime itself, so
++    # re-add its root after sanitization: the restart-safe worker must import
++    # the same patched scheduler and terminal scope as its gateway parent.
++    runtime_root = str(Path(__file__).resolve().parent.parent)
++    worker_env["PYTHONPATH"] = os.pathsep.join(
++        part for part in (runtime_root, worker_env.get("PYTHONPATH", "")) if part
++    )
+     try:
+         process = subprocess.Popen(
+             scoped_command,
+diff --git a/tools/process_registry.py b/tools/process_registry.py
+index 9a0ec39..a8b01bf 100644
+--- a/tools/process_registry.py
++++ b/tools/process_registry.py
+@@ -150,7 +150,8 @@ def _systemd_run_user_scope_available() -> bool:
+     """True if ``systemd-run --user --scope`` can create a cgroup.
+     ``shutil.which`` alone is insufficient: system services and containers may lack
+     the user D-Bus bus even with the binary on PATH (every spawn would fail with
+-    ``Failed to connect to user bus``), so a cheap ``/bin/true`` probe is run and cached."""
++    ``Failed to connect to user bus``), so a cheap resolved ``true`` probe is run
++    and cached."""
+     global _SYSTEMD_SCOPE_AVAILABLE, _SYSTEMD_SCOPE_PROBED_AT
+     verdict = _systemd_scope_cached()
+     if verdict is not None:
+@@ -169,8 +170,9 @@ def _systemd_run_user_scope_available() -> bool:
+                 binary = shutil.which("systemd-run")
+-                if binary:
++                true_binary = shutil.which("true")
++                if binary and true_binary:
+                     # Unique unit avoids collisions; the timeout bounds D-Bus.
+                     probe_unit = f"hermes-probe-scope-{os.getpid()}-{uuid.uuid4().hex[:8]}"
+                     result = subprocess.run(
+-                        _systemd_scope_argv(binary, probe_unit, "/bin/true"), capture_output=True, timeout=3,
++                        _systemd_scope_argv(binary, probe_unit, true_binary), capture_output=True, timeout=3,
+                     )
+                     available = result.returncode == 0
+                     if not available:
 diff --git a/tools/cronjob_tools.py b/tools/cronjob_tools.py
 index dbb77c1..39f58c0 100644
 --- a/tools/cronjob_tools.py
