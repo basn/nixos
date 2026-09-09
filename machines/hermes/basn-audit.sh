@@ -45,10 +45,10 @@ for target in audit-services audit-hermes; do
   printf 'HEALTH_EXIT=%s\n' "$rc"
   [[ "$rc" == 0 ]] || status=$rc
 done
-ssh -F /etc/ssh/audit_config audit-nixos-sov "validate $revision"
-nix_status=$?
-printf 'VALIDATION_SSH_EXIT=%s\n' "$nix_status"
-[[ "$nix_status" == 0 ]] || status=$nix_status
+ssh -F /etc/ssh/audit_config audit-nixos-sov "candidate $revision"
+candidate_status=$?
+printf 'CANDIDATE_AUDIT_SSH_EXIT=%s\n' "$candidate_status"
+[[ "$candidate_status" == 0 ]] || status=$candidate_status
 set -e
 [[ "$before" == "$(sha256sum flake.lock)" ]] || { echo 'LOCKFILE_CHANGED' >&2; exit 74; }
 printf 'AUDIT_EXIT=%s\n' "$status"

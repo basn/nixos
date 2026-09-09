@@ -38,6 +38,18 @@ let
     ];
     text = builtins.readFile ./hermes-validate-flake.sh;
   };
+  candidate = pkgs.writeShellApplication {
+    name = "hermes-candidate-flake";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.git
+      pkgs.nix
+      pkgs.python3
+    ];
+    text = ''
+      exec python3 ${./hermes-candidate-flake.py} "$@"
+    '';
+  };
   dispatch = pkgs.writeShellApplication {
     name = "hermes-audit-dispatch";
     runtimeInputs = [ pkgs.coreutils ];
@@ -53,8 +65,13 @@ let
             [[ "$revision" =~ ^[0-9a-f]{40}$ ]] || exit 64
             exec timeout --kill-after=30s 30m ${validate}/bin/hermes-validate-flake "$revision"
             ;;
+          candidate\ *)
+            revision="''${SSH_ORIGINAL_COMMAND#candidate }"
+            [[ "$revision" =~ ^[0-9a-f]{40}$ ]] || exit 64
+            exec timeout --kill-after=30s 90m ${candidate}/bin/hermes-candidate-flake "$revision"
+            ;;
         ''}
-        *) echo 'Allowed: health${lib.optionalString cfg.validation " or validate <current-main-commit>"}' >&2; exit 64 ;;
+        *) echo 'Allowed: health${lib.optionalString cfg.validation " or validate|candidate <current-main-commit>"}' >&2; exit 64 ;;
       esac
     '';
   };
@@ -62,7 +79,7 @@ in
 {
   options.basn.hermesAudit = {
     enable = lib.mkEnableOption "restricted Hermes runtime inspection";
-    validation = lib.mkEnableOption "validation of current basn/nixos main";
+    validation = lib.mkEnableOption "validation and candidate-update analysis of current basn/nixos main";
     units = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];

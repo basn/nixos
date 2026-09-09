@@ -146,8 +146,9 @@ terminal(command="basn-audit", background=true, notify_on_complete=true)
 The command resolves GitHub and the configured registry domains, tests GitHub
 HTTPS, clones fresh public `basn/nixos` main into a unique
 `/workspace/nixos-audit.XXXXXXXX/repo`, and prints `CHECKOUT_COMMIT`. It never
-reuses `/workspace/nixos-update-check`. It inspects the PostgreSQL image from
-that fresh checkout with `skopeo`, reads runtime status, and requests validation
+reuses `/workspace/nixos-update-check`. Literal OCI references remain a separate
+audit: `basn-audit` inspects the configured PostgreSQL image with `skopeo` and
+reads restricted runtime status before requesting a candidate-update analysis
 of the same commit on nixos-sov. No registry image layers are pulled by skopeo.
 
 Individual access paths inside the terminal sandbox:
@@ -156,6 +157,7 @@ Individual access paths inside the terminal sandbox:
 ssh -F /etc/ssh/audit_config audit-services health
 ssh -F /etc/ssh/audit_config audit-hermes health
 ssh -F /etc/ssh/audit_config audit-nixos-sov "validate <40-character-main-commit>"
+ssh -F /etc/ssh/audit_config audit-nixos-sov "candidate <40-character-main-commit>"
 skopeo inspect --format '{{.Digest}}' docker://<configured-image-reference>
 ```
 
@@ -171,13 +173,36 @@ health helper that reports selected systemd properties and container names,
 images, and status. It does not return service definitions, logs, or environment
 variables. Container unit names come from each target's OCI configuration.
 
-The validator accepts only a hexadecimal commit matching a newly fetched main
-from `https://github.com/basn/nixos.git`. It runs as the unprivileged audit user,
-serializes requests, uses an isolated cache and temporary checkout, and runs:
+Both validator modes accept only a hexadecimal commit matching a newly fetched
+main from `https://github.com/basn/nixos.git`. They run as the unprivileged audit
+user, serialize requests with the same lock, and use isolated caches and
+temporary checkouts. `validate` preserves the existing main-only check:
 
 ```sh
 nix flake check --no-build --no-write-lock-file
 ```
+
+`candidate` additionally evaluates every name declared by
+`nixosConfigurations`—including the exact `battlestation`, `services`, and
+`hermes` outputs—before and after running `nix flake update` in its disposable
+checkout. For each output it compares the evaluated system toplevel derivation
+and `config.environment.systemPackages` names and versions. It then runs the same
+no-build flake check against both baseline and candidate inputs.
+
+The candidate command returns delimited structured JSON followed by a readable
+summary. It includes the checked main commit, both lockfile SHA-256 hashes,
+changed locked inputs, per-output derivation and evaluated package differences,
+all relevant exit codes and bounded error text, and explicit coverage gaps.
+These are evaluated package inventories and derivation paths, **not verified
+built closure diffs**. No host system closures are built by default, and
+evaluation can still encounter import-from-derivation work.
+
+After a successful `nix flake update`, the exact candidate `flake.lock` is kept
+mode 0600 under `/var/lib/hermes-audit/candidate-artifacts/` on nixos-sov. The
+report names the fixed artifact path and hash; the ten newest artifacts are
+retained. The disposable checkout and cache are always removed. The restricted
+SSH command does not provide artifact download or upload access, and neither
+mode modifies the real checkout, pushes, deploys, or restarts services.
 
 `NIX_FLAKE_CHECK_EXIT` records the real Nix exit code, which is also returned over
 SSH. `VALIDATION_SSH_EXIT=255` means SSH failed, not that evaluation failed.
@@ -185,8 +210,29 @@ SSH. `VALIDATION_SSH_EXIT=255` means SSH failed, not that evaluation failed.
 advanced between the two fetches and requires a new audit. Otherwise, classify
 Nix stderr: option/assertion/evaluation failures belong to the repository;
 DNS/fetch/daemon/permission/resource failures belong to the execution environment.
-The evaluator is capped at 12 GiB address space and 30 minutes. `--no-build`
+The main-only evaluator is capped at 24 GiB address space and 30 minutes. `--no-build`
 does not promise that evaluation will never need an import-from-derivation build.
+
+The candidate evaluator is capped at 24 GiB and 90 minutes because it evaluates
+both sides for every declared output. `CANDIDATE_AUDIT_SSH_EXIT` is the real
+restricted-SSH result. A zero scheduler or agent exit alone is not proof: the
+saved report must contain the candidate JSON, actual per-host results, and the
+candidate validation exit code.
+
+### Scheduled flake watcher
+
+The versioned prompt in `cron-update-watch-prompt.md` defines the live
+`basn-nixos-flake-update-watch` job. The job must run `basn-audit`, wait for its real
+exit status, and base update findings on the candidate report. A newer input
+revision or hash alone is not a useful-update finding. The watcher assesses the
+reported host derivation and package changes for concrete security, stability,
+or performance value and states when evaluation or validation is partial or
+blocked. It must not describe evaluated inventories as built closure diffs.
+
+Literal OCI image/tag/digest checks remain a separate part of `basn-audit`; do
+not infer container-image changes from `nix flake update`. During acceptance
+testing, suppress Home Assistant notifications explicitly and verify the new
+saved cron report rather than relying on scheduler `ok`.
 
 ### Credentials and approvals
 
