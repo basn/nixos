@@ -10,6 +10,7 @@
     ./services/rsync.nix
     ./services/znapzend.nix
     ./services/backupuser.nix
+    ./services/network-link-recovery.nix
     ./sops.nix
   ];
 

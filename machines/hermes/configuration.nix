@@ -205,7 +205,7 @@ in
         _config_version = 27;
         model = {
           provider = "openai-codex";
-          default = "gpt-6-astra";
+          default = "gpt-5.6-sol";
           openai_runtime = "auto";
         };
         auxiliary = {
