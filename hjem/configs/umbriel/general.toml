@@ -4,3 +4,7 @@ xwayland = true
 show_cheatsheet = false
 focus_on_activate = false
 honor_restored_maximize = false
+
+[[window_rule]]
+match.app_id = "^steam_app_[0-9]+$"
+tearing = true
