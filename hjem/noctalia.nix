@@ -4,7 +4,7 @@
     users = {
       basn = {
         packages = with pkgs; [
-          noctalia-shell
+          noctalia
           satty
         ];
       };

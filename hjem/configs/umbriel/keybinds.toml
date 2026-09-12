@@ -1,9 +1,18 @@
 [keybinds]
 "Mod+Return" = "spawn:ghostty"
-"Mod+M" = "session-quit"
 "Mod+Q" = "window-close"
-"Mod+Space" = "spawn:noctalia-shell ipc call launcher toggle"
-"Mod+L" = "spawn:noctalia-shell ipc call sessionMenu lock"
+"Mod+Space" = "spawn:noctalia msg panel-toggle launcher"
+"Mod+L" = "spawn:noctalia msg session lock"
+
+"Mod+1" = "workspace-switch:1"
+"Mod+2" = "workspace-switch:2"
+"Mod+3" = "workspace-switch:3"
+"Mod+4" = "workspace-switch:4"
+"Mod+5" = "workspace-switch:5"
+"Mod+6" = "workspace-switch:6"
+"Mod+7" = "workspace-switch:7"
+"Mod+8" = "workspace-switch:8"
+"Mod+9" = "workspace-switch:9"
 
 "Mod+Tab" = "window-focus-next"
 "Alt+Left" = "window-focus-left"

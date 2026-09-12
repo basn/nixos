@@ -1,0 +1,15 @@
+diff --git a/src/app/application_ui.cpp b/src/app/application_ui.cpp
+index 074800c..b23714c 100644
+--- a/src/app/application_ui.cpp
++++ b/src/app/application_ui.cpp
+@@ -445,6 +445,10 @@ void Application::initInputDispatch() {
+   m_wayland.setKeyboardEventCallback([this](const KeyboardEvent& event) {
+     if (m_lockScreen.isActive()) {
+       m_lockScreen.onKeyboardEvent(event);
++      if (event.pressed && !event.preedit
++          && KeybindMatcher::matches(KeybindAction::Cancel, event.sym, event.modifiers)) {
++        (void)m_compositorPlatform.setOutputPower(false);
++      }
+       return;
+     }
+     // Grab popups are modal: while one is open it owns the keyboard and ESC

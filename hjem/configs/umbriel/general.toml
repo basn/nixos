@@ -1,5 +1,5 @@
 [general]
-autostart = ["noctalia-shell"]
+autostart = ["noctalia"]
 xwayland = true
 show_cheatsheet = false
 focus_on_activate = false

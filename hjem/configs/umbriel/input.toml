@@ -6,6 +6,7 @@ repeat_delay = 600
 numlock_toggle = false
 
 [input.mouse]
+accel_profile = "flat"
 sensitivity = -0.4
 
 [input.cursor]
