@@ -1,0 +1,17 @@
+[output.DP-1]
+enabled = true
+mode = "2560x1440@179.952"
+position = [0, 0]
+scale = 1.0
+vrr = "always"
+tearing = true
+workspaces = 9
+
+[output.DP-2]
+enabled = true
+mode = "2560x1440@164.999"
+position = [2560, 0]
+scale = 1.0
+vrr = "always"
+tearing = true
+workspaces = 9

@@ -6,42 +6,6 @@
   ...
 }:
 let
-  mangoPackage = pkgs.mango;
-
-  mangoNoctaliaLauncher = pkgs.writeShellScriptBin "mango-noctalia-session" ''
-    set -eu
-    export XDG_CURRENT_DESKTOP=mango:wlroots
-    export XDG_SESSION_DESKTOP=mango
-    export XDG_SESSION_TYPE=wayland
-
-    ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd \
-      DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE
-    ${pkgs.systemd}/bin/systemctl --user import-environment \
-      DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE
-
-    cfg="$HOME/.config/mango/config.conf"
-    if [ -f "$cfg" ]; then
-      exec ${mangoPackage}/bin/mango -c "$cfg" -s ${pkgs.noctalia-shell}/bin/noctalia-shell
-    else
-      exec ${mangoPackage}/bin/mango -s ${pkgs.noctalia-shell}/bin/noctalia-shell
-    fi
-  '';
-
-  mangoNoctaliaSession = pkgs.symlinkJoin {
-    name = "mango-noctalia-session";
-    paths = [
-      (pkgs.writeTextDir "share/wayland-sessions/mango-noctalia.desktop" ''
-        [Desktop Entry]
-        Name=Mango (Noctalia)
-        Comment=Mango with Noctalia shell
-        Exec=${mangoNoctaliaLauncher}/bin/mango-noctalia-session
-        Type=Application
-        DesktopNames=mango;wlroots
-      '')
-    ];
-    passthru.providedSessions = [ "mango-noctalia" ];
-  };
-
   baseUdevRules = ''
     # Prevent autosuspend on Fosi Audio K7 USB DAC to avoid audio crackle/dropouts.
     ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="152a", ATTR{idProduct}=="889b", TEST=="power/control", ATTR{power/control}="on"
@@ -58,6 +22,7 @@ in
     ./cachyos-proton.nix
     ./opencode.nix
     ./specialisation.nix
+    ./umbriel.nix
   ];
 
   swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
@@ -296,7 +261,6 @@ in
     lact = {
       enable = true;
     };
-    displayManager.sessionPackages = [ mangoNoctaliaSession ];
   };
   security = {
     rtkit = {
@@ -324,9 +288,6 @@ in
       protonup-ng
       sddm-astronaut
       playerctl
-      grim
-      slurp
-      wl-clipboard
       rocmPackages.rocm-smi
       rocmPackages.rocminfo
       mangohud
@@ -373,10 +334,6 @@ in
     };
   };
   programs = {
-    mango = {
-      enable = true;
-      package = mangoPackage;
-    };
     steam = {
       enable = true;
       gamescopeSession = {

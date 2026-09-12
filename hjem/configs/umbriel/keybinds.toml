@@ -1,0 +1,40 @@
+[keybinds]
+"Mod+Return" = "spawn:ghostty"
+"Mod+M" = "session-quit"
+"Mod+Q" = "window-close"
+"Mod+Space" = "spawn:noctalia-shell ipc call launcher toggle"
+"Mod+L" = "spawn:noctalia-shell ipc call sessionMenu lock"
+
+"Mod+Tab" = "window-focus-next"
+"Alt+Left" = "window-focus-left"
+"Alt+Right" = "window-focus-right"
+"Alt+Up" = "window-focus-up"
+"Alt+Down" = "window-focus-down"
+"Alt+Tab" = { action = "overview-toggle", repeat = false }
+
+"Mod+Shift+Left" = "column-move-left"
+"Mod+Shift+Right" = "column-move-right"
+"Mod+Shift+Up" = "window-move-up"
+"Mod+Shift+Down" = "window-move-down"
+
+"Mod+N" = "workspace-set-layout:toggle"
+"Mod+F" = "window-toggle-fullscreen"
+"Mod+Shift+F" = "window-toggle-floating"
+"Mod+A" = "window-toggle-maximize"
+"Mod+Z" = "scratchpad-toggle"
+"Mod+O" = { action = "overview-toggle", repeat = false }
+
+"Mod+Left" = "workspace-previous"
+"Mod+Right" = "workspace-next"
+"Mod+Ctrl+Left" = "window-move-to-workspace-previous"
+"Mod+Ctrl+Right" = "window-move-to-workspace-next"
+
+"XF86AudioRaiseVolume" = "spawn:wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+"
+"XF86AudioLowerVolume" = "spawn:wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+"XF86AudioMute" = "spawn:wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+"XF86AudioMicMute" = "spawn:wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+"XF86AudioPlay" = "spawn:playerctl play-pause"
+"XF86AudioPause" = "spawn:playerctl pause"
+"XF86AudioNext" = "spawn:playerctl next"
+"XF86AudioPrev" = "spawn:playerctl previous"
+"XF86AudioStop" = "spawn:playerctl stop"

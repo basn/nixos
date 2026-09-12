@@ -1,0 +1,4 @@
+{ ... }:
+{
+  programs.umbriel.enable = true;
+}

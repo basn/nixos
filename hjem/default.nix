@@ -12,10 +12,7 @@ let
   };
 
   orcaSlicer =
-    if config.networking.hostName == "battlestation" then
-      stablePkgs.orca-slicer
-    else
-      pkgs.orca-slicer;
+    if config.networking.hostName == "battlestation" then stablePkgs.orca-slicer else pkgs.orca-slicer;
 in
 {
   imports = [
@@ -23,7 +20,7 @@ in
     ./ghostty.nix
     ./fastfetch.nix
     ./mangohud.nix
-    ./mango.nix
+    ./umbriel.nix
     ./noctalia.nix
     ./git.nix
   ];

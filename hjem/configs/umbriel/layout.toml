@@ -1,0 +1,15 @@
+[layout]
+mode = "master"
+gap = 0
+width_presets = [0.333, 0.5, 0.667]
+
+[layout.struts]
+left = 0
+right = 0
+top = 0
+bottom = 0
+
+[layout.master]
+position = "left"
+default_width_fraction = 0.55
+new_on_top = true
