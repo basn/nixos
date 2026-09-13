@@ -9,22 +9,8 @@ let
   hermesUid = 999;
   agentBrowser = import ./agent-browser.nix { inherit pkgs; };
   terminalImage = import ./terminal-image.nix { inherit pkgs; };
-  hermesPatchedRuntime = pkgs.python312.pkgs.toPythonModule (
-    pkgs.runCommand "hermes-patched-runtime" { nativeBuildInputs = [ pkgs.patch ]; } ''
-      site_packages="$out/${pkgs.python312.sitePackages}"
-      mkdir -p "$site_packages"
-      cp -R \
-        ${inputs.hermes-agent}/cron \
-        ${inputs.hermes-agent}/hermes_cli \
-        ${inputs.hermes-agent}/tools \
-        "$site_packages/"
-      chmod -R u+w "$site_packages"
-      patch -d "$site_packages" -p1 < ${./cron-docker-results.patch}
-    ''
-  );
   hermesPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
     extraDependencyGroups = [ "firecrawl" ];
-    extraPythonPackages = [ hermesPatchedRuntime ];
   };
 in
 {
