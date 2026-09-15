@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 let
   opencodeSkillNew = pkgs.writeShellScriptBin "opencode-skill-new" ''
         set -eu
@@ -68,8 +68,25 @@ let
           echo "No MCP fragment files found in $dir" >&2
         fi
   '';
+
+  opencodeWithMcpEnv = pkgs.writeShellScriptBin "oc" ''
+    set -a
+    . ${config.sops.secrets.opencode-mcp-env.path}
+    set +a
+    exec ${pkgs.opencode}/bin/opencode "$@"
+  '';
 in
 {
+  sops = {
+    defaultSopsFile = ./secrets/opencode-mcp.env;
+    secrets.opencode-mcp-env = {
+      format = "dotenv";
+      owner = "basn";
+      group = "users";
+      mode = "0400";
+    };
+  };
+
   hjem.users.basn.files.".config/opencode/opencode.json".source = ./opencode.json;
 
   systemd.tmpfiles.rules = [
@@ -79,16 +96,16 @@ in
   ];
 
   environment.systemPackages = with pkgs; [
-    opencode
+    pkgs.opencode
     nixd
     jq
     opencodeSkillNew
     opencodeMcpNew
     opencodeMcpSync
+    opencodeWithMcpEnv
   ];
 
   environment.shellAliases = {
-    oc = "opencode";
     ocfg = "nvim ~/.config/opencode/opencode.json";
     oskills = "ls ~/.config/opencode/skills";
     omcps = "ls ~/.config/opencode/mcp.d";

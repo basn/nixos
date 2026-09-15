@@ -95,22 +95,35 @@
       "enabled": true,
       "command": [
         "nix",
-        "shell",
-        "nixpkgs#uv",
-        "nixpkgs#python312",
-        "-c",
-        "uv",
-        "tool",
         "run",
-        "--python",
-        "python3.12",
-        "mcp-server-home-assistant"
+        "nixpkgs#ha-mcp",
+        "--"
       ],
       "environment": {
-        "HOME_ASSISTANT_WEB_SOCKET_URL": "{env:HOME_ASSISTANT_WEB_SOCKET_URL}",
-        "HOME_ASSISTANT_API_TOKEN": "{env:HOME_ASSISTANT_API_TOKEN}"
+        "HOMEASSISTANT_URL": "{env:HOMEASSISTANT_URL}",
+        "HOMEASSISTANT_TOKEN": "{env:HOMEASSISTANT_TOKEN}"
       },
       "timeout": 60000
+    },
+    "unifi": {
+      "type": "local",
+      "enabled": true,
+      "command": [
+        "nix",
+        "shell",
+        "--inputs-from",
+        "/home/basn/nixos",
+        "nixpkgs#nodejs",
+        "-c",
+        "npx",
+        "-y",
+        "@robinbowes/unifi-mcp"
+      ],
+      "environment": {
+        "UNIFI_BASE_URL": "{env:UNIFI_BASE_URL}",
+        "UNIFI_API_KEY": "{env:UNIFI_API_KEY}"
+      },
+      "timeout": 120000
     },
     "nixos": {
       "type": "local",

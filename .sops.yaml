@@ -12,6 +12,11 @@ keys:
   - &server_skullcanyon age1vu6x0k0r2mvj8lgw54w8xq69956emeaa549zgjg9y8xqhmpvqpfsanmmt6
   - &server_hermes age1spcakwpad69z58xgjdtnq2e59hm78rsygqn0s6dz2rd4mqf6gqls2w9y63
 creation_rules:
+  - path_regex: ^machines/battlestation/secrets/[^/]+\.(yaml|json|env|ini|conf)$
+    key_groups:
+      - age:
+        - *basn
+        - *ws_battlestation
   - path_regex: ^machines/hermes/secrets/[^/]+\.(yaml|json|env|ini|conf)$
     key_groups:
       - age:
