@@ -1,0 +1,11 @@
+diff --git a/src/compositor/noctalia_compositor.c b/src/compositor/noctalia_compositor.c
+index ec4b5d7..aafc62c 100644
+--- a/src/compositor/noctalia_compositor.c
++++ b/src/compositor/noctalia_compositor.c
+@@ -1805,5 +1805,6 @@ static void configure_libinput_pointer(struct wlr_input_device* device) {
+   if (libinput_device_config_accel_is_available(libinput_dev)) {
+     libinput_device_config_accel_set_profile(libinput_dev, LIBINPUT_CONFIG_ACCEL_PROFILE_FLAT);
++    libinput_device_config_accel_set_speed(libinput_dev, -0.4);
+     wlr_log(WLR_INFO, "pointer: disabled acceleration for %s", device->name);
+   }
+ }

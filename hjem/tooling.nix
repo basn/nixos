@@ -7,7 +7,7 @@
           nix shell --inputs-from /home/basn/nixos nixpkgs#bubblewrap nixpkgs#nodejs nixpkgs#python3 nixpkgs#uv -c bash -c 'export UV_PYTHON="$(command -v python3)"; exec npx -y @openai/codex -c "mcp_servers.nixos.command=\"nix\"" -c "mcp_servers.nixos.args=[\"run\", \"github:utensils/mcp-nixos\", \"--\"]" "$@"' codex-nix $argv
       end
     '';
-    ".config/opencode/opencode.json".source = ../machines/battlestation/opencode.json;
-    ".config/opencode/unifi-controller.pem".source = ../machines/battlestation/unifi-controller.pem;
+    ".config/opencode/opencode.json".source = ./configs/opencode.json;
+    ".config/opencode/unifi-controller.pem".source = ./certs/unifi-controller.pem;
   };
 }

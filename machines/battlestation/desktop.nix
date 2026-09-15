@@ -7,6 +7,9 @@
         mesonFlags = (old.mesonFlags or [ ]) ++ [ "-Dtests=disabled" ];
         doCheck = false;
       });
+      noctalia-greeter = prev.noctalia-greeter.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [ ./noctalia-greeter-pointer-speed.patch ];
+      });
     })
   ];
 
