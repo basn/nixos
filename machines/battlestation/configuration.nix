@@ -6,6 +6,16 @@
   ...
 }:
 let
+  cachyosKernelPackages =
+    let
+      basePackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto-x86_64-v3;
+      kernel = basePackages.kernel.override {
+        # Temporary workaround for CachyOS/linux-cachyos#1031.
+        structuredExtraConfig.DRM_GUD = lib.kernel.no;
+      };
+    in
+    basePackages.extend (_final: _prev: { inherit kernel; });
+
   baseUdevRules = ''
     # Prevent autosuspend on Fosi Audio K7 USB DAC to avoid audio crackle/dropouts.
     ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="152a", ATTR{idProduct}=="889b", TEST=="power/control", ATTR{power/control}="on"
@@ -25,8 +35,21 @@ in
     ./umbriel.nix
   ];
 
-  swapDevices = [ { device = "/dev/zvol/osdisk/swap"; } ];
+  swapDevices = [
+    {
+      device = "/dev/disk/by-partuuid/28a1f5f2-a0d8-48bd-a5b9-69b0c7b545e5";
+      priority = 100;
+      randomEncryption.enable = true;
+    }
+  ];
   boot = {
+    zswap = {
+      enable = true;
+      compressor = "zstd";
+      zpool = "zsmalloc";
+      maxPoolPercent = 20;
+      shrinkerEnabled = true;
+    };
     initrd = {
       availableKernelModules = [
         "vmd"
@@ -65,7 +88,7 @@ in
       "kvm-intel"
       "ntsync"
     ];
-    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto-x86_64-v3;
+    kernelPackages = cachyosKernelPackages;
     kernelParams = [
       "split_lock_detect=off"
       "intel_iommu=on"
