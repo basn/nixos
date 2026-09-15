@@ -88,6 +88,7 @@ in
   };
 
   hjem.users.basn.files.".config/opencode/opencode.json".source = ./opencode.json;
+  hjem.users.basn.files.".config/opencode/unifi-controller.pem".source = ./unifi-controller.pem;
 
   systemd.tmpfiles.rules = [
     "d /home/basn/.config/opencode 0755 basn users - -"

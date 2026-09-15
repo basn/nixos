@@ -117,11 +117,13 @@
         "-c",
         "npx",
         "-y",
-        "@robinbowes/unifi-mcp"
+        "@robinbowes/unifi-mcp@0.2.6"
       ],
       "environment": {
-        "UNIFI_BASE_URL": "{env:UNIFI_BASE_URL}",
-        "UNIFI_API_KEY": "{env:UNIFI_API_KEY}"
+        "UNIFI_BASE_URL": "https://unifi.local",
+        "UNIFI_API_KEY": "{env:UNIFI_API_KEY}",
+        "NODE_EXTRA_CA_CERTS": "/home/basn/.config/opencode/unifi-controller.pem",
+        "UNIFI_SPEC_URL": "file:///proxy/network/api-docs/integration.json"
       },
       "timeout": 120000
     },

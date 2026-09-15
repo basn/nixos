@@ -140,7 +140,10 @@ in
     firewall = {
       enable = true;
     };
-    extraHosts = "0.0.0.0 apresolve.spotify.com";
+    extraHosts = ''
+      0.0.0.0 apresolve.spotify.com
+      192.168.195.1 unifi.local
+    '';
   };
   nix.settings = {
     max-jobs = 2;
