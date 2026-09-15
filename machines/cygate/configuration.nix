@@ -105,7 +105,7 @@
   };
   nix.settings = {
     max-jobs = 1;
-    cores = 10;
+    cores = 16;
   };
   systemd.services.nix-daemon.serviceConfig = {
     CPUQuota = "1000%";
