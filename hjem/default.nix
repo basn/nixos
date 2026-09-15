@@ -8,6 +8,7 @@
     ./umbriel.nix
     ./noctalia.nix
     ./git.nix
+    ./tooling.nix
   ];
   hjem = {
     users = {

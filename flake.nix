@@ -130,7 +130,7 @@
           includeSmartdRole = true;
           extraSpecialArgs = { inherit unstableSmall; };
           modules = baseModules ++ [
-            ./machines/battlestation/configuration.nix
+            ./machines/battlestation/default.nix
             inputs.hjem.nixosModules.default
             ({ ... }: { nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ]; })
             ./hjem/default.nix

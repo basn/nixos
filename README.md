@@ -10,6 +10,11 @@ Personal NixOS flake for multiple machines and install media.
 - Optional user environment via `hjem/`
 - Per-host role and service documentation in `machines/<host>/README.md`
 
+Hosts importing `hjem/default.nix` share the Codex Fish helper and OpenCode
+configuration files from `hjem/tooling.nix`. The OpenCode package, helper
+commands, and SOPS-backed MCP environment remain host-specific; currently only
+battlestation provides that system setup and its credentials.
+
 ## Flake Outputs
 
 `flake.nix` is the authoritative inventory of NixOS hosts and installation
