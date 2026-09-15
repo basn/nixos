@@ -8,3 +8,20 @@ honor_restored_maximize = false
 [[window_rule]]
 match.app_id = "^steam_app_[0-9]+$"
 tearing = true
+
+# Bitwarden's browser-extension popout keeps this title across Chromium-based
+# browsers, while its app ID remains the browser's own.
+[[window_rule]]
+match.title = "^Bitwarden( Password Manager)?$"
+default_floating = true
+default_width = 0.35
+default_height = 0.6
+
+# Keep Steam's companion windows out of the tiling layout without affecting
+# the main Steam client or game windows.
+[[window_rule]]
+match.app_id = "^steam$"
+match.title = "^(Friends List|Steam Chat)$"
+default_floating = true
+default_width = 0.4
+default_height = 0.6
