@@ -1,14 +1,14 @@
-{config, lib, pkgs, ...}:
+{ unstableSmall, ... }:
 {
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = with unstableSmall; [
     uptime-kuma
   ];
- services = {
-   uptime-kuma = {
-     enable = true;
-     settings = {
-       PORT = "9090";
-     };
-   };
- };
+  services = {
+    uptime-kuma = {
+      enable = true;
+      settings = {
+        PORT = "9090";
+      };
+    };
+  };
 }

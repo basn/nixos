@@ -149,13 +149,13 @@
         nixos-sov = mkHost {
           includeZfsRole = true;
           includeAutoUpgradeRole = true;
-          extraSpecialArgs = { inherit unstablePkgs; };
+          extraSpecialArgs = { inherit unstablePkgs unstableSmall; };
           modules = baseModules ++ [ ./machines/cygate/configuration.nix ];
         };
         nixos-sov2 = mkHost {
           includeZfsRole = true;
           includeAutoUpgradeRole = true;
-          extraSpecialArgs = { inherit unstablePkgs; };
+          extraSpecialArgs = { inherit unstablePkgs unstableSmall; };
           modules = baseModules ++ [ ./machines/cygate2/configuration.nix ];
         };
         hermes = mkHost {
