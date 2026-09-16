@@ -32,6 +32,8 @@
 "Mod+A" = "window-toggle-maximize"
 "Mod+Z" = "scratchpad-toggle"
 "Mod+O" = { action = "overview-toggle", repeat = false }
+"Print" = "spawn:noctalia msg screenshot-fullscreen"
+"Mod+Print" = "spawn:noctalia msg screenshot-region"
 
 "Mod+Left" = "workspace-previous"
 "Mod+Right" = "workspace-next"
