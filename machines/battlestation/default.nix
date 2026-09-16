@@ -35,6 +35,12 @@ in
     }
   ];
   boot = {
+    plymouth = {
+      enable = true;
+      theme = "nixos-bgrt";
+      themePackages = [ pkgs.nixos-bgrt-plymouth ];
+    };
+    consoleLogLevel = 3;
     zswap = {
       enable = true;
       compressor = "zstd";
@@ -43,6 +49,7 @@ in
       shrinkerEnabled = true;
     };
     initrd = {
+      verbose = false;
       availableKernelModules = [
         "vmd"
         "xhci_pci"
@@ -85,6 +92,9 @@ in
       "split_lock_detect=off"
       "intel_iommu=on"
       "iommu=pt"
+      "quiet"
+      "rd.udev.log_level=3"
+      "rd.systemd.show_status=auto"
     ];
     extraModprobeConfig = "options zfs zfs_arc_max=6442450944";
   };

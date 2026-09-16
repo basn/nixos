@@ -3,6 +3,8 @@ name: Build and cache NixOS systems
 on:
   push:
     branches: [main]
+    paths:
+      - flake.lock
   workflow_dispatch:
 
 permissions:
