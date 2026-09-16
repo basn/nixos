@@ -14,7 +14,6 @@
     ./services/blocky.nix
     ./services/nginx.nix
     ./services/kuma.nix
-    ./services/pykms.nix
     ./services/vaultwarden.nix
     ./services/ac.nix
     ./services/monitoring.nix
