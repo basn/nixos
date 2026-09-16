@@ -229,6 +229,7 @@ in
           DATABASE_USER = "typetype";
           DRAGONFLY_URL = "redis://typetype-dragonfly:6379";
           DOWNLOADER_SERVICE_URL = "http://typetype-downloader:18093";
+          JAVA_TOOL_OPTIONS = "-Xmx2g";
           YOUTUBE_REMOTE_LOGIN_ENABLED = "false";
           YOUTUBE_REMOTE_LOGIN_SERVICE_URL = "http://typetype-token:8081";
           YOUTUBE_REMOTE_LOGIN_CALLBACK_BASE_URL = "http://typetype-server:8080";

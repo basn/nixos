@@ -6,6 +6,13 @@
     fsType = "zfs";
   };
 
+  swapDevices = [
+    {
+      device = "/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_services-swap";
+      priority = 10;
+    }
+  ];
+
   imports = [
     ../../modules/hermes-audit.nix
     ./hardware-configuration.nix
