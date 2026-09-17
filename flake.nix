@@ -63,6 +63,13 @@
         nixpkgsLib.nixosSystem {
           inherit system;
           modules = [
+            # Temporary compatibility for sops-nix until
+            # https://github.com/Mic92/sops-nix/issues/983 is fixed.
+            ({ ... }: {
+              nixpkgs.overlays = [
+                (_final: prev: { buildGo125Module = prev.buildGoModule; })
+              ];
+            })
             { boot.zfs.forceImportRoot = false; }
             ./common/openssh.nix
             ./modules/zfs-compatible-kernel.nix
