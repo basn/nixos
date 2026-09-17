@@ -136,6 +136,22 @@
         "nixpkgs#mcp-nixos",
         "--"
       ]
+    },
+    "drawio": {
+      "type": "local",
+      "enabled": true,
+      "command": [
+        "nix",
+        "shell",
+        "--inputs-from",
+        "/home/basn/nixos",
+        "nixpkgs#nodejs",
+        "-c",
+        "npx",
+        "-y",
+        "@drawio/mcp"
+      ],
+      "timeout": 60000
     }
   },
   "lsp": {
