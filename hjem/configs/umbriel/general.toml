@@ -5,6 +5,10 @@ show_cheatsheet = false
 focus_on_activate = false
 honor_restored_maximize = false
 
+[environment]
+XCURSOR_THEME = "volantes_cursors"
+XCURSOR_SIZE = "24"
+
 [[window_rule]]
 match.app_id = "^steam_app_[0-9]+$"
 tearing = true

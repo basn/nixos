@@ -10,6 +10,7 @@ accel_profile = "flat"
 sensitivity = -0.4
 
 [input.cursor]
+theme = "volantes_cursors"
 size = 24
 follows_focus = false
 
