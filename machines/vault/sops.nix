@@ -12,6 +12,10 @@
         sopsFile = ./secrets/zfs-kuma.yaml;
         key = "berget-replication";
       };
+      nut-upsmon = {
+        sopsFile = ../../secrets/nut.yaml;
+        key = "password";
+      };
     };
   };
 }

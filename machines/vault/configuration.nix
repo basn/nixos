@@ -1,6 +1,7 @@
 {
   inputs,
   pkgs,
+  config,
   ...
 }:
 {
@@ -11,6 +12,7 @@
     ./services/znapzend.nix
     ./services/backupuser.nix
     ./services/network-link-recovery.nix
+    ../../modules/nut-client.nix
     ./sops.nix
   ];
 
@@ -142,6 +144,10 @@
         enable = true;
       };
     };
+  };
+  basn.nutClient = {
+    enable = true;
+    passwordFile = config.sops.secrets.nut-upsmon.path;
   };
   powerManagement = {
     powertop = {

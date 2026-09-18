@@ -1,11 +1,11 @@
 {
   lib,
   pkgs,
+  config,
   ...
 }:
 {
-  imports = [
-  ];
+  imports = [ ../../modules/nut-client.nix ];
 
   basn.boot.useLatestZfsCompatibleKernel = true;
 
@@ -62,6 +62,16 @@
         443
       ];
     };
+  };
+
+  sops.secrets.nut-upsmon = {
+    sopsFile = ../../secrets/nut.yaml;
+    key = "password";
+  };
+
+  basn.nutClient = {
+    enable = true;
+    passwordFile = config.sops.secrets.nut-upsmon.path;
   };
 
   basn = {
