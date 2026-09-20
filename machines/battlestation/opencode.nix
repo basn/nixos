@@ -1,14 +1,5 @@
 { config, pkgs, ... }:
 let
-  # Temporary workaround for https://github.com/NixOS/nixpkgs/issues/563241.
-  # Remove this override once OpenCode's Bun 1.4.x fix reaches nixpkgs.
-  opencodePatched = pkgs.opencode.overrideAttrs (oldAttrs: {
-    postPatch = (oldAttrs.postPatch or "") + ''
-      substituteInPlace packages/opencode/script/build.ts \
-        --replace-fail 'splitting: true,' 'splitting: false,'
-    '';
-  });
-
   opencodeSkillNew = pkgs.writeShellScriptBin "opencode-skill-new" ''
         set -eu
         if [ "$#" -ne 1 ]; then
@@ -82,7 +73,7 @@ let
     set -a
     . ${config.sops.secrets.opencode-mcp-env.path}
     set +a
-    exec ${opencodePatched}/bin/opencode "$@"
+    exec ${pkgs.opencode}/bin/opencode "$@"
   '';
 in
 {
@@ -103,7 +94,7 @@ in
   ];
 
   environment.systemPackages = with pkgs; [
-    opencodePatched
+    pkgs.opencode
     nixd
     jq
     opencodeSkillNew
