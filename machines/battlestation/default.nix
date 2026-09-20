@@ -1,21 +1,9 @@
 {
   config,
-  lib,
   pkgs,
   unstableSmall,
   ...
 }:
-let
-  cachyosKernelPackages =
-    let
-      basePackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto-x86_64-v3;
-      kernel = basePackages.kernel.override {
-        # Temporary workaround for CachyOS/linux-cachyos#1031.
-        structuredExtraConfig.DRM_GUD = lib.kernel.no;
-      };
-    in
-    basePackages.extend (_final: _prev: { inherit kernel; });
-in
 {
   imports = [
     ./audio.nix
@@ -87,7 +75,7 @@ in
       "kvm-intel"
       "ntsync"
     ];
-    kernelPackages = cachyosKernelPackages;
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto-x86_64-v3;
     kernelParams = [
       "split_lock_detect=off"
       "intel_iommu=on"
