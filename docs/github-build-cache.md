@@ -5,8 +5,8 @@ machines over SSH and never activates a NixOS configuration.
 
 ## Architecture
 
-1. A push to trusted `main`, or a manual dispatch from `main`, starts the
-   `Build and cache NixOS systems` workflow.
+1. A push to trusted `main` that changes `flake.lock`, or a manual dispatch
+   from `main`, starts the `Build and cache NixOS systems` workflow.
 2. The persistent `nixos-sov` runner evaluates the flake and obtains its build
    matrix from the flake-owned `machine-build-matrix` package. Installation
    media outputs whose names end in `Iso` are excluded.

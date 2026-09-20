@@ -31,6 +31,12 @@ second hard-coded host inventory in documentation.
   a one-host change.
 - Prefer public service hostnames in application configuration unless an
   internal endpoint is explicitly required.
+- When changing file layout, workflow triggers, or documented operational
+  behavior, update the affected README or `docs/` references in the same
+  change.
+- Mark temporary patches and overrides with an upstream issue or explanation
+  and a removal condition. When updating the relevant dependency, check
+  whether its workarounds are still needed.
 
 ## Authorization Boundaries
 
