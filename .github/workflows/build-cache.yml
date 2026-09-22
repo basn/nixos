@@ -60,7 +60,7 @@ jobs:
               --no-link \
               --print-out-paths \
               --max-jobs 1 \
-              --cores 10
+              --cores 16
           )"
           matrix="$(< "$matrix_path")"
           if [ -z "$matrix" ]; then
@@ -157,7 +157,7 @@ jobs:
               --no-link \
               --print-out-paths \
               --max-jobs 1 \
-              --cores 10
+              --cores 16
           )"
           if [ -z "$output" ]; then
             echo '::error::Nix did not return a system output path' >&2

@@ -11,7 +11,8 @@ machines over SSH and never activates a NixOS configuration.
    matrix from the flake-owned `machine-build-matrix` package. Installation
    media outputs whose names end in `Iso` are excluded.
 3. The runner builds every real machine's
-   `config.system.build.toplevel` serially with one Nix job and eight cores.
+   `config.system.build.toplevel` serially with one Nix job and 16 cores. The
+   runner's Nix daemon has a matching `1600%` CPU quota.
 4. After each successful build, `attic push nixos <output>` uploads the full
    output closure to `https://attic.basn.se/`. Attic's normal closure upload
    behavior skips paths already present in the cache.
