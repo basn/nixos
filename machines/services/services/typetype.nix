@@ -213,7 +213,7 @@ in
     backend = "podman";
     containers = {
       typetype = {
-        image = "ghcr.io/typetype-video/typetype:1.7.0@sha256:fb43c8a9ab8d5cbaafed18064b20688a2af55d587e0d529e6231f44ad045cce1";
+        image = "ghcr.io/typetype-video/typetype:1.8.1@sha256:886aef8ae9f4a48275aaaf6f8e73da2e96240683d93acdafd498198d853c483f";
         networks = [ "typetype" ];
         ports = [ "127.0.0.1:18082:80" ];
         volumes = [ "${typetypeNginx}:/etc/nginx/templates/default.conf.template:ro" ];
@@ -221,7 +221,7 @@ in
       };
 
       typetype-server = {
-        image = "ghcr.io/typetype-video/typetype-server:1.7.1@sha256:c33675e2665314c0f86dca1bd75e24170e0beff2a50f1e878494b9bbf20d8438";
+        image = "ghcr.io/typetype-video/typetype-server:sha-945d59a@sha256:6a59de6d153ac1d1a90c4e786f694ec8ea05106c0471c1bc2fe55da9da9f702c";
         networks = [ "typetype" ];
         environment = {
           ALLOWED_ORIGINS = "https://tube.basn.se";
@@ -247,7 +247,7 @@ in
       };
 
       typetype-downloader = {
-        image = "ghcr.io/typetype-video/typetype-downloader:1.7.0@sha256:2e760bda8f80046adefbb021ea588219cc5082be0ccf029801048e7aa0211d80";
+        image = "ghcr.io/typetype-video/typetype-downloader:1.8.1@sha256:03ae47465a4300d5d726d901a9139b09002182974779c628a4172b7eb98fd5cf";
         networks = [ "typetype" ];
         environment = {
           HTTP_PORT = "18093";
@@ -281,7 +281,7 @@ in
       };
 
       typetype-token = {
-        image = "ghcr.io/typetype-video/typetype-token:1.7.0@sha256:18e425d86ca299be89c80fbff3e4d7bd0ae549d3bbc092347bc6d76ca0202a28";
+        image = "ghcr.io/typetype-video/typetype-token:1.8.1@sha256:660deaceeadf8f8036af8abc470fbc47caf2d384b05365802801942ce8f899ff";
         networks = [ "typetype" ];
         extraOptions = [ "--ipc=host" ];
         environment = {
@@ -315,7 +315,7 @@ in
       };
 
       typetype-garage = {
-        image = "docker.io/dxflrs/garage:v2.3.0@sha256:866bd13ed2038ba7e7190e840482bc27234c4afaf77be8cfa439ae088c1e4690";
+        image = "docker.io/dxflrs/garage:v2.4.1@sha256:9c96caa2612d3411acc5b0e6701fb238dbfba33e533a6d7d3d811a4b12d0d020";
         networks = [ "typetype" ];
         environmentFiles = [ typetypeSecrets ];
         volumes = [
