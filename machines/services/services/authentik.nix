@@ -35,7 +35,7 @@ in
     backend = "podman";
     containers = {
       authentik-postgres = {
-        image = "docker.io/library/postgres:17.11@sha256:a65e6a841f6c4dbc4abda3d67fa3bc21824e9611064fcd82e87ea67aad60a0c3";
+        image = "docker.io/library/postgres:17.11@sha256:d74eeac9a635390a49bc21bd49fccd973de707e2a53a76ac49b552b8712ec46f";
         networks = [ "authentik" ];
         environment = {
           POSTGRES_DB = "authentik";
@@ -46,7 +46,7 @@ in
       };
 
       authentik-redis = {
-        image = "docker.io/library/redis:7.4.11-alpine@sha256:520775a41a63e77e06c73e35d2fd9cc15921a609516818796b4ecbb813078bc7";
+        image = "docker.io/library/redis:7.4.11-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499";
         networks = [ "authentik" ];
         cmd = [
           "redis-server"

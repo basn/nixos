@@ -295,7 +295,7 @@ in
       };
 
       typetype-postgres = {
-        image = "docker.io/library/postgres:17.11@sha256:a65e6a841f6c4dbc4abda3d67fa3bc21824e9611064fcd82e87ea67aad60a0c3";
+        image = "docker.io/library/postgres:17.11@sha256:d74eeac9a635390a49bc21bd49fccd973de707e2a53a76ac49b552b8712ec46f";
         networks = [ "typetype" ];
         environment = {
           POSTGRES_DB = "typetype";
@@ -306,7 +306,7 @@ in
       };
 
       typetype-dragonfly = {
-        image = "docker.dragonflydb.io/dragonflydb/dragonfly:v1.40.1@sha256:ebf3c6c213e82fb51b4521660cca13f06f3421dc5b1ed14f2f474c50b5e29986";
+        image = "docker.dragonflydb.io/dragonflydb/dragonfly:v1.40.2@sha256:18afa43e911f1dff18c7d1eb452361876d9702bb1cdff5c5d75c69617a4065c9";
         networks = [ "typetype" ];
         extraOptions = [
           "--ulimit=memlock=-1"
