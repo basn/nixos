@@ -2,9 +2,6 @@
 {
   sops = {
     defaultSopsFile = ./secrets/services.yaml;
-    age = {
-      keyFile = "/home/basn/.config/sops/age/keys.txt";
-    };
     secrets = {
       authentik = {
         sopsFile = ./secrets/authentik.env;
@@ -34,6 +31,14 @@
         sopsFile = ./secrets/typetype.env;
         format = "dotenv";
         key = "DOWNLOADER_S3_SECRET_KEY";
+      };
+      vikunja-service-secret = {
+        sopsFile = ./secrets/vikunja.yaml;
+        restartUnits = [ "vikunja.service" ];
+      };
+      vikunja-oidc-client-secret = {
+        sopsFile = ./secrets/vikunja.yaml;
+        restartUnits = [ "vikunja.service" ];
       };
       zfs-kuma-vaultwarden-replication = {
         sopsFile = ./secrets/zfs-kuma.yaml;

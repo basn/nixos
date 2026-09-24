@@ -41,6 +41,20 @@ in
           };
         };
       };
+      "tank/vikunja" = {
+        enable = true;
+        recursive = true;
+        mbuffer.enable = false;
+        plan = "1d=>4h,1w=>1d";
+        timestampFormat = "%Y-%m-%d-%H%M%S";
+        destinations = {
+          vikunja = {
+            dataset = "storage/backup-vikunja";
+            plan = "30d=>1d";
+            host = "zfsbackup@vault";
+          };
+        };
+      };
     };
   };
 }

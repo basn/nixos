@@ -3,7 +3,7 @@
 Flake output: `services`.
 
 Services is the general application host. It runs Podman workloads, Blocky,
-Nginx, Uptime Kuma, py-kms, Vaultwarden, the AC service, monitoring,
+Nginx, Uptime Kuma, py-kms, Vaultwarden, Vikunja, the AC service, monitoring,
 Authentik, FreshRSS, SearxNG, the network optimizer, and ZnapZend. Service
 modules live in `services/`; SOPS declarations are in `sops.nix`.
 
@@ -11,9 +11,12 @@ modules live in `services/`; SOPS declarations are in `sops.nix`.
 
 - Podman and managed container refresh/prune jobs; Blocky; Nginx; and Uptime
   Kuma.
-- Authentik, Vaultwarden, FreshRSS, SearxNG, py-kms, the AC service, and the
-  network optimizer.
+- Authentik, Vaultwarden, Vikunja, FreshRSS, SearxNG, py-kms, the AC service,
+  and the network optimizer.
 - Prometheus/Grafana monitoring, ZnapZend, OpenSSH, ZFS auto-scrub, and TRIM.
+
+Vikunja deployment prerequisites, authentication policy, backup, and restore
+procedures are documented in [`../../docs/vikunja.md`](../../docs/vikunja.md).
 
 ```sh
 nix build .#nixosConfigurations.services.config.system.build.toplevel --no-link

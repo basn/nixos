@@ -200,6 +200,18 @@ in
         forceSSL = true;
         locations."/".proxyPass = "http://10.1.1.8:8222";
       };
+      "vikunja.basn.se" = {
+        enableACME = true;
+        forceSSL = true;
+        extraConfig = ''
+          client_max_body_size 32m;
+        '';
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:3456";
+          recommendedProxySettings = true;
+          proxyWebsockets = true;
+        };
+      };
       "hass.basn.se" = {
         enableACME = true;
         forceSSL = true;

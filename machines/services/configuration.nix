@@ -25,6 +25,7 @@
     ./services/ac.nix
     ./services/monitoring.nix
     ./services/authentik.nix
+    ./services/vikunja.nix
     ./services/freshrss.nix
     ./services/searx.nix
     ./services/typetype.nix
