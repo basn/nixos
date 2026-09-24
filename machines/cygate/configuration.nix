@@ -105,10 +105,10 @@
   };
   nix.settings = {
     max-jobs = 1;
-    cores = 16;
+    cores = 28;
   };
   systemd.services.nix-daemon.serviceConfig = {
-    CPUQuota = "1600%";
+    CPUQuota = "2800%";
     Nice = 10;
     # nix-daemon.nix sets best-effort; intentionally lower build I/O priority.
     IOSchedulingClass = lib.mkForce "idle";
