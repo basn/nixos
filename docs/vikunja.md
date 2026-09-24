@@ -70,7 +70,7 @@ provider with these values:
 - Client ID: `vikunja`
 - Client secret: the encrypted Vikunja OIDC secret
 - Issuer/discovery base: `https://auth.basn.se/application/o/vikunja/`
-- Strict redirect URI: `https://vikunja.basn.se/api/v1/auth/openid/authentik/callback`
+- Strict redirect URI: `https://vikunja.basn.se/auth/openid/authentik`
 - Scopes: `openid profile email`
 
 Do not add `vikunja_scope`, a `vikunja_groups` claim, team mappings, a proxy
