@@ -473,8 +473,10 @@ in
     oci-containers = {
       backend = "docker";
       containers = {
+        # Firecrawl's official Compose stack publishes these interdependent
+        # images on moving tags; pin the registry snapshot together.
         firecrawl-redis = {
-          image = "redis:alpine";
+          image = "docker.io/library/redis:alpine@sha256:ba6e394f6acc2a695ef1b6944f161b9ca813711739be68319fa0db3470673f1d";
           extraOptions = [
             "--network=host"
             "--memory=256m"
@@ -491,7 +493,7 @@ in
           ];
         };
         firecrawl-rabbitmq = {
-          image = "rabbitmq:3-management";
+          image = "docker.io/library/rabbitmq:3-management@sha256:e582c0bc7766f3342496d8485efb5a1df782b5ce3886ad017e2eaae442311f69";
           extraOptions = [
             "--network=host"
             "--memory=512m"
@@ -502,7 +504,7 @@ in
           environment.RABBITMQ_NODE_IP_ADDRESS = "127.0.0.1";
         };
         firecrawl-postgres = {
-          image = "ghcr.io/firecrawl/nuq-postgres:latest";
+          image = "ghcr.io/firecrawl/nuq-postgres:latest@sha256:9b638af78d99873bc0ba2b57c9cbcd01df6ce96efeaa72d36cfbe0f76521e8fc";
           extraOptions = [
             "--network=host"
             "--memory=512m"
@@ -522,7 +524,7 @@ in
           ];
         };
         firecrawl-playwright = {
-          image = "ghcr.io/firecrawl/playwright-service:latest";
+          image = "ghcr.io/firecrawl/playwright-service:latest@sha256:df1a393ce8bfc3801570a826a9b0dcc400ae48789adb4a0ad9d6cbf0229b059b";
           extraOptions = [
             "--network=host"
             "--memory=1536m"
@@ -539,7 +541,7 @@ in
           };
         };
         firecrawl-api = {
-          image = "ghcr.io/firecrawl/firecrawl:latest";
+          image = "ghcr.io/firecrawl/firecrawl:latest@sha256:9679231e2e5b1433a1dec02d60eed2c573bff9d2478655561687b696b1e1857d";
           dependsOn = [
             "firecrawl-redis"
             "firecrawl-rabbitmq"
