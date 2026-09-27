@@ -17,6 +17,8 @@ modules live in `services/`; SOPS declarations are in `sops.nix`.
 
 Vikunja deployment prerequisites, authentication policy, backup, and restore
 procedures are documented in [`../../docs/vikunja.md`](../../docs/vikunja.md).
+The PinePods public ingress and declarative Authentik application are documented
+in [`../../docs/pinepods.md`](../../docs/pinepods.md).
 
 ```sh
 nix build .#nixosConfigurations.services.config.system.build.toplevel --no-link

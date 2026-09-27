@@ -44,6 +44,10 @@
         sopsFile = ./secrets/zfs-kuma.yaml;
         key = "vaultwarden-replication";
       };
+      pinepods-oidc-client-secret = {
+        key = "pinepods/oidc-client-secret";
+        restartUnits = [ "podman-authentik-worker.service" ];
+      };
     };
   };
 }

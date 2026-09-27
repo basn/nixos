@@ -371,6 +371,15 @@ in
           proxyWebsockets = true;
         };
       };
+      "pods.basn.se" = {
+        enableACME = true;
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://192.168.180.10:80";
+          proxyWebsockets = true;
+          recommendedProxySettings = true;
+        };
+      };
     };
   };
 }

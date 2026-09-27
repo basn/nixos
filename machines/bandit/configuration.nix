@@ -19,6 +19,7 @@
     ./services/jellyfin.nix
     ./sops.nix
     ./services/immich.nix
+    ./services/pinepods.nix
     inputs.sops_nix.nixosModules.sops
   ];
   boot = {
@@ -123,6 +124,22 @@
     };
     "/data/immich" = {
       device = "data/immich";
+      fsType = "zfs";
+    };
+    "/data/pinepods" = {
+      device = "data/pinepods";
+      fsType = "zfs";
+    };
+    "/data/pinepods/postgres" = {
+      device = "data/pinepods/postgres";
+      fsType = "zfs";
+    };
+    "/data/pinepods/downloads" = {
+      device = "data/pinepods/downloads";
+      fsType = "zfs";
+    };
+    "/data/pinepods/backups" = {
+      device = "data/pinepods/backups";
       fsType = "zfs";
     };
     "/var/lib/plex" = {

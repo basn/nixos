@@ -4,6 +4,13 @@ let
   authentikImage = "ghcr.io/goauthentik/server:2026.8.3@sha256:ab9b4e8cc4ab3f8d1198d2db6aeea66bafea1963b3f2843589e0d163f97d9849";
 in
 {
+  sops.templates.authentik-pinepods-env = {
+    content = ''
+      PINEPODS_OIDC_CLIENT_SECRET=${config.sops.placeholder.pinepods-oidc-client-secret}
+    '';
+    mode = "0400";
+  };
+
   # Use the upstream images so flake updates do not build Authentik's Node/V8
   # web assets locally.  The native PostgreSQL 14 data remains untouched as a
   # rollback source; the restore unit imports its pre-cutover dump once.
@@ -115,8 +122,14 @@ in
           AUTHENTIK_POSTGRESQL__USER = "authentik";
           AUTHENTIK_REDIS__HOST = "authentik-redis";
         };
-        environmentFiles = [ authentikSecrets ];
-        volumes = [ "/docker/authentik/media:/media:U" ];
+        environmentFiles = [
+          authentikSecrets
+          config.sops.templates.authentik-pinepods-env.path
+        ];
+        volumes = [
+          "/docker/authentik/media:/media:U"
+          "${./authentik-blueprints/pinepods.yaml}:/blueprints/pinepods.yaml:ro"
+        ];
       };
     };
   };

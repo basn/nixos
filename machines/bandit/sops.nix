@@ -3,10 +3,6 @@
 {
   sops = {
     defaultSopsFile = ./secrets/bandit.yaml;
-    age = {
-      #      sshKeyPaths = [ "/home/basn/.ssh/id_ed25519" ];
-      keyFile = "/home/basn/.config/sops/age/keys.txt";
-    };
     secrets = {
       wg = {
         format = "binary";
@@ -32,6 +28,18 @@
         key = "unpackerr-env";
         mode = "0400";
         restartUnits = [ "unpackerr.service" ];
+      };
+      pinepods-postgres-superuser-password = {
+        key = "pinepods/postgres-superuser-password";
+      };
+      pinepods-db-password = {
+        key = "pinepods/db-password";
+      };
+      pinepods-admin-password = {
+        key = "pinepods/admin-password";
+      };
+      pinepods-oidc-client-secret = {
+        key = "pinepods/oidc-client-secret";
       };
     };
   };
