@@ -1,7 +1,7 @@
 [layout]
 mode = "master"
 gap = 0
-width_presets = [0.333, 0.5, 0.667]
+extent_presets = [0.333, 0.5, 0.667]
 
 [layout.struts]
 left = 0

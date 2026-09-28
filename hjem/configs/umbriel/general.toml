@@ -18,8 +18,7 @@ tearing = true
 [[window_rule]]
 match.title = "^Bitwarden( Password Manager)?$"
 default_floating = true
-default_width = 0.35
-default_height = 0.6
+default_floating_size = { width = 0.35, height = 0.6 }
 
 # Keep Steam's companion windows out of the tiling layout without affecting
 # the main Steam client or game windows.
@@ -27,5 +26,4 @@ default_height = 0.6
 match.app_id = "^steam$"
 match.title = "^(Friends List|Steam Chat)$"
 default_floating = true
-default_width = 0.4
-default_height = 0.6
+default_floating_size = { width = 0.4, height = 0.6 }
