@@ -20,6 +20,7 @@
     ./sops.nix
     ./services/immich.nix
     ./services/pinepods.nix
+    ./nvidia.nix
     inputs.sops_nix.nixosModules.sops
   ];
   boot = {
