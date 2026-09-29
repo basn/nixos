@@ -1,9 +1,9 @@
 { config, pkgs, ... }:
-  let
-    llamaCppCuda = pkgs.llama-cpp.override {
-      cudaSupport = true;
-    };
-  in
+let
+  llamaCppCuda = pkgs.llama-cpp.override {
+    cudaSupport = true;
+  };
+in
 {
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia = {
@@ -41,7 +41,7 @@
       Group = "llama-cpp";
       StateDirectory = "llama-cpp";
       CacheDirectory = "llama-cpp";
-      ExecStart = "${llamaCppCuda}/bin/llama-server --hf-repo unsloth/Qwen3.5-9B-GGUF:Q8_0 --no-mmproj --alias qwen3.5-9b-local --host 127.0.0.1 --port 8080 --ctx-size 131072 --parallel 2 --cache-type-k q8_0 --cache-type-v q8_0 --flash-attn auto --gpu-layers all --fit off --jinja --metrics";
+      ExecStart = "${llamaCppCuda}/bin/llama-server --hf-repo unsloth/Qwen3.5-9B-GGUF:Q8_0 --no-mmproj --alias qwen3.5-9b-local --host 0.0.0.0 --port 8080 --ctx-size 131072 --parallel 2 --cache-type-k q8_0 --cache-type-v q8_0 --flash-attn auto --gpu-layers all --fit off --jinja --metrics";
       Restart = "on-failure";
       RestartSec = 5;
       TimeoutStartSec = "30min";

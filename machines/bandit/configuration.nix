@@ -191,6 +191,7 @@
       allowedTCPPorts = [
         22
         80
+        8080
       ];
     };
   };

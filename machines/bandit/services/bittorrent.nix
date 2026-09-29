@@ -39,6 +39,13 @@ let
       ${pkgs.iptables}/bin/iptables -A INPUT -i wg0 -j qbittorrent-incoming
     ${pkgs.iptables}/bin/iptables -A qbittorrent-incoming -p tcp --dport "$seedport" -j ACCEPT
     ${pkgs.iptables}/bin/iptables -A qbittorrent-incoming -p udp --dport "$seedport" -j ACCEPT
+
+    # Nginx reaches the Web UI directly over the namespace veth. Do not use a
+    # host port mapping here: its prerouting DNAT would also capture llama.cpp.
+    ${pkgs.iptables}/bin/iptables -C INPUT -i veth-wg -p tcp \
+      --dport ${toString config.services.qbittorrent.port} -j ACCEPT 2>/dev/null || \
+      ${pkgs.iptables}/bin/iptables -A INPUT -i veth-wg -p tcp \
+        --dport ${toString config.services.qbittorrent.port} -j ACCEPT
   '';
   azirePortforward = pkgs.writeShellApplication {
     name = "azire-portforward";
@@ -84,12 +91,6 @@ in
     enable = true;
     wireguardConfigFile = config.sops.secrets."wg".path;
     accessibleFrom = [ "192.168.0.0/24" ];
-    portMappings = [
-      {
-        from = 8080;
-        to = 8080;
-      }
-    ];
   };
   systemd.services.qbittorrent = {
     after = [ "nscd.service" ];
