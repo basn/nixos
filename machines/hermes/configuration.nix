@@ -188,38 +188,49 @@ in
         SEARXNG_URL = "https://search.basn.se";
       };
       settings = {
-        _config_version = 27;
+        providers.bandit-local = {
+          api = "http://bandit.netbird.basn.se:8080/v1";
+          transport = "chat_completions";
+          default_model = "qwen3.5-9b-local";
+          models."qwen3.5-9b-local" = {
+            context_length = 65536;
+            supports_vision = false;
+          };
+        };
         model = {
           provider = "openai-codex";
-          default = "gpt-5.6-sol";
-          openai_runtime = "auto";
+          default = "gpt-6-astra";
         };
+        fallback_providers = [
+          {
+            provider = "openai-codex";
+            model = "gpt-5.6-sol";
+          }
+        ];
         auxiliary = {
-          # Keep narrow background tasks on GPT-5.6 Luna; the agent loop,
-          # tool routing, and vision use the default model.
           approval = {
             provider = "openai-codex";
             model = "gpt-5.6-luna";
           };
           compression = {
-            provider = "openai-codex";
-            model = "gpt-5.6-luna";
+            provider = "bandit-local";
+            model = "qwen3.5-9b-local";
           };
           curator = {
-            provider = "openai-codex";
-            model = "gpt-5.6-luna";
+            provider = "bandit-local";
+            model = "qwen3.5-9b-local";
           };
           skills_hub = {
-            provider = "openai-codex";
-            model = "gpt-5.6-luna";
+            provider = "bandit-local";
+            model = "qwen3.5-9b-local";
           };
           title_generation = {
-            provider = "openai-codex";
-            model = "gpt-5.6-luna";
+            provider = "bandit-local";
+            model = "qwen3.5-9b-local";
           };
-          web_extract = {
+          vision = {
             provider = "openai-codex";
-            model = "gpt-5.6-luna";
+            model = "gpt-5.6-sol";
           };
         };
         timezone = "Europe/Stockholm";
