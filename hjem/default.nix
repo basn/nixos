@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
   imports = [
     ./browsers.nix
@@ -23,6 +23,7 @@
           orca-slicer
           virt-manager
           libvirt
+          inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.desktop
         ];
         clobberFiles = true;
       };
