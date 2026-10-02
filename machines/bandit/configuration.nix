@@ -23,6 +23,13 @@
     ./nvidia.nix
     inputs.sops_nix.nixosModules.sops
   ];
+  swapDevices = [
+    {
+      device = "/dev/disk/by-partuuid/95419ba3-5534-4825-9705-13820aa59fc6";
+      priority = 100;
+      randomEncryption.enable = true;
+    }
+  ];
   boot = {
     kernelModules = [
       "kvm-intel"

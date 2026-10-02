@@ -43,6 +43,23 @@ in `sops.nix`. Keep storage and service changes local to this directory.
 PinePods deployment, authentication, storage, and recovery requirements are
 documented in [`../../docs/pinepods.md`](../../docs/pinepods.md).
 
+## Swap
+
+Bandit has a 64 GiB swap partition on the dedicated Intel SSDPEKKW256G7 with
+serial `BTPY6325064Y256D`. The partition uses PARTUUID
+`95419ba3-5534-4825-9705-13820aa59fc6`, priority 100, and NixOS random-key
+encryption. NixOS opens the partition as plain dm-crypt with a new random key
+and initializes swap on the encrypted mapper, so the underlying partition does
+not contain persistent plaintext swap metadata. Previous swap contents become
+inaccessible when that key is discarded; this is not a guarantee that the
+physical flash cells are erased.
+
+Only the first 64 GiB of the 256 GB SSD is partitioned; the remainder is left
+unallocated. This swap is not suitable for hibernation because its encryption
+key is regenerated. The old inactive `osdata/swap` 16 GiB zvol remains in place
+until the new swap has been verified after a reboot, after which its removal is
+a separate operation.
+
 ```sh
 nix build .#nixosConfigurations.bandit.config.system.build.toplevel --no-link
 ```
