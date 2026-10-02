@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
   hjem = {
     users = {
@@ -8,6 +8,7 @@
           pkgs.vivaldi-ffmpeg-codecs
           pkgs.chromium
           pkgs.google-chrome
+          inputs.helium.packages.${pkgs.stdenv.hostPlatform.system}.default
         ];
       };
     };

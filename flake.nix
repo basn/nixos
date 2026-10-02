@@ -21,6 +21,10 @@
       url = "github:feel-co/hjem";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    helium = {
+      url = "github:amaanq/helium-flake";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     nvf = {
       url = "github:notashelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs-unstable";

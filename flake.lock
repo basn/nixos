@@ -71,6 +71,26 @@
         "type": "github"
       }
     },
+    "helium": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790829646,
+        "narHash": "sha256-DElBT51c3oIxydiC/8KNScp8S/U0WV46ZnWclvb61iw=",
+        "owner": "amaanq",
+        "repo": "helium-flake",
+        "rev": "fa670d821a8b1dcbf653256e48a9387285b02748",
+        "type": "github"
+      },
+      "original": {
+        "owner": "amaanq",
+        "repo": "helium-flake",
+        "type": "github"
+      }
+    },
     "hermes-agent": {
       "inputs": {
         "flake-parts": "flake-parts",
@@ -348,6 +368,7 @@
     },
     "root": {
       "inputs": {
+        "helium": "helium",
         "hermes-agent": "hermes-agent",
         "hjem": "hjem",
         "nix-cachyos-kernel": "nix-cachyos-kernel",
