@@ -16,8 +16,10 @@ these live operations.
    file's SOPS metadata without decrypting it, and commit only the encrypted
    file.
 3. Add a NetBird policy that permits TCP port 18111 from the `nixos-sov2` peer
-   to the `services` peer and denies other peers. The host firewall is an
-   independent second layer and accepts only source `100.86.229.241` on `wt0`.
+   to the `services` peer and denies other peers. The services host firewall
+   opens TCP port 18111 normally; the NetBird policy provides the peer-level
+   restriction, while the ingest process still binds only to the services
+   NetBird address.
 4. Confirm NetBird still assigns `100.86.89.177` to `services` and
    `100.86.229.241` to `nixos-sov2`, and that
    `services.netbird.basn.se` resolves to `100.86.89.177` from `nixos-sov2`.
@@ -57,8 +59,8 @@ the web service immediately.
    Verify `dayzweb-ingest.service` is active, bound only to
    `100.86.89.177:18111`, and that `dayzweb.service` is using the same revision.
 5. From `nixos-sov2`, verify DNS and TCP reachability over NetBird. Also verify
-   another peer cannot reach port 18111; do not weaken the host firewall to
-   make this check pass.
+   another peer is denied by the NetBird policy. The host firewall opens the
+   port normally and is not the peer-level access-control boundary.
 6. Activate the validated `nixos-sov2` generation. Run one manual
    `dayzweb-collector.service` invocation and inspect its focused journal. Only
    after it completes successfully should `dayzweb-collector.timer` remain

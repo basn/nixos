@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
@@ -98,7 +97,4 @@ in
     };
   };
 
-  networking.firewall.extraInputRules = lib.mkAfter ''
-    iifname "wt0" ip saddr 100.86.229.241 tcp dport 18111 accept
-  '';
 }
