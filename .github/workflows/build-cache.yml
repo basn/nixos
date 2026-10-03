@@ -22,7 +22,8 @@ jobs:
     runs-on: [self-hosted, nixos, nix-nightly]
     timeout-minutes: 30
     outputs:
-      build_matrix: ${{ steps.build-matrix.outputs.matrix }}
+      build_matrix: ${{ steps.select-machines.outputs.matrix }}
+      has_affected_hosts: ${{ steps.select-machines.outputs.has_affected_hosts }}
     env:
       NIX_CONFIG: |
         access-tokens = github.com=${{ secrets.NIX_GITHUB_TOKEN }}
@@ -58,6 +59,7 @@ jobs:
             nix build .#machine-build-matrix \
               --no-eval-cache \
               --no-link \
+              --no-write-lock-file \
               --print-out-paths \
               --max-jobs 1
           )"
@@ -69,27 +71,199 @@ jobs:
           printf 'Machine build matrix: %s\n' "$matrix"
           printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
           printf 'matrix_path=%s\n' "$matrix_path" >> "$GITHUB_OUTPUT"
-      - name: Evaluate machine system derivations
+      - name: Add locked jq to job PATH
         shell: bash
         run: |
           set -euo pipefail
-          machine_names="$(
-            nix shell --inputs-from . nixpkgs#jq \
-              -c jq -r '.include[].host' "$matrix_path"
-          )"
-          if [ -z "$machine_names" ]; then
+          # The nested shell expands this command substitution.
+          # shellcheck disable=SC2016
+          nix shell --no-write-lock-file --inputs-from . nixpkgs#jq \
+            -c sh -c 'dirname "$(command -v jq)"' >> "$GITHUB_PATH"
+      - name: Select affected machines
+        id: select-machines
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+          FETCH_TOKEN: ${{ github.token }}
+          MATRIX_PATH: ${{ steps.build-matrix.outputs.matrix_path }}
+        run: |
+          set -euo pipefail
+
+          mode="comparison"
+          reason="Exact previous-push and current revisions compared successfully"
+          selected_hosts=()
+          unchanged_hosts=()
+          summary_written=false
+
+          join_hosts() {
+            if (( $# == 0 )); then
+              printf '_none_'
+            else
+              printf "\`%s\`" "$1"
+              shift
+              if (( $# > 0 )); then
+                printf ", \`%s\`" "$@"
+              fi
+            fi
+          }
+
+          write_summary() {
+            {
+              printf '## Build cache host selection\n\n'
+              printf -- '- Mode: **%s**\n' "$mode"
+              printf -- '- Reason: %s\n' "$reason"
+              printf -- '- Selected: %s\n' "$(join_hosts "${selected_hosts[@]}")"
+              printf -- '- Unchanged: %s\n' "$(join_hosts "${unchanged_hosts[@]}")"
+            } >> "$GITHUB_STEP_SUMMARY"
+            summary_written=true
+          }
+
+          finish() {
+            local status=$?
+            if (( status != 0 )) && [[ "$summary_written" != true ]]; then
+              mode="validation failure"
+              reason="Current-revision host enumeration or derivation evaluation failed"
+              write_summary
+            fi
+            exit "$status"
+          }
+          trap finish EXIT
+
+          if [[ ! "$CURRENT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::github.sha is not a full lowercase Git SHA" >&2
+            exit 1
+          fi
+          checked_out_sha="$(git rev-parse HEAD)"
+          if [[ "$checked_out_sha" != "$CURRENT_SHA" ]]; then
+            echo "::error::Checked-out revision does not match github.sha" >&2
+            exit 1
+          fi
+
+          full_matrix="$(jq -c . "$MATRIX_PATH")"
+          mapfile -t current_hosts < <(jq -er ".include[].host" "$MATRIX_PATH")
+          if (( ${#current_hosts[@]} == 0 )); then
             echo '::error::The flake generated no machine names to evaluate' >&2
             exit 1
           fi
-          while IFS= read -r host; do
-            nix eval --no-eval-cache --raw \
-              ".#nixosConfigurations.${host}.config.system.build.toplevel.drvPath" \
-              > /dev/null
-          done <<< "$machine_names"
-        env:
-          matrix_path: ${{ steps.build-matrix.outputs.matrix_path }}
+
+          declare -A current_drv_paths=()
+          current_ref="git+file://${GITHUB_WORKSPACE}?rev=${CURRENT_SHA}&shallow=1"
+          for host in "${current_hosts[@]}"; do
+            if [[ ! "$host" =~ ^[A-Za-z0-9_][A-Za-z0-9_-]*$ ]]; then
+              echo "::error::Unsafe machine name in build matrix: $host" >&2
+              exit 1
+            fi
+            if ! current_drv_paths["$host"]="$(
+              nix eval --no-eval-cache --no-write-lock-file --raw \
+                "${current_ref}#nixosConfigurations.\"${host}\".config.system.build.toplevel.drvPath"
+            )"; then
+              echo "::error::Failed to evaluate current system derivation for $host" >&2
+              exit 1
+            fi
+          done
+
+          use_full_matrix() {
+            mode="full fleet safety fallback"
+            reason="$1"
+            selected_hosts=("${current_hosts[@]}")
+            unchanged_hosts=()
+            {
+              printf 'matrix=%s\n' "$full_matrix"
+              printf 'has_affected_hosts=true\n'
+              printf 'run_flake_check=true\n'
+            } >> "$GITHUB_OUTPUT"
+            echo "::warning::$reason"
+            write_summary
+          }
+
+          if [[ "$EVENT_NAME" == workflow_dispatch ]]; then
+            mode="manual full fleet"
+            reason="Manual dispatch always validates and builds the full current fleet"
+            selected_hosts=("${current_hosts[@]}")
+            {
+              printf 'matrix=%s\n' "$full_matrix"
+              printf 'has_affected_hosts=true\n'
+              printf 'run_flake_check=true\n'
+            } >> "$GITHUB_OUTPUT"
+            write_summary
+            exit 0
+          fi
+
+          if [[ "$EVENT_NAME" != push ]]; then
+            echo "::error::Unsupported event: $EVENT_NAME" >&2
+            exit 1
+          fi
+          if [[ ! "$BEFORE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            use_full_matrix "Push baseline is missing or is not a full lowercase Git SHA"
+            exit 0
+          fi
+          if [[ "$BEFORE_SHA" == 0000000000000000000000000000000000000000 ]]; then
+            use_full_matrix "Push has no accessible previous revision"
+            exit 0
+          fi
+
+          if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            auth_header="$(printf 'x-access-token:%s' "$FETCH_TOKEN" | base64 -w 0)"
+            if ! GIT_CONFIG_COUNT=1 \
+              GIT_CONFIG_KEY_0=http.extraHeader \
+              GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $auth_header" \
+              git fetch --no-tags --depth=1 origin "$BEFORE_SHA"; then
+              unset auth_header
+              use_full_matrix "Could not fetch the exact previous-push revision"
+              exit 0
+            fi
+            unset auth_header
+          fi
+          if [[ "$(git rev-parse "${BEFORE_SHA}^{commit}" 2>/dev/null || true)" != "$BEFORE_SHA" ]]; then
+            use_full_matrix "Fetched push baseline did not resolve to the requested revision"
+            exit 0
+          fi
+          baseline_ref="git+file://${GITHUB_WORKSPACE}?rev=${BEFORE_SHA}&shallow=1"
+          declare -A baseline_drv_paths=()
+          old_evaluation_failed=false
+          for host in "${current_hosts[@]}"; do
+            if ! baseline_drv_paths["$host"]="$(
+              nix eval --no-eval-cache --no-write-lock-file --raw \
+                "${baseline_ref}#nixosConfigurations.\"${host}\".config.system.build.toplevel.drvPath"
+            )"; then
+              old_evaluation_failed=true
+              break
+            fi
+          done
+          if [[ "$old_evaluation_failed" == true ]]; then
+            use_full_matrix "Previous-push host evaluation failed or a current host was absent there"
+            exit 0
+          fi
+
+          for host in "${current_hosts[@]}"; do
+            if [[ "${current_drv_paths[$host]}" == "${baseline_drv_paths[$host]}" ]]; then
+              unchanged_hosts+=("$host")
+            else
+              selected_hosts+=("$host")
+            fi
+          done
+
+          selected_json="$(printf '%s\n' "${selected_hosts[@]}" | jq -Rsc "split(\"\n\") | map(select(length > 0))")"
+          affected_matrix="$(
+            jq -c --argjson selected "$selected_json" \
+              "{include: [.include[] | select(.host as \$host | \$selected | index(\$host))]}" \
+              "$MATRIX_PATH"
+          )"
+          {
+            printf 'matrix=%s\n' "$affected_matrix"
+            printf 'run_flake_check=false\n'
+            if (( ${#selected_hosts[@]} == 0 )); then
+              printf 'has_affected_hosts=false\n'
+            else
+              printf 'has_affected_hosts=true\n'
+            fi
+          } >> "$GITHUB_OUTPUT"
+          write_summary
       - name: Check flake
-        run: nix flake check --no-eval-cache --no-build --show-trace
+        if: steps.select-machines.outputs.run_flake_check == 'true'
+        run: nix flake check --no-eval-cache --no-build --no-write-lock-file --show-trace
       - name: Remove temporary Nix cache
         if: ${{ always() }}
         shell: bash
@@ -97,7 +271,7 @@ jobs:
 
   build-and-cache:
     needs: validate
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && needs.validate.outputs.has_affected_hosts == 'true'
     name: Build and cache ${{ matrix.host }}
     runs-on: [self-hosted, nixos, nix-nightly]
     # Battlestation may need to build its CachyOS ThinLTO kernel and matching
@@ -129,7 +303,7 @@ jobs:
           set -euo pipefail
           # The nested shell expands this command substitution.
           # shellcheck disable=SC2016
-          nix shell --inputs-from . nixpkgs#attic-client \
+          nix shell --no-write-lock-file --inputs-from . nixpkgs#attic-client \
             -c sh -c 'dirname "$(command -v attic)"' >> "$GITHUB_PATH"
       - name: Log in to the Attic build cache
         shell: bash
@@ -154,6 +328,7 @@ jobs:
             nix build ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel" \
               --no-eval-cache \
               --no-link \
+              --no-write-lock-file \
               --print-out-paths \
               --max-jobs 1
           )"
