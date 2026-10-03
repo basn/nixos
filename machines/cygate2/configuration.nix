@@ -6,11 +6,35 @@
 
 {
   imports = [
+    ../../modules/dayzweb-split.nix
     ./hardware-configuration.nix
     ./services/kuma.nix
     ./services/nginx.nix
     ./services/syncoid.nix
   ];
+
+  users.users.dayzweb = {
+    isSystemUser = true;
+    group = "dayzweb";
+  };
+  users.groups.dayzweb = { };
+
+  systemd.tmpfiles.rules = [
+    "d /srv/dayzweb 0755 root root -"
+    "d /srv/dayzweb/releases 0755 root root -"
+  ];
+
+  services.dayzwebSplit = {
+    sourcePath = "/srv/dayzweb/current";
+    user = "dayzweb";
+    netbirdUnits = [ "netbird.service" ];
+    worker = {
+      enable = true;
+      ingestUrl = "http://services.netbird.basn.se:18111";
+      serverId = "1ed9f69d-4ee3-6dac-b18b-ea5e938a80e2";
+      detailConcurrency = 8;
+    };
+  };
 
   boot = {
     zfs = {
