@@ -247,6 +247,10 @@ in
             "--dns-search=."
           ];
           docker_forward_env = [ ];
+          env_passthrough = [
+            "HASS_URL"
+            "HASS_TOKEN"
+          ];
           docker_volumes = [
             "/var/lib/hermes/output:/output"
             "/var/lib/hermes/.hermes/cron/output:/cron-output:ro"
