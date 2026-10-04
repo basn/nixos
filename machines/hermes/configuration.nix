@@ -188,15 +188,6 @@ in
         SEARXNG_URL = "https://search.basn.se";
       };
       settings = {
-        providers.bandit-local = {
-          api = "http://bandit.netbird.basn.se:8080/v1";
-          transport = "chat_completions";
-          default_model = "qwen3.5-9b-local";
-          models."qwen3.5-9b-local" = {
-            context_length = 65536;
-            supports_vision = false;
-          };
-        };
         model = {
           provider = "openai-codex";
           default = "gpt-6-astra";
@@ -213,24 +204,24 @@ in
             model = "gpt-5.6-luna";
           };
           compression = {
-            provider = "bandit-local";
-            model = "qwen3.5-9b-local";
+            provider = "openai-codex";
+            model = "gpt-5.6-luna";
           };
           curator = {
-            provider = "bandit-local";
-            model = "qwen3.5-9b-local";
+            provider = "openai-codex";
+            model = "gpt-5.6-luna";
           };
           skills_hub = {
-            provider = "bandit-local";
-            model = "qwen3.5-9b-local";
+            provider = "openai-codex";
+            model = "gpt-5.6-luna";
           };
           title_generation = {
-            provider = "bandit-local";
-            model = "qwen3.5-9b-local";
-          };
-          vision = {
             provider = "openai-codex";
-            model = "gpt-5.6-sol";
+            model = "gpt-5.6-luna";
+          };
+          web_extract = {
+            provider = "openai-codex";
+            model = "gpt-5.6-luna";
           };
         };
         timezone = "Europe/Stockholm";

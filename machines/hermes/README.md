@@ -24,23 +24,12 @@ parent's actual route because `delegation.provider`, `delegation.model`, and the
 endpoint override fields remain unset; the existing delegation concurrency,
 depth, and orchestrator settings are unchanged. Review, background review, and
 planning likewise inherit the active main route. The default MoA preset keeps
-its own cloud routes and is not pinned to the local provider.
+its own cloud routes.
 
-Compression, curator, Skills Hub, and title generation use the named custom
-provider `bandit-local`, serving `qwen3.5-9b-local` at
-`http://bandit.netbird.basn.se:8080/v1`. Its provider-scoped context length is
-65,536 tokens, matching one slot of Bandit's `--ctx-size 131072 --parallel 2`
-server. This is a per-slot serving allocation, not the model's training context
-or a hardware limit, and it does not constrain Astra. At the locked Hermes
-revision, `web_extract` no longer uses an auxiliary LLM; it remains local
-through the existing Firecrawl backend at `127.0.0.1:3002`, and stale
-`auxiliary.web_extract` settings are ignored.
-Approval remains on `openai-codex` with `gpt-5.6-luna`, while vision explicitly
-uses `openai-codex` with `gpt-5.6-sol`. The local model is marked text-only,
-matching Bandit's `--no-mmproj`, so Hermes does not natively embed images into
-requests to it. The named provider has no key configured; Hermes therefore uses
-its supported keyless-local placeholder and does not reuse or globally override
-OpenAI credentials or `OPENAI_BASE_URL`.
+Approval, compression, curator, Skills Hub, title generation, and web extraction
+are declared on `openai-codex:gpt-5.6-luna`. At the locked Hermes revision,
+`web_extract` no longer uses an auxiliary LLM, so that historical route is
+ignored. Vision has no auxiliary override and inherits the active main route.
 
 The top-level fallback route is `openai-codex:gpt-5.6-sol`. Hermes invokes it
 only after supported primary-route errors such as exhausted retries, server or
@@ -48,17 +37,13 @@ connection failures, or authentication failures. It is availability fallback,
 not a quality escalation, and it is turn-scoped according to Hermes's fallback
 semantics.
 
-The Bandit endpoint depends on user-managed NetBird connectivity and DNS for
-`bandit.netbird.basn.se`; this repository does not configure NetBird. Hermes's
-existing egress policy permits the NetBird address range.
-
 The Hermes Nix module deep-merges declared settings into an existing runtime
 `config.yaml`; omitting a previously managed key does not delete it. An existing
-`model.openai_runtime: auto` therefore remains but is a runtime no-op, and an
-existing `auxiliary.web_extract` block remains inert because this Hermes
-revision ignores it. `_config_version` is different: the module generates the
-current package version on every build and overwrites the existing value during
-the merge.
+`model.openai_runtime: auto` therefore remains but is a runtime no-op. A stale
+custom provider may likewise remain after its declaration is removed, but no
+configured route references it. `_config_version` is different: the module
+generates the current package version on every build and overwrites the existing
+value during the merge.
 
 Changing the configured main route does not rewrite model overrides already
 stored on existing sessions. Start a new conversation, or explicitly switch an
@@ -72,8 +57,7 @@ nix build .#nixosConfigurations.hermes.config.system.build.toplevel --no-link
 ```
 
 Building only validates the declared system closure. It does not deploy or
-restart Hermes, activate Bandit's endpoint/firewall changes, authenticate the
-Codex fallback, or configure NetBird.
+restart Hermes or authenticate the Codex fallback.
 
 ## VM definition
 
