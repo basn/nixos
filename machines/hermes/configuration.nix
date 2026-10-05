@@ -9,8 +9,19 @@ let
   hermesUid = 999;
   agentBrowser = import ./agent-browser.nix { inherit pkgs; };
   terminalImage = import ./terminal-image.nix { inherit pkgs; };
+  homeAssistantPlugin = pkgs.fetchFromGitHub {
+    owner = "NousResearch";
+    repo = "hermes-homeassistant";
+    name = "homeassistant";
+    rev = "ba30cb0cf86c52bdb5cde98974bc062e97966529";
+    hash = "sha256-Pg4smvkiVpmcmUola0rziMBfq5V7UjzX8864Dem76pI=";
+  };
   hermesPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
     extraDependencyGroups = [ "firecrawl" ];
+    # The plugin catalog requires >=0.21.5, and this revision descends from
+    # v2026.9.24 (0.21.5) but is stamped 0.0.0. Remove this override once the
+    # upstream Nix package reports a compatible version itself.
+    version = "0.21.5";
   };
 in
 {
@@ -172,6 +183,7 @@ in
       addToSystemPackages = true;
       stateDir = "/var/lib/hermes";
       workingDirectory = "/var/lib/hermes/workspace";
+      extraPlugins = [ homeAssistantPlugin ];
       extraPackages = [
         agentBrowser
         pkgs.chromium
@@ -198,6 +210,7 @@ in
             model = "gpt-5.6-sol";
           }
         ];
+        plugins.enabled = [ "homeassistant" ];
         auxiliary = {
           approval = {
             provider = "openai-codex";

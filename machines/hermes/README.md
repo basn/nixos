@@ -16,6 +16,8 @@ Flake output: `hermes`.
 - `hermes-agent`, `hermes-dashboard`, Nginx, PostgreSQL, Redis, and Docker.
 - Prometheus node and systemd exporters, OpenSSH, ZFS auto-scrub, and Sanoid.
 - The agent browser package is built from `agent-browser.nix`.
+- The standalone Home Assistant plugin is pinned and enabled declaratively;
+  runtime dependency installation remains disabled.
 
 ## Model routing
 
