@@ -16,13 +16,50 @@ let
     rev = "ba30cb0cf86c52bdb5cde98974bc062e97966529";
     hash = "sha256-Pg4smvkiVpmcmUola0rziMBfq5V7UjzX8864Dem76pI=";
   };
-  hermesPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
-    extraDependencyGroups = [ "firecrawl" ];
-    # The plugin catalog requires >=0.21.5, and this revision descends from
-    # v2026.9.24 (0.21.5) but is stamped 0.0.0. Remove this override once the
-    # upstream Nix package reports a compatible version itself.
-    version = "0.21.5";
+  # Hermes's left-core migration checks plugins by a literal directory name,
+  # while normal discovery correctly uses the manifest identity and the Nix
+  # module deliberately prefixes declarative links with nix-managed-. Remove
+  # this patch once the pinned Hermes input includes manifest-aware presence
+  # detection in hermes_cli/left_core_migration.py.
+  patchedHermesSource = pkgs.applyPatches {
+    name = "hermes-agent-source-homeassistant-plugin-presence";
+    src = inputs.hermes-agent;
+    patches = [ ./homeassistant-plugin-presence.patch ];
   };
+  hermesPythonOverlay = pkgs.runCommand "hermes-agent-homeassistant-plugin-presence" { } ''
+    mkdir -p "$out/hermes_cli"
+    cp ${patchedHermesSource}/hermes_cli/left_core_migration.py "$out/hermes_cli/"
+    cat > "$out/sitecustomize.py" <<'PY'
+    from pathlib import Path
+
+    import hermes_cli
+
+    override = str(Path(__file__).resolve().parent / "hermes_cli")
+    if override not in hermes_cli.__path__:
+        hermes_cli.__path__.insert(0, override)
+    PY
+  '';
+  hermesPackageBase =
+    inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override
+      {
+        extraDependencyGroups = [ "firecrawl" ];
+        # The plugin catalog requires >=0.21.5, and this revision descends from
+        # v2026.9.24 (0.21.5) but is stamped 0.0.0. Remove this override once the
+        # upstream Nix package reports a compatible version itself.
+        version = "0.21.5";
+      };
+  # The outer package references a separately sealed uv2nix environment, so
+  # outer derivation patches alone do not change imported Python. The overlay
+  # extends the sealed hermes_cli package path with only the patched module;
+  # keeping every other module in place preserves __file__-relative resources.
+  hermesPackage = hermesPackageBase.overrideAttrs (old: {
+    postInstall = (old.postInstall or "") + ''
+      wrapProgram "$out/bin/hermes" --prefix PYTHONPATH : ${hermesPythonOverlay}
+    '';
+    passthru = (old.passthru or { }) // {
+      inherit patchedHermesSource;
+    };
+  });
 in
 {
   imports = [ ../../modules/hermes-audit.nix ];

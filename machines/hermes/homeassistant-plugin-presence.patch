@@ -1,0 +1,79 @@
+diff --git a/hermes_cli/left_core_migration.py b/hermes_cli/left_core_migration.py
+index 7901400..12be738 100644
+--- a/hermes_cli/left_core_migration.py
++++ b/hermes_cli/left_core_migration.py
+@@ -155,2 +155,7 @@ def plugin_present(plugin: str, home: Path) -> bool:
+-    """Installed in *home* (enabled or not: a user who disabled it chose to). Read-only."""
+-    return (home / "plugins" / plugin).is_dir()
++    """Installed in *home* under its discovery identity (enabled or not: a user who disabled it chose to).
++    Read-only. Directory names are not identities: declarative Nix installs deliberately use a
++    ``nix-managed-`` prefix, while discovery enables them by manifest key/name."""
++    from hermes_cli.plugins_discovery import scan_directory
++    from hermes_cli.plugins_manifest import manifest_key
++    return any(plugin in {manifest_key(manifest), manifest.name}
++               for manifest in scan_directory(home / "plugins", "user"))
+diff --git a/tests/hermes_cli/test_left_core_migration.py b/tests/hermes_cli/test_left_core_migration.py
+index 443e853..73114af 100644
+--- a/tests/hermes_cli/test_left_core_migration.py
++++ b/tests/hermes_cli/test_left_core_migration.py
+@@ -91 +91 @@ def test_migrate_home_installs_the_catalog_plugin_once(tmp_path):
+-        (home / "plugins" / name).mkdir(parents=True)
++        _directory_plugin(home / "plugins" / name)
+@@ -133,0 +134,28 @@ def test_home_without_homeassistant_gets_nothing_and_no_notice(tmp_path):
++def _directory_plugin(path: Path, *, name: str = "homeassistant", manifest: str | None = None) -> Path:
++    path.mkdir(parents=True)
++    (path / "plugin.yaml").write_text(
++        manifest if manifest is not None else f"name: {name}\nversion: 1.0.0\n", encoding="utf-8")
++    return path
++
++
++@pytest.mark.parametrize("directory", ["homeassistant", "nix-managed-homeassistant"])
++def test_plugin_present_uses_manifest_identity_not_directory_name(tmp_path, directory):
++    home = _home(tmp_path)
++    source = _directory_plugin(tmp_path / "plugin-source")
++    plugins = home / "plugins"
++    plugins.mkdir()
++    (plugins / directory).symlink_to(source, target_is_directory=True)
++
++    assert lcm.plugin_present("homeassistant", home) is True
++
++
++def test_plugin_present_ignores_directory_name_without_matching_manifest(tmp_path):
++    home = _home(tmp_path)
++    plugins = home / "plugins"
++    _directory_plugin(plugins / "homeassistant", name="different-plugin")
++    (plugins / "missing-manifest").mkdir()
++    _directory_plugin(plugins / "malformed", manifest="- not-a-mapping\n")
++
++    assert lcm.plugin_present("homeassistant", home) is False
++
++
+@@ -135,2 +163,3 @@ def test_a_disabled_or_present_plugin_is_left_alone(tmp_path):
+-    home = _home(tmp_path, env="HASS_TOKEN=abc\n")
+-    (home / "plugins" / "homeassistant").mkdir(parents=True)
++    home = _home(tmp_path, env="HASS_TOKEN=abc\n", config=(
++        "plugins:\n  disabled: [homeassistant]\n"))
++    _directory_plugin(home / "plugins" / "homeassistant")
+@@ -139,0 +169,16 @@ def test_a_disabled_or_present_plugin_is_left_alone(tmp_path):
++def test_nix_managed_plugin_records_install_with_lazy_installs_off(tmp_path, monkeypatch):
++    home = _home(tmp_path, env="HASS_TOKEN=abc\n", config="toolsets: [homeassistant]\n")
++    source = _directory_plugin(tmp_path / "plugin-source")
++    (home / "plugins").mkdir()
++    (home / "plugins" / "nix-managed-homeassistant").symlink_to(source, target_is_directory=True)
++    monkeypatch.setenv("HERMES_HOME", str(home))
++    import pm.install
++    monkeypatch.setattr(pm.install, "lazy_installs_allowed", lambda: False)
++    monkeypatch.setattr(lcm, "_install_into", lambda h: pytest.fail("installed"))
++    said = []
++
++    assert lcm.recover_at_startup(say=said.append) == []
++    assert said == []
++    assert lcm._read_config(home)["_left_core_installed"] == ["homeassistant"]
++
++
+@@ -146 +191 @@ def test_a_preinstalled_plugin_gets_the_scope_conversion_once(tmp_path):
+-    (home / "plugins" / "homeassistant").mkdir(parents=True)
++    _directory_plugin(home / "plugins" / "homeassistant")
+@@ -236 +281 @@ def test_the_migration_installs_once_so_a_removal_sticks(tmp_path, monkeypatch):
+-        plugin.mkdir(parents=True)
++        _directory_plugin(plugin)

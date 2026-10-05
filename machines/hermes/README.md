@@ -18,6 +18,12 @@ Flake output: `hermes`.
 - The agent browser package is built from `agent-browser.nix`.
 - The standalone Home Assistant plugin is pinned and enabled declaratively;
   runtime dependency installation remains disabled.
+- The Hermes package is temporarily patched so the left-core migration checks
+  declarative `nix-managed-*` plugins by their manifest identity, matching normal
+  discovery. A one-module Python overlay preserves the sealed package's
+  path-relative resources. Remove `homeassistant-plugin-presence.patch` and its
+  package overlay once the pinned Hermes input contains the equivalent upstream
+  fix.
 
 ## Model routing
 
