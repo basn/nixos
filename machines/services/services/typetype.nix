@@ -213,7 +213,7 @@ in
     backend = "podman";
     containers = {
       typetype = {
-        image = "ghcr.io/typetype-video/typetype:1.9.0@sha256:7b3518b5bfdcd7c597535affa713e15701429897ae93f880debecb9859a07cba";
+        image = "ghcr.io/typetype-video/typetype:1.10.0@sha256:e339425a82f340c42ad67e1e55b88e95e2e9e4565f33c47a63b2b4ba63d19869";
         networks = [ "typetype" ];
         ports = [ "127.0.0.1:18082:80" ];
         volumes = [ "${typetypeNginx}:/etc/nginx/templates/default.conf.template:ro" ];
@@ -221,7 +221,7 @@ in
       };
 
       typetype-server = {
-        image = "ghcr.io/typetype-video/typetype-server:sha-49e33da@sha256:ce14f58257f70620980d6d2eb8af602df992d21af1e6faecd1ceedf6f24caf32";
+        image = "ghcr.io/typetype-video/typetype-server:1.10.0@sha256:aec23107e58bae16133af4ff3ecaf6c0c4cd621e030811129c11dfe6b3bebf37";
         networks = [ "typetype" ];
         environment = {
           ALLOWED_ORIGINS = "https://tube.basn.se";
@@ -247,7 +247,7 @@ in
       };
 
       typetype-downloader = {
-        image = "ghcr.io/typetype-video/typetype-downloader:1.9.0@sha256:7f60ff0b77e6c37dcecd9e419727eafd25f2b2cf75e969c29a6eb1ff504793fa";
+        image = "ghcr.io/typetype-video/typetype-downloader:1.10.0@sha256:2e38afac2b25e4c2ddf1624fd15605498595ca6f558f14fcbe78623366e77e41";
         networks = [ "typetype" ];
         environment = {
           HTTP_PORT = "18093";
@@ -281,7 +281,7 @@ in
       };
 
       typetype-token = {
-        image = "ghcr.io/typetype-video/typetype-token:1.9.0@sha256:9e615d193c5a47140533826aa87379a6ce2e911ed405779cad8f071a11590339";
+        image = "ghcr.io/typetype-video/typetype-token:1.10.0@sha256:25a6571359522d07dcbef11931e318280c945b06baac004452ccf4595ea612dd";
         networks = [ "typetype" ];
         extraOptions = [ "--ipc=host" ];
         environment = {
