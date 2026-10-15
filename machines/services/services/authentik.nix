@@ -1,7 +1,7 @@
 { config, ... }:
 let
   authentikSecrets = config.sops.secrets.authentik.path;
-  authentikImage = "ghcr.io/goauthentik/server:2026.8.3@sha256:ab9b4e8cc4ab3f8d1198d2db6aeea66bafea1963b3f2843589e0d163f97d9849";
+  authentikImage = "ghcr.io/goauthentik/server:2026.8.4@sha256:e7226ae116dac5aa0a5643803e735b010038f492c401e08e16b3bf1ac54c090c";
 in
 {
   sops.templates.authentik-pinepods-env = {
