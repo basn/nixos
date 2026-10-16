@@ -43,6 +43,25 @@ in `sops.nix`. Keep storage and service changes local to this directory.
 PinePods deployment, authentication, storage, and recovery requirements are
 documented in [`../../docs/pinepods.md`](../../docs/pinepods.md).
 
+## rclone mount cleanup
+
+When `rclone.service` stops, it first attempts the normal FUSE unmount of
+`/mnt/telia`. After the rclone process has exited, a guarded post-stop step
+reads the kernel mount table without traversing the mountpoint. It lazily
+detaches the mount only when exactly one `/mnt/telia` entry remains and its
+source and type are `encrypted:/files/` and `fuse.rclone`. An absent mount is
+successful; mount-table read errors, stacked mounts, unexpected identities,
+and detach or verification failures fail visibly without touching an
+unverified mount.
+
+The lazy detach is crash recovery for the stale kernel mount. It neither
+deletes `/data2/rclone-cache` nor guarantees that pending cached uploads were
+flushed before rclone exited. The focused mock check is available as:
+
+```sh
+nix build .#nixosConfigurations.bandit.config.system.build.rcloneCleanupMountTest --no-link
+```
+
 ## Swap
 
 Bandit has a 64 GiB swap partition on the dedicated Intel SSDPEKKW256G7 with
