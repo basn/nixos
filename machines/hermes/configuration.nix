@@ -427,10 +427,7 @@ in
   };
 
   users.users.hermes.extraGroups = [ "docker" ];
-  users.users.basn.extraGroups = [
-    "docker"
-    "hermes"
-  ];
+  users.users.basn.extraGroups = [ "docker" ];
 
   systemd = {
     services.hermes-terminal-image = {
