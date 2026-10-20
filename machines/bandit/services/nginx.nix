@@ -33,6 +33,16 @@
           '';
         };
       };
+      "muxarr.basn.se" = {
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8183";
+          proxyWebsockets = true;
+          extraConfig = ''
+            allow 10.1.1.8/32;
+            deny all;
+          '';
+        };
+      };
     };
   };
 }

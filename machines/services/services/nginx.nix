@@ -255,6 +255,14 @@ in
           proxyPass = "http://192.168.180.10:8989";
         };
       };
+      "muxarr.basn.se" = authentikConfig // {
+        enableACME = true;
+        forceSSL = true;
+        locations."/" = authentikAuthStrict // {
+          proxyPass = "http://192.168.180.10:80";
+          proxyWebsockets = true;
+        };
+      };
       "radarr.basn.se" = authentikConfig // {
         enableACME = true;
         forceSSL = true;
