@@ -30,11 +30,9 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-cachyos-kernel = {
-      # Temporary: GCC 16-built LLD 21.1.8 causes objtool failures:
-      # https://github.com/ClangBuiltLinux/linux/issues/2162
-      # Fix: https://github.com/llvm/llvm-project/pull/198129
-      # Remove once the pinned toolchain contains the fix and battlestation builds.
-      url = "github:xddxdd/nix-cachyos-kernel/b1332396df6e880d7e3b6b451c6a74132ce8cf66";
+      # Temporary candidate with the LLD fix and a modules.cer-producing builder.
+      # Remove once a newer revision retains both fixes and battlestation builds.
+      url = "github:xddxdd/nix-cachyos-kernel/be0be288549209421ab4f67c392a23109cb809a3";
     };
     hermes-agent = {
       url = "github:NousResearch/hermes-agent";
