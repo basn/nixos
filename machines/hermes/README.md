@@ -20,10 +20,47 @@ Flake output: `hermes`.
   runtime dependency installation remains disabled.
 - The Hermes package is temporarily patched so the left-core migration checks
   declarative `nix-managed-*` plugins by their manifest identity, matching normal
-  discovery. A one-module Python overlay preserves the sealed package's
-  path-relative resources. Remove `homeassistant-plugin-presence.patch` and its
-  package overlay once the pinned Hermes input contains the equivalent upstream
-  fix.
+  discovery. Remove `homeassistant-plugin-presence.patch` and its module overlay
+  once the pinned Hermes input contains the equivalent upstream fix.
+- `final-output-drain.patch` fixes a sandbox poller race: a child can write its
+  final output between the log snapshot and the exit check. Drain once more
+  before publishing completion, preserving nonzero exit codes. A failed final
+  read reports `lost`, not success; a concurrent kill keeps its result. Remove
+  this patch and its `tools/process_registry.py` overlay once the pinned input
+  includes the fix and passes the bundled regression tests.
+
+Both patches apply to the exact locked Hermes source. The existing package
+wrapper extends the sealed `hermes_cli` and `tools` package paths with only the
+patched modules; replacing the outer derivation's `src` or `patches` alone would
+not change its separately built uv2nix environment. Other modules and their
+path-relative resources stay in that environment. No flake input update is
+needed.
+
+### Final-output patch validation
+
+In a disposable checkout of the Hermes revision recorded in `flake.lock`, apply
+`final-output-drain.patch` with `git apply`. Its regression fixture uses a local
+child process gated to finish after the first log snapshot, exercising exit
+codes 0, 17 and 75 with successful reads, malformed headers, backend errors and
+concurrent kills. It does not run remote audits or send notifications.
+
+With Hermes test dependencies installed, run:
+
+```sh
+python -m pytest tests/tools/test_process_registry*.py -q
+```
+
+Validate the actual Nix package and affected host separately (from this NixOS
+repository, with Nix available):
+
+```sh
+nixfmt --check machines/hermes/configuration.nix
+nix build .#nixosConfigurations.hermes.config.services.hermes-agent.package --no-link --no-write-lock-file
+nix build .#nixosConfigurations.hermes.config.system.build.toplevel --no-link --no-write-lock-file
+```
+
+A source-level test or local recreation of the Python overlay is not a Nix
+build, host activation, or proof that the running service loaded this patch.
 
 ## Model routing
 

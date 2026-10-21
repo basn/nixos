@@ -1,0 +1,151 @@
+diff --git a/tests/tools/test_process_registry.py b/tests/tools/test_process_registry.py
+index f62f7be5..0eefeadc 100644
+--- a/tests/tools/test_process_registry.py
++++ b/tests/tools/test_process_registry.py
+@@ -952,7 +952,13 @@ class TestSpawnEnvSanitization:
+
+             def execute(self, command, **kwargs):
+                 self.commands.append((command, kwargs))
+-                return next(self._responses)
++                try:
++                    return next(self._responses)
++                except StopIteration:
++                    # One final log snapshot after observing child exit.
++                    assert command.startswith("O=")
++                    offset = command.split(";", 1)[0].split("=", 1)[1]
++                    return {"output": f"{offset} {offset}\n"}
+
+         env = FakeEnv()
+
+@@ -991,7 +997,13 @@ class TestEnvPollerIncrementalRead:
+
+             def execute(self, command, **kwargs):
+                 self.commands.append(command)
+-                return next(self._responses)
++                try:
++                    return next(self._responses)
++                except StopIteration:
++                    # One final log snapshot after observing child exit.
++                    assert command.startswith("O=")
++                    offset = command.split(";", 1)[0].split("=", 1)[1]
++                    return {"output": f"{offset} {offset}\n"}
+
+         env = FakeEnv()
+         with patch("tools.process_registry.time.sleep", return_value=None), \
+@@ -999,6 +1011,8 @@ class TestEnvPollerIncrementalRead:
+             registry._env_poller_loop(
+                 session, env, "/tmp/bg.log", "/tmp/bg.pid", "/tmp/bg.exit"
+             )
++        assert session.completion_reason == "exited"
++        assert session.exit_code == 0
+         return env.commands
+
+
+diff --git a/tools/process_registry.py b/tools/process_registry.py
+index af1257ac..044dbd6b 100644
+--- a/tools/process_registry.py
++++ b/tools/process_registry.py
+@@ -1433,8 +1433,10 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+         q = shlex.quote
+         # Byte offset already read from the log (bytes, not chars: the shell counts bytes).
+         prev_output_bytes = 0
++        pending_exit_code = None
+         while not session.exited:
+-            time.sleep(2)
++            if pending_exit_code is None:
++                time.sleep(2)
+             try:
+                 # Read only the bytes written since the last poll.
+                 raw = env.execute(self._log_delta_command(q(log_path), prev_output_bytes),
+@@ -1470,6 +1472,14 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+                     self._check_watch_patterns(session, delta)
+                     self._emit_output(session, delta)
+
++                if pending_exit_code is not None:
++                    # The child can finish between the previous log snapshot and
++                    # the liveness check. Publish only after draining that tail.
++                    if new_size is None:
++                        raise RuntimeError("Final sandbox log read failed")
++                    self._finish_exited(session, pending_exit_code)
++                    return
++
+                 check = env.execute(
+                     f"kill -0 \"$(cat {q(pid_path)} 2>/dev/null)\" 2>/dev/null; echo $?", timeout=5)
+                 check_output = check.get("output", "").strip()
+@@ -1480,8 +1490,7 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+                         exit_code = int(exit_str.splitlines()[-1].strip())
+                     except (ValueError, IndexError):
+                         exit_code = -1
+-                    self._finish_exited(session, exit_code)
+-                    return
++                    pending_exit_code = exit_code
+             except Exception:
+                 # Environment might be gone (sandbox reaped, etc.). A kill that already
+                 # settled the session keeps its result.
+diff --git a/tests/tools/test_process_registry_final_drain.py b/tests/tools/test_process_registry_final_drain.py
+new file mode 100644
+index 00000000..d8ab558e
+--- /dev/null
++++ b/tests/tools/test_process_registry_final_drain.py
+@@ -0,0 +1,61 @@
++"""A real subprocess finishes between a sandbox log snapshot and exit check."""
++import subprocess
++import sys
++import time
++from unittest.mock import patch
++
++import pytest
++from tools.process_registry import ProcessRegistry, ProcessSession
++
++
++@pytest.mark.parametrize("exit_code", [0, 17, 75])
++@pytest.mark.parametrize("final_read", ["ok", "bad_header", "backend_error", "killed"])
++def test_final_output_is_drained_before_completion(tmp_path, exit_code, final_read):
++    log, pid, status = (tmp_path / name for name in ("bg.log", "bg.pid", "bg.exit"))
++    initial = "HEALTH_EXIT=0\n"
++    final = "CANDIDATE_AUDIT_JSON_BEGIN\n" + ("x" * 40000) + "\nCANDIDATE_AUDIT_JSON_END\nAUDIT_EXIT=" + str(exit_code) + "\n"
++    log.write_text(initial)
++    with log.open("a") as out:
++        child = subprocess.Popen(
++            [sys.executable, "-c", "import sys; sys.stdin.read(1); sys.stdout.write(sys.argv[1]); sys.exit(int(sys.argv[2]))", final, str(exit_code)],
++            stdin=subprocess.PIPE, stdout=out,
++        )
++    pid.write_text(str(child.pid))
++
++    class Env:
++        first = True
++        def execute(self, command, **kwargs):
++            if command.startswith("O=") and not self.first:
++                if final_read == "bad_header":
++                    return {"output": "", "returncode": 1}
++                if final_read == "backend_error":
++                    raise RuntimeError("injected transport failure")
++                if final_read == "killed":
++                    registry._finish_exited(session, -15, reason="killed", source="test")
++            result = subprocess.run(["bash", "-c", command], capture_output=True, text=True, timeout=10)
++            if command.startswith("O=") and self.first:
++                self.first = False
++                # Finish AFTER the log read, BEFORE the poller's kill -0.
++                child.communicate(b"!", timeout=10)
++                status.write_text(str(child.returncode) + "\n")
++            return {"output": result.stdout, "returncode": result.returncode}
++
++    registry = ProcessRegistry()
++    session = ProcessSession(id="proc_final_drain", command="local fixture", task_id="test", started_at=time.time())
++    published = []
++    try:
++        with patch("tools.process_registry.time.sleep"), patch.object(registry, "_move_to_finished", side_effect=lambda s: published.append(s.output_buffer)):
++            registry._env_poller_loop(session, Env(), str(log), str(pid), str(status))
++        if final_read == "ok":
++            assert session.exit_code == exit_code
++            assert session.output_buffer == initial + final
++            assert published == [initial + final]
++        else:
++            assert session.exit_code == (-15 if final_read == "killed" else -1)
++            assert session.completion_reason == ("killed" if final_read == "killed" else "lost")
++            assert session.output_buffer == initial
++            assert published == [initial]
++    finally:
++        if child.poll() is None:
++            child.kill()
++            child.wait()

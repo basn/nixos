@@ -21,22 +21,31 @@ let
   # module deliberately prefixes declarative links with nix-managed-. Remove
   # this patch once the pinned Hermes input includes manifest-aware presence
   # detection in hermes_cli/left_core_migration.py.
+  # Drain the sandbox log after observing exit, before publishing completion.
+  # Remove final-output-drain.patch and its tools overlay once the pinned
+  # Hermes input includes the fix and passes the bundled race/failure tests.
   patchedHermesSource = pkgs.applyPatches {
-    name = "hermes-agent-source-homeassistant-plugin-presence";
+    name = "hermes-agent-source-local-fixes";
     src = inputs.hermes-agent;
-    patches = [ ./homeassistant-plugin-presence.patch ];
+    patches = [
+      ./homeassistant-plugin-presence.patch
+      ./final-output-drain.patch
+    ];
   };
-  hermesPythonOverlay = pkgs.runCommand "hermes-agent-homeassistant-plugin-presence" { } ''
-    mkdir -p "$out/hermes_cli"
+  hermesPythonOverlay = pkgs.runCommand "hermes-agent-local-fixes" { } ''
+    mkdir -p "$out/hermes_cli" "$out/tools"
     cp ${patchedHermesSource}/hermes_cli/left_core_migration.py "$out/hermes_cli/"
+    cp ${patchedHermesSource}/tools/process_registry.py "$out/tools/"
     cat > "$out/sitecustomize.py" <<'PY'
     from pathlib import Path
 
     import hermes_cli
+    import tools
 
-    override = str(Path(__file__).resolve().parent / "hermes_cli")
-    if override not in hermes_cli.__path__:
-        hermes_cli.__path__.insert(0, override)
+    for package in (hermes_cli, tools):
+        override = str(Path(__file__).resolve().parent / package.__name__)
+        if override not in package.__path__:
+            package.__path__.insert(0, override)
     PY
   '';
   hermesPackageBase =
@@ -50,7 +59,7 @@ let
       };
   # The outer package references a separately sealed uv2nix environment, so
   # outer derivation patches alone do not change imported Python. The overlay
-  # extends the sealed hermes_cli package path with only the patched module;
+  # extends the sealed hermes_cli and tools paths with only patched modules;
   # keeping every other module in place preserves __file__-relative resources.
   hermesPackage = hermesPackageBase.overrideAttrs (old: {
     postInstall = (old.postInstall or "") + ''
