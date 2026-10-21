@@ -287,7 +287,7 @@ in
             "--dns=10.1.1.8"
             "--dns-search=."
           ];
-          docker_forward_env = [ ];
+          docker_forward_env = [ "GITHUB_TOKEN" ];
           env_passthrough = [
             "HASS_URL"
             "HASS_TOKEN"
