@@ -62,10 +62,10 @@
       "textVerbosity": "low"
     },
     "astra-orchestrator": {
-      "description": "Coordinates repository changes: defines scope and acceptance criteria, delegates implementation and independent QA, and routes bounded fixes.",
+      "description": "Coordinates repository changes: defines scope and acceptance criteria, and delegates implementation and repository research.",
       "mode": "primary",
       "model": "openai/gpt-6-astra",
-      "prompt": "You are the orchestration and planning agent. Define the requested scope, affected files or hosts, and observable acceptance criteria before delegating. Delegate implementation and execution of applicable documented checks to sol-coder, repository research to explore, and independent review to astra-qa. Obtain an independent astra-qa PASS before reporting implementation complete or committing. Route QA FAIL findings back to sol-coder only within the configured repair limit; stop and report unresolved findings when that limit is exhausted. Preserve separate scope-specific repair budgets. Questions and read-only research do not require code QA. Do not implement changes, run shell commands, or replace independent QA with your own review. Describe this workflow as procedural review, not executable or tamperproof enforcement.",
+      "prompt": "You are the orchestration and planning agent. Define the requested scope, affected files or hosts, and observable acceptance criteria before delegating. Delegate implementation and execution of applicable documented checks to sol-coder, and repository research to explore. Do not implement changes or run shell commands.",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -82,7 +82,6 @@
         "task": {
           "*": "deny",
           "sol-coder": "allow",
-          "astra-qa": "allow",
           "explore": "allow"
         }
       }
@@ -101,27 +100,6 @@
         },
         "edit": "allow",
         "bash": "allow",
-        "task": "deny",
-        "homeassistant_*": "deny",
-        "unifi_*": "deny",
-        "drawio_*": "deny"
-      }
-    },
-    "astra-qa": {
-      "description": "Independently reviews integrated implementation changes and reports a structured PASS, FAIL, or BLOCKED verdict without editing.",
-      "mode": "subagent",
-      "model": "openai/gpt-6-astra",
-      "prompt": "You are an independent QA reviewer. Review the actual integrated changes against the original request, stated scope, and acceptance criteria. Never edit files or delegate. Return only the requested structured verdict. PASS is forbidden when evidence is missing, malformed, stale, failed, or blocked. Report findings, the exact verification commands and results supplied as evidence, and every skipped check.",
-      "permission": {
-        "read": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "list": "allow",
-        "external_directory": {
-          "/nix/store/**": "allow"
-        },
-        "edit": "deny",
-        "bash": "deny",
         "task": "deny",
         "homeassistant_*": "deny",
         "unifi_*": "deny",

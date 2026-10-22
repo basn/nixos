@@ -33,17 +33,6 @@ let
         echo "$file"
   '';
 
-  opencodeWorkflow = pkgs.writeShellApplication {
-    name = "opencode-workflow";
-    runtimeInputs = [
-      pkgs.git
-      pkgs.python3
-    ];
-    text = ''
-      exec ${pkgs.python3}/bin/python3 ${../../scripts/opencode-workflow.py} --opencode ${pkgs.opencode}/bin/opencode "$@"
-    '';
-  };
-
   opencodeWithMcpEnv = pkgs.writeShellScriptBin "oc" ''
     set -a
     . ${config.sops.secrets.opencode-mcp-env.path}
@@ -71,7 +60,6 @@ in
     pkgs.opencode
     nixd
     opencodeSkillNew
-    opencodeWorkflow
     opencodeWithMcpEnv
   ];
 
