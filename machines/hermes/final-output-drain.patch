@@ -1,0 +1,350 @@
+diff --git a/tools/process_registry_env_log.py b/tools/process_registry_env_log.py
+index a9cac46..3a11d27 100644
+--- a/tools/process_registry_env_log.py
++++ b/tools/process_registry_env_log.py
+@@ -3,0 +4,3 @@
++FINAL_LOG_SNAPSHOT_PREFIX = "HERMES_FINAL_LOG_V1"
++
++
+@@ -34,0 +38,19 @@ def log_delta_command(quoted_log_path: str, offset: int) -> str:
++
++
++def final_log_snapshot_command(quoted_log_path: str, offset: int) -> str:
++    """Read and encode one exact final byte window, or emit no success record."""
++    return (
++        f"O={offset}; "
++        'D=$(mktemp) || exit 90; E=$(mktemp) || { rm -f "$D"; exit 90; }; '
++        "trap 'rm -f \"$D\" \"$E\"' 0 1 2 15; "
++        f"S=$(wc -c < {quoted_log_path}) || exit 91; "
++        "case \"$S\" in ''|*[!0-9]*) exit 91;; esac; "
++        'if [ "$S" -lt "$O" ]; then O=0; fi; N=$((S-O)); '
++        f'dd if={quoted_log_path} bs=1 skip="$O" count="$N" of="$D" 2>/dev/null || exit 92; '
++        'R=$(wc -c < "$D") || exit 92; [ "$R" -eq "$N" ] || exit 92; '
++        'base64 -w 0 "$D" > "$E" || exit 93; '
++        'B=$(wc -c < "$E") || exit 93; X=$(((N+2)/3*4)); '
++        '[ "$B" -eq "$X" ] || exit 93; '
++        f"printf '{FINAL_LOG_SNAPSHOT_PREFIX} %s %s %s\\n' \"$S\" \"$O\" \"$N\"; "
++        'cat "$E" || exit 94'
++    )
+diff --git a/tools/process_registry.py b/tools/process_registry.py
+index e1949b6..beef282 100644
+--- a/tools/process_registry.py
++++ b/tools/process_registry.py
+@@ -6,0 +7,2 @@ Nothing runs on the host unless TERMINAL_ENV=local; other backends run in their
++import base64
++import binascii
+@@ -41 +43,5 @@ from tools.process_registry_results import load_completed_results, save_complete
+-from tools.process_registry_env_log import log_delta_command
++from tools.process_registry_env_log import (
++    FINAL_LOG_SNAPSHOT_PREFIX,
++    final_log_snapshot_command,
++    log_delta_command,
++)
+@@ -1429,0 +1436 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
++    _final_log_snapshot_command = staticmethod(final_log_snapshot_command)
+@@ -1435,0 +1443 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
++        pending_exit_code = None
+@@ -1437 +1445,2 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+-            time.sleep(2)
++            if pending_exit_code is None:
++                time.sleep(2)
+@@ -1439,6 +1448,23 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+-                # Read only the bytes written since the last poll.
+-                raw = env.execute(self._log_delta_command(q(log_path), prev_output_bytes),
+-                                  timeout=10).get("output", "")
+-                header, _, delta = raw.partition("\n")
+-                try:
+-                    size_str, offset_str = header.split()
++                if pending_exit_code is None:
++                    # Read only the bytes written since the last poll.
++                    raw = env.execute(self._log_delta_command(q(log_path), prev_output_bytes),
++                                      timeout=10).get("output", "")
++                    header, _, delta = raw.partition("\n")
++                    try:
++                        size_str, offset_str = header.split()
++                        new_size = int(size_str)
++                        used_offset = int(offset_str)
++                    except ValueError:
++                        # No usable header (command failed, shell missing a tool): skip this
++                        # poll rather than act on a half-read value.
++                        new_size = None
++                        used_offset = None
++                        delta = ""
++                else:
++                    raw = env.execute(
++                        self._final_log_snapshot_command(q(log_path), prev_output_bytes), timeout=10,
++                    ).get("output", "")
++                    header, separator, encoded = raw.partition("\n")
++                    marker, size_str, offset_str, length_str = header.split()
++                    if marker != FINAL_LOG_SNAPSHOT_PREFIX or not separator:
++                        raise ValueError("Invalid final sandbox log snapshot header")
+@@ -1447,6 +1473,18 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+-                except ValueError:
+-                    # No usable header (command failed, shell missing a tool): skip this
+-                    # poll rather than act on a half-read value.
+-                    new_size = None
+-                    used_offset = None
+-                    delta = ""
++                    byte_length = int(length_str)
++                    if (
++                        used_offset < 0
++                        or new_size < used_offset
++                        or used_offset != (0 if new_size < prev_output_bytes else prev_output_bytes)
++                        or byte_length != new_size - used_offset
++                        or len(encoded) != ((byte_length + 2) // 3) * 4
++                    ):
++                        raise ValueError("Invalid final sandbox log snapshot metadata")
++                    try:
++                        final_bytes = base64.b64decode(encoded.encode("ascii"), validate=True)
++                    except (UnicodeEncodeError, binascii.Error, ValueError) as exc:
++                        raise ValueError("Invalid final sandbox log snapshot payload") from exc
++                    if len(final_bytes) != byte_length:
++                        raise ValueError("Incomplete final sandbox log snapshot payload")
++                    # A terminal partial or invalid UTF-8 sequence is real output, not a
++                    # reason to discard an otherwise byte-complete final snapshot.
++                    delta = final_bytes.decode("utf-8", errors="replace")
+@@ -1472,0 +1511,6 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
++                if pending_exit_code is not None:
++                    # The child can finish between the previous log snapshot and
++                    # the liveness check. Publish only after draining that tail.
++                    self._finish_exited(session, pending_exit_code)
++                    return
++
+@@ -1483,2 +1527 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+-                    self._finish_exited(session, exit_code)
+-                    return
++                    pending_exit_code = exit_code
+diff --git a/tests/tools/test_process_registry.py b/tests/tools/test_process_registry.py
+index f62f7be..7fe4105 100644
+--- a/tests/tools/test_process_registry.py
++++ b/tests/tools/test_process_registry.py
+@@ -955 +955,9 @@ class TestSpawnEnvSanitization:
+-                return next(self._responses)
++                try:
++                    return next(self._responses)
++                except StopIteration:
++                    # One final log snapshot after observing child exit.
++                    assert command.startswith("O=")
++                    offset = command.split(";", 1)[0].split("=", 1)[1]
++                    return {
++                        "output": f"HERMES_FINAL_LOG_V1 {offset} {offset} 0\n"
++                    }
+@@ -994 +1002,9 @@ class TestEnvPollerIncrementalRead:
+-                return next(self._responses)
++                try:
++                    return next(self._responses)
++                except StopIteration:
++                    # One final log snapshot after observing child exit.
++                    assert command.startswith("O=")
++                    offset = command.split(";", 1)[0].split("=", 1)[1]
++                    return {
++                        "output": f"HERMES_FINAL_LOG_V1 {offset} {offset} 0\n"
++                    }
+@@ -1001,0 +1018,2 @@ class TestEnvPollerIncrementalRead:
++        assert session.completion_reason == "exited"
++        assert session.exit_code == 0
+diff --git a/tests/tools/test_process_registry_write_stdin_surrogates.py b/tests/tools/test_process_registry_write_stdin_surrogates.py
+--- a/tests/tools/test_process_registry_write_stdin_surrogates.py
++++ b/tests/tools/test_process_registry_write_stdin_surrogates.py
+@@ -3,0 +4 @@ surrogateescape content instead of crashing on the strict UTF-8 encode."""
++import sys
+@@ -22 +23 @@ def test_write_stdin_pty_surrogateescape_roundtrip(tmp_path):
+-        f"python3 {shlex.quote(str(script))}",
++        f"{shlex.quote(sys.executable)} {shlex.quote(str(script))}",
+diff --git a/tests/tools/test_process_registry_final_drain.py b/tests/tools/test_process_registry_final_drain.py
+new file mode 100644
+index 0000000..41ad224
+--- /dev/null
++++ b/tests/tools/test_process_registry_final_drain.py
+@@ -0,0 +1,191 @@
++"""Regression tests for trustworthy final sandbox log snapshots."""
++
++import base64
++import os
++import subprocess
++import sys
++import time
++from unittest.mock import patch
++
++import pytest
++
++from tools.process_registry import ProcessRegistry, ProcessSession
++from tools.process_registry_env_log import FINAL_LOG_SNAPSHOT_PREFIX
++
++
++def _snapshot(size, offset, payload):
++    encoded = base64.b64encode(payload).decode("ascii")
++    return f"{FINAL_LOG_SNAPSHOT_PREFIX} {size} {offset} {len(payload)}\n{encoded}"
++
++
++def _run_case(tmp_path, exit_code, mode, *, initial=b"HEALTH_EXIT=0\n", final=b"FINAL\n"):
++    log, pid, status = (tmp_path / name for name in ("bg.log", "bg.pid", "bg.exit"))
++    payload = tmp_path / "final.bin"
++    log.write_bytes(initial)
++    payload.write_bytes(final)
++    with log.open("ab") as out:
++        child = subprocess.Popen(
++            [
++                sys.executable,
++                "-c",
++                "import os,sys; os.read(0,1); os.write(1,open(sys.argv[1],'rb').read()); sys.exit(int(sys.argv[2]))",
++                str(payload),
++                str(exit_code),
++            ],
++            stdin=subprocess.PIPE,
++            stdout=out,
++        )
++    pid.write_text(str(child.pid))
++
++    registry = ProcessRegistry()
++    events = []
++    registry.on_output = lambda _session, chunk: events.append(("output", chunk))
++    session = ProcessSession(
++        id="proc_final_drain",
++        command="local fixture",
++        task_id="test",
++        started_at=time.time(),
++        notify_on_complete=True,
++        watch_patterns=["FINAL"],
++    )
++    registry._running[session.id] = session
++
++    class Env:
++        first = True
++
++        def execute(self, command, **_kwargs):
++            if command.startswith("O=") and not self.first:
++                if mode == "missing":
++                    log.unlink()
++                elif mode == "unreadable":
++                    log.unlink()
++                    log.mkdir()
++                elif mode == "short":
++                    return {"output": _snapshot(10, 0, b"short")}
++                elif mode == "missing_payload":
++                    return {"output": f"{FINAL_LOG_SNAPSHOT_PREFIX} 5 0 5\n"}
++                elif mode == "error_payload":
++                    return {"output": f"{FINAL_LOG_SNAPSHOT_PREFIX} 3 0 3\n!!!!"}
++                elif mode == "forward_offset":
++                    return {"output": _snapshot(20, 20, b"")}
++                elif mode == "backward_nonzero":
++                    return {"output": _snapshot(5, 2, b"xxx")}
++                elif mode == "unjustified_zero":
++                    return {"output": _snapshot(20, 0, b"x" * 20)}
++                elif mode == "backend_error":
++                    raise RuntimeError("injected transport failure")
++                elif mode == "truncated":
++                    log.write_bytes(final)
++                elif mode == "killed_before":
++                    registry._finish_exited(session, -15, reason="killed", source="test")
++                result = subprocess.run(
++                    ["bash", "-c", command], capture_output=True, text=True, timeout=10,
++                )
++                if mode == "killed_after":
++                    registry._finish_exited(session, -15, reason="killed", source="test")
++                return {"output": result.stdout, "returncode": result.returncode}
++            result = subprocess.run(
++                ["bash", "-c", command], capture_output=True, text=True, timeout=10,
++            )
++            if command.startswith("O=") and self.first:
++                self.first = False
++                child.communicate(b"!", timeout=10)
++                status.write_text(str(child.returncode) + "\n")
++            return {"output": result.stdout, "returncode": result.returncode}
++
++    try:
++        with (
++            patch("tools.process_registry.time.sleep"),
++            patch("tools.process_registry.save_completed_result"),
++            patch.object(registry, "_write_checkpoint"),
++            patch.object(registry, "_release_finished_handles"),
++        ):
++            registry._env_poller_loop(session, Env(), str(log), str(pid), str(status))
++    finally:
++        if log.exists():
++            os.chmod(log, 0o600)
++        if child.poll() is None:
++            child.kill()
++            child.wait()
++    notifications = []
++    while not registry.completion_queue.empty():
++        notifications.append(registry.completion_queue.get_nowait())
++    return session, events, notifications
++
++
++@pytest.mark.parametrize("exit_code", [0, 17, 75])
++def test_final_output_is_published_before_one_real_completion(tmp_path, exit_code):
++    session, events, notifications = _run_case(tmp_path, exit_code, "ok")
++    assert session.exit_code == exit_code
++    assert session.completion_reason == "exited"
++    assert session.output_buffer == "HEALTH_EXIT=0\nFINAL\n"
++    assert events == [("output", "HEALTH_EXIT=0\n"), ("output", "FINAL\n")]
++    assert [event["type"] for event in notifications] == ["watch_match", "completion"]
++    assert notifications[-1]["output"] == session.output_buffer
++
++
++def test_final_output_keeps_buffer_and_completion_limits(tmp_path):
++    session, _events, notifications = _run_case(
++        tmp_path, 0, "ok", initial=b"", final=b"x" * 200_005,
++    )
++    assert session.output_buffer == "x" * 200_000
++    assert [event["type"] for event in notifications] == ["completion"]
++    assert notifications[0]["output"] == "x" * 2000
++    assert notifications[0]["output_cut"] == 198_000
++
++
++@pytest.mark.parametrize(
++    "mode",
++    [
++        "missing",
++        "unreadable",
++        "short",
++        "missing_payload",
++        "error_payload",
++        "forward_offset",
++        "backward_nonzero",
++        "unjustified_zero",
++        "backend_error",
++    ],
++)
++def test_failed_final_snapshot_keeps_verified_output_and_reports_lost(tmp_path, mode):
++    session, events, notifications = _run_case(tmp_path, 17, mode)
++    assert session.exit_code == -1
++    assert session.completion_reason == "lost"
++    assert session.output_buffer == "HEALTH_EXIT=0\n"
++    assert events == [("output", "HEALTH_EXIT=0\n")]
++    assert [event["type"] for event in notifications] == ["completion"]
++    assert notifications[0]["output"] == "HEALTH_EXIT=0\n"
++
++
++@pytest.mark.parametrize(
++    ("mode", "initial", "final", "expected"),
++    [
++        ("ok", b"", b"", ""),
++        ("truncated", b"stale output", b"fresh", "fresh"),
++        ("ok", b"prefix \xf0\x9f", b"\x98\x80", "prefix 😀"),
++        ("ok", b"prefix ", b"\xf0\x9f", "prefix \ufffd"),
++        ("ok", b"prefix ", b"\xfftail", "prefix \ufffdtail"),
++    ],
++)
++def test_final_snapshot_preserves_empty_truncated_and_byte_edge_cases(
++    tmp_path, mode, initial, final, expected,
++):
++    session, _events, notifications = _run_case(
++        tmp_path, 0, mode, initial=initial, final=final,
++    )
++    assert session.exit_code == 0
++    assert session.output_buffer == expected
++    assert [event["type"] for event in notifications] == ["completion"]
++    assert notifications[0]["output"] == expected
++
++
++@pytest.mark.parametrize("mode", ["killed_before", "killed_after"])
++def test_concurrent_kill_wins_without_post_completion_mutation(tmp_path, mode):
++    session, events, notifications = _run_case(tmp_path, 75, mode)
++    assert session.exit_code == -15
++    assert session.completion_reason == "killed"
++    assert session.output_buffer == "HEALTH_EXIT=0\n"
++    assert events == [("output", "HEALTH_EXIT=0\n")]
++    assert [event["type"] for event in notifications] == ["completion"]
++    assert notifications[0]["output"] == "HEALTH_EXIT=0\n"
