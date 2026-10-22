@@ -41,7 +41,7 @@ needed.
 ### Final-output patch validation
 
 In a disposable checkout of Hermes revision
-`ff997f37768a9dcb2ca05bce4dfbe4974f2bd631`, apply
+`41dfcf2c1bd7146d4ad46aea08b7dd007900602e`, apply
 `final-output-drain.patch` with
 `git apply --unidiff-zero final-output-drain.patch`. Its regression fixture uses
 a local child process gated to finish after the first log snapshot and real

@@ -40,15 +40,15 @@ index e1949b6..beef282 100644
 +    final_log_snapshot_command,
 +    log_delta_command,
 +)
-@@ -1429,0 +1436 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+@@ -1421,0 +1428 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
 +    _final_log_snapshot_command = staticmethod(final_log_snapshot_command)
-@@ -1435,0 +1443 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+@@ -1427,0 +1435 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
 +        pending_exit_code = None
-@@ -1437 +1445,2 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+@@ -1429 +1437,2 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
 -            time.sleep(2)
 +            if pending_exit_code is None:
 +                time.sleep(2)
-@@ -1439,6 +1448,23 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+@@ -1431,6 +1440,23 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
 -                # Read only the bytes written since the last poll.
 -                raw = env.execute(self._log_delta_command(q(log_path), prev_output_bytes),
 -                                  timeout=10).get("output", "")
@@ -78,7 +78,7 @@ index e1949b6..beef282 100644
 +                    marker, size_str, offset_str, length_str = header.split()
 +                    if marker != FINAL_LOG_SNAPSHOT_PREFIX or not separator:
 +                        raise ValueError("Invalid final sandbox log snapshot header")
-@@ -1447,6 +1473,18 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+@@ -1439,6 +1465,18 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
 -                except ValueError:
 -                    # No usable header (command failed, shell missing a tool): skip this
 -                    # poll rather than act on a half-read value.
@@ -103,14 +103,14 @@ index e1949b6..beef282 100644
 +                    # A terminal partial or invalid UTF-8 sequence is real output, not a
 +                    # reason to discard an otherwise byte-complete final snapshot.
 +                    delta = final_bytes.decode("utf-8", errors="replace")
-@@ -1472,0 +1511,6 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+@@ -1464,0 +1503,6 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
 +                if pending_exit_code is not None:
 +                    # The child can finish between the previous log snapshot and
 +                    # the liveness check. Publish only after draining that tail.
 +                    self._finish_exited(session, pending_exit_code)
 +                    return
 +
-@@ -1483,2 +1527 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+@@ -1475,2 +1519 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
 -                    self._finish_exited(session, exit_code)
 -                    return
 +                    pending_exit_code = exit_code
