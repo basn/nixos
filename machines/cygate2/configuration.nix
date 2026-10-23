@@ -36,7 +36,7 @@
     };
     population = {
       enable = true;
-      timerEnable = false;
+      timerEnable = true;
       ingestUrl = "http://services.netbird.basn.se:18111";
       serverId = "am-cherno1";
       address = "91.134.31.223:27017";
