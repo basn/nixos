@@ -25,6 +25,11 @@ these live operations.
    `services.netbird.basn.se` resolves to `100.86.89.177` from `nixos-sov2`.
    Correct the repository configuration before deployment if either address
    changed.
+5. For Steam presence polling, provision the Steam Web API key directly on
+   `nixos-sov2` as `/var/lib/dayzweb-secrets/steam-api-key`, with the directory
+   owned by root mode `0700` and the non-empty file owned by root mode `0600`.
+   This separate runtime credential must never enter Git, the Nix store, logs,
+   command-line arguments, or the ingest-token secret.
 
 Until the encrypted token file exists, evaluation emits a warning, neither the
 ingest service nor worker timer is enabled, and both services have a runtime
@@ -68,8 +73,13 @@ the web service immediately.
 7. Confirm the old `dayzweb-collect` service and timer remain disabled and that
    only the services-host ingest process writes SQLite. Check that the web UI
    and collection history show the expected new successful collection.
+8. For Steam polling, verify only the key file's owner, mode, and non-empty
+   status. Run `dayzweb-steam-collector.service` once in its normal credential
+   context, then leave `dayzweb-steam-collector.timer` enabled only after that
+   succeeds. An empty shared watch list is a successful no-op and does not
+   validate the key against Steam; never add a production watch as a smoke test.
 
-Rollback must stop the new worker timer first. Restore the previous matching
+Rollback must stop the new worker timers first. Restore the previous matching
 revision on both hosts; restore the SQLite backup only while every database
 writer and the web service are stopped. Never run the old and new collectors
 at the same time.

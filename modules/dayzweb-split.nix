@@ -20,7 +20,7 @@ let
   tokenSopsFile = ../secrets/dayzweb-ingest-token.yaml;
   tokenProvisioned = builtins.pathExists tokenSopsFile;
   tokenCredentialPath = "/run/secrets/dayzweb-ingest-token";
-  anyEnabled = cfg.ingest.enable || cfg.worker.enable || cfg.population.enable;
+  anyEnabled = cfg.ingest.enable || cfg.worker.enable || cfg.population.enable || cfg.steam.enable;
   hardening = {
     CapabilityBoundingSet = "";
     DevicePolicy = "closed";
@@ -147,6 +147,29 @@ in
         description = "SOPS-provisioned runtime token path outside the Nix store.";
       };
     };
+    steam = {
+      enable = lib.mkEnableOption "the independent shared Steam presence monitor";
+      timerEnable = lib.mkEnableOption "the persistent DayZWeb Steam presence timer";
+      ingestUrl = lib.mkOption {
+        type = lib.types.str;
+        description = "NetBird URL of the services ingest API.";
+      };
+      intervalSeconds = lib.mkOption {
+        type = lib.types.ints.between 120 300;
+        default = 120;
+        description = "Steam presence sampling interval.";
+      };
+      tokenCredentialPath = lib.mkOption {
+        type = lib.types.strMatching "^/.*";
+        default = tokenCredentialPath;
+        readOnly = true;
+        description = "SOPS-provisioned runtime ingest-token path outside the Nix store.";
+      };
+      apiKeyCredentialPath = lib.mkOption {
+        type = lib.types.strMatching "^/.*";
+        description = "Root-managed runtime Steam API key path outside the Nix store.";
+      };
+    };
   };
 
   config = lib.mkMerge [
@@ -176,7 +199,8 @@ in
           restartUnits =
             lib.optionals cfg.ingest.enable [ "dayzweb-ingest.service" ]
             ++ lib.optionals cfg.worker.enable [ "dayzweb-collector.service" ]
-            ++ lib.optionals cfg.population.enable [ "dayzweb-population-collector.service" ];
+            ++ lib.optionals cfg.population.enable [ "dayzweb-population-collector.service" ]
+            ++ lib.optionals cfg.steam.enable [ "dayzweb-steam-collector.service" ];
         };
       };
     })
@@ -308,6 +332,53 @@ in
           OnUnitActiveSec = "${toString cfg.population.intervalSeconds}s";
           Persistent = true;
           Unit = "dayzweb-population-collector.service";
+        };
+      };
+    })
+
+    (lib.mkIf cfg.steam.enable {
+      systemd.services.dayzweb-steam-collector = {
+        description = "DayZWeb shared Steam presence sample";
+        after = [ "network-online.target" ] ++ cfg.netbirdUnits;
+        wants = [ "network-online.target" ];
+        requires = cfg.netbirdUnits;
+        environment = {
+          DAYZWEB_INGEST_URL = cfg.steam.ingestUrl;
+          DAYZWEB_STEAM_INTERVAL_SECONDS = toString cfg.steam.intervalSeconds;
+          PYTHONPATH = cfg.sourcePath;
+        };
+        unitConfig.ConditionPathExists = [
+          "${cfg.sourcePath}/app/steam_collector.py"
+          cfg.steam.tokenCredentialPath
+          cfg.steam.apiKeyCredentialPath
+        ];
+        serviceConfig = hardening // {
+          Type = "oneshot";
+          User = cfg.user;
+          Group = cfg.user;
+          WorkingDirectory = cfg.sourcePath;
+          ExecStart = lib.escapeShellArgs [
+            "${python}/bin/python"
+            "-m"
+            "app.steam_collector"
+            "--once"
+          ];
+          LoadCredential = [
+            "ingest-token:${cfg.steam.tokenCredentialPath}"
+            "steam-api-key:${cfg.steam.apiKeyCredentialPath}"
+          ];
+          ReadOnlyPaths = [ cfg.sourcePath ];
+          TimeoutStartSec = "45s";
+        };
+      };
+
+      systemd.timers.dayzweb-steam-collector = {
+        wantedBy = lib.optionals (tokenProvisioned && cfg.steam.timerEnable) [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "2min";
+          OnUnitActiveSec = "${toString cfg.steam.intervalSeconds}s";
+          Persistent = true;
+          Unit = "dayzweb-steam-collector.service";
         };
       };
     })

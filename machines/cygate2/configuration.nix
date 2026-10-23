@@ -42,6 +42,13 @@
       address = "91.134.31.223:27017";
       intervalSeconds = 120;
     };
+    steam = {
+      enable = true;
+      timerEnable = true;
+      ingestUrl = "http://services.netbird.basn.se:18111";
+      apiKeyCredentialPath = "/var/lib/dayzweb-secrets/steam-api-key";
+      intervalSeconds = 120;
+    };
   };
 
   boot = {

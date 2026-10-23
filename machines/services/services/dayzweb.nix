@@ -20,6 +20,8 @@ let
     DAYZWEB_SERVER_ID = "1ed9f69d-4ee3-6dac-b18b-ea5e938a80e2";
     DAYZWEB_ADMIN_USERNAME = "basn";
     DAYZWEB_TIMEZONE = "Europe/Stockholm";
+    DAYZWEB_PUBLIC_ORIGIN = "https://dayz.basn.se";
+    DAYZWEB_STEAM_WATCH_ENABLED = "true";
   };
 in
 {
