@@ -34,6 +34,14 @@
       serverId = "1ed9f69d-4ee3-6dac-b18b-ea5e938a80e2";
       detailConcurrency = 8;
     };
+    population = {
+      enable = true;
+      timerEnable = false;
+      ingestUrl = "http://services.netbird.basn.se:18111";
+      serverId = "am-cherno1";
+      address = "91.134.31.223:27017";
+      intervalSeconds = 120;
+    };
   };
 
   boot = {

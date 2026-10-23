@@ -15,6 +15,7 @@ let
     ]
   );
   environment = {
+    DAYZWEB_ARCHIVE_CATALOG = "/var/lib/dayzweb/published-archives/catalog.json";
     DAYZWEB_DATABASE = "/var/lib/dayzweb/dayzweb.sqlite3";
     DAYZWEB_SERVER_ID = "1ed9f69d-4ee3-6dac-b18b-ea5e938a80e2";
     DAYZWEB_ADMIN_USERNAME = "basn";

@@ -20,7 +20,7 @@ let
   tokenSopsFile = ../secrets/dayzweb-ingest-token.yaml;
   tokenProvisioned = builtins.pathExists tokenSopsFile;
   tokenCredentialPath = "/run/secrets/dayzweb-ingest-token";
-  anyEnabled = cfg.ingest.enable || cfg.worker.enable;
+  anyEnabled = cfg.ingest.enable || cfg.worker.enable || cfg.population.enable;
   hardening = {
     CapabilityBoundingSet = "";
     DevicePolicy = "closed";
@@ -118,6 +118,35 @@ in
         description = "Worker startup timeout.";
       };
     };
+    population = {
+      enable = lib.mkEnableOption "the independent AM-Cherno1 population monitor";
+      timerEnable = lib.mkEnableOption "the persistent DayZWeb population timer";
+      ingestUrl = lib.mkOption {
+        type = lib.types.str;
+        description = "NetBird URL of the services ingest API.";
+      };
+      serverId = lib.mkOption {
+        type = lib.types.str;
+        default = "am-cherno1";
+        description = "Population identity accepted by the ingest API.";
+      };
+      address = lib.mkOption {
+        type = lib.types.str;
+        default = "91.134.31.223:27017";
+        description = "DayZ query host and port.";
+      };
+      intervalSeconds = lib.mkOption {
+        type = lib.types.ints.between 60 300;
+        default = 120;
+        description = "Population sampling interval.";
+      };
+      tokenCredentialPath = lib.mkOption {
+        type = lib.types.strMatching "^/.*";
+        default = tokenCredentialPath;
+        readOnly = true;
+        description = "SOPS-provisioned runtime token path outside the Nix store.";
+      };
+    };
   };
 
   config = lib.mkMerge [
@@ -146,7 +175,8 @@ in
           mode = "0400";
           restartUnits =
             lib.optionals cfg.ingest.enable [ "dayzweb-ingest.service" ]
-            ++ lib.optionals cfg.worker.enable [ "dayzweb-collector.service" ];
+            ++ lib.optionals cfg.worker.enable [ "dayzweb-collector.service" ]
+            ++ lib.optionals cfg.population.enable [ "dayzweb-population-collector.service" ];
         };
       };
     })
@@ -160,6 +190,7 @@ in
         requires = cfg.netbirdUnits;
         environment = {
           DAYZWEB_DATABASE = cfg.ingest.database;
+          DAYZWEB_POPULATION_SERVER_ID = cfg.population.serverId;
           PYTHONPATH = cfg.sourcePath;
         };
         unitConfig = {
@@ -233,6 +264,50 @@ in
           OnCalendar = cfg.worker.onCalendar;
           Persistent = true;
           Unit = "dayzweb-collector.service";
+        };
+      };
+    })
+
+    (lib.mkIf cfg.population.enable {
+      systemd.services.dayzweb-population-collector = {
+        description = "DayZWeb AM-Cherno1 population sample";
+        after = [ "network-online.target" ] ++ cfg.netbirdUnits;
+        wants = [ "network-online.target" ];
+        requires = cfg.netbirdUnits;
+        environment = {
+          DAYZWEB_INGEST_URL = cfg.population.ingestUrl;
+          DAYZWEB_POPULATION_SERVER_ID = cfg.population.serverId;
+          DAYZWEB_POPULATION_ADDRESS = cfg.population.address;
+          PYTHONPATH = cfg.sourcePath;
+        };
+        unitConfig.ConditionPathExists = [
+          "${cfg.sourcePath}/app/population_collector.py"
+          cfg.population.tokenCredentialPath
+        ];
+        serviceConfig = hardening // {
+          Type = "oneshot";
+          User = cfg.user;
+          Group = cfg.user;
+          WorkingDirectory = cfg.sourcePath;
+          ExecStart = lib.escapeShellArgs [
+            "${python}/bin/python"
+            "-m"
+            "app.population_collector"
+            "--once"
+          ];
+          LoadCredential = "ingest-token:${cfg.population.tokenCredentialPath}";
+          ReadOnlyPaths = [ cfg.sourcePath ];
+          TimeoutStartSec = "90s";
+        };
+      };
+
+      systemd.timers.dayzweb-population-collector = {
+        wantedBy = lib.optionals (tokenProvisioned && cfg.population.timerEnable) [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "2min";
+          OnUnitActiveSec = "${toString cfg.population.intervalSeconds}s";
+          Persistent = true;
+          Unit = "dayzweb-population-collector.service";
         };
       };
     })
