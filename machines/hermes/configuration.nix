@@ -53,10 +53,10 @@ let
     inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override
       {
         extraDependencyGroups = [ "firecrawl" ];
-        # The plugin catalog requires >=0.21.5, and this revision descends from
-        # v2026.9.24 (0.21.5) but is stamped 0.0.0. Remove this override once the
-        # upstream Nix package reports a compatible version itself.
-        version = "0.21.5";
+        # This revision descends from v0.22.5 but the upstream Nix package still
+        # defaults to 0.0.0. Remove this override once upstream derives the
+        # package version from its release metadata.
+        version = "0.22.5";
       };
   # The outer package references a separately sealed uv2nix environment, so
   # outer derivation patches alone do not change imported Python. The overlay

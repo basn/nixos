@@ -31,19 +31,17 @@ Flake output: `hermes`.
   `tools/process_registry_env_log.py` overlays once the pinned input contains an
   equivalent trustworthy final snapshot and passes the bundled regressions.
 
-Both patches apply to the exact locked Hermes source. The existing package
+Both patches apply to the locked Hermes source. The existing package
 wrapper extends the sealed `hermes_cli` and `tools` package paths with only the
 patched modules; replacing the outer derivation's `src` or `patches` alone would
 not change its separately built uv2nix environment. Other modules and their
-path-relative resources stay in that environment. No flake input update is
-needed.
+path-relative resources stay in that environment.
 
-### Final-output patch validation
+### Local patch validation
 
 In a disposable checkout of Hermes revision
-`41dfcf2c1bd7146d4ad46aea08b7dd007900602e`, apply
-`final-output-drain.patch` with
-`git apply --unidiff-zero final-output-drain.patch`. Its regression fixture uses
+`bac34e9e9946c9c6a9ce7ce64efadd47f8fa375b`, apply both patches with
+`git apply --unidiff-zero`. The final-output regression fixture uses
 a local child process gated to finish after the first log snapshot and real
 completion publication. It covers exit codes 0, 17 and 75; missing, unreadable,
 short and malformed snapshots; empty and truncated logs; split, incomplete and
@@ -55,7 +53,10 @@ the hermetic test PATH and make a bare `python3` unavailable.
 With Hermes test dependencies installed, run:
 
 ```sh
-scripts/run_tests.sh tests/tools/test_process_registry*.py tests/tools/test_notify_on_complete.py
+scripts/run_tests.sh \
+  tests/tools/test_process_registry*.py \
+  tests/tools/test_notify_on_complete.py \
+  tests/hermes_cli/test_left_core_migration.py
 ```
 
 Validate the actual Nix package and affected host separately (from this NixOS
