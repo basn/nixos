@@ -30,9 +30,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-cachyos-kernel = {
-      # Temporary candidate with the LLD fix and a modules.cer-producing builder.
-      # Remove once a newer revision retains both fixes and battlestation builds.
-      url = "github:xddxdd/nix-cachyos-kernel/be0be288549209421ab4f67c392a23109cb809a3";
+      url = "github:xddxdd/nix-cachyos-kernel";
     };
     hermes-agent = {
       url = "github:NousResearch/hermes-agent";
