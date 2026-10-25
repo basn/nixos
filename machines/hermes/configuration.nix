@@ -70,6 +70,11 @@ let
       inherit patchedHermesSource;
     };
   });
+  # nixpkgs mcp-nixos is currently broken by its FastMCP/MCP dependency set.
+  # Remove this upstream package pin once nixpkgs PR #563493 is merged and the
+  # nixpkgs package builds again with a compatible FastMCP 4 / MCP 2 stack:
+  # https://github.com/NixOS/nixpkgs/pull/563493
+  mcpNixos = inputs.mcp-nixos.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in
 {
   imports = [ ../../modules/hermes-audit.nix ];
@@ -236,7 +241,7 @@ in
         pkgs.chromium
         pkgs.docker
         pkgs.jq
-        pkgs."mcp-nixos"
+        mcpNixos
       ];
       environment = {
         AGENT_BROWSER_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
@@ -356,7 +361,7 @@ in
           destructive_slash_confirm = true;
         };
         mcp_servers.nixos = {
-          command = "${pkgs."mcp-nixos"}/bin/mcp-nixos";
+          command = "${mcpNixos}/bin/mcp-nixos";
           timeout = 120;
           connect_timeout = 60;
         };

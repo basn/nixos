@@ -36,6 +36,9 @@
       url = "github:NousResearch/hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    mcp-nixos = {
+      url = "github:utensils/mcp-nixos/v3.1.0";
+    };
   };
   outputs =
     inputs@{ self, ... }:
