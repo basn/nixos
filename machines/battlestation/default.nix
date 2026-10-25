@@ -37,7 +37,6 @@
       shrinkerEnabled = true;
     };
     initrd = {
-      verbose = false;
       availableKernelModules = [
         "vmd"
         "xhci_pci"
