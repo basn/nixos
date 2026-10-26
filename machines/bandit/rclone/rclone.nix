@@ -232,6 +232,7 @@ in
     unitConfig.RequiresMountsFor = [ cacheDir ];
 
     serviceConfig = {
+      Type = "notify";
       ExecStart = ''
         ${pkgs.rclone}/bin/rclone mount \
           --log-file=${logFile} \

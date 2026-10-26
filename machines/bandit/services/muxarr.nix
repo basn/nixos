@@ -36,6 +36,7 @@ in
   systemd.services.podman-muxarr = {
     requires = [ "rclone.service" ];
     after = [ "rclone.service" ];
+    partOf = [ "rclone.service" ];
     bindsTo = [
       "data-files.mount"
       "rclone.service"

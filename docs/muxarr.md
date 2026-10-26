@@ -27,22 +27,31 @@ mount and `rclone.service`. Before every container start it verifies that
 `encrypted:/files/` `fuse.rclone` mount. A failed check prevents that startup
 attempt.
 
-The container unit is ordered after and requires `rclone.service`, and is bound
-to both rclone and the `/data/files` mount unit. These relationships stop Muxarr
-when rclone exits or the ZFS mount unit disappears. There is deliberately no
-continuous mount supervisor: if the Telia FUSE mount detaches while rclone stays
-active, systemd cannot infer that from the rclone service state and Muxarr may
-remain attached to the old mount.
+The container unit is ordered after and requires `rclone.service`, is part of
+rclone, and is bound to both rclone and the `/data/files` mount unit. An explicit
+`systemctl restart rclone.service` therefore stops Muxarr before rclone unmounts,
+then starts a fresh container after rclone reports that the replacement mount is
+ready. These relationships also stop Muxarr when rclone exits or the ZFS mount
+unit disappears.
 
-After `/mnt/telia` is remounted, manually restart `podman-muxarr.service` so
-Podman creates a new container with a fresh bind mount. Confirm the expected
-mount first; a live restart and mount inspection require explicit operational
-authorization and are not performed by this repository change.
+This does not automatically reactivate Muxarr after an unexpected rclone crash
+and automatic rclone recovery, or after separate `stop` and `start` commands.
+It also does not detect an active but hung rclone process or a Telia FUSE mount
+that detaches while rclone remains active. In those cases Muxarr may remain
+stopped or attached to the old mount. After confirming that rclone is active and
+`/mnt/telia` has the expected identity, manually restart Muxarr:
 
 ```sh
+systemctl is-active rclone.service
 findmnt --mountpoint /mnt/telia --types fuse.rclone --source encrypted:/files/
 sudo systemctl restart podman-muxarr.service
 ```
+
+A live restart and mount inspection require explicit operational authorization
+and are not performed by this repository change. Stopping the container for an
+rclone restart can interrupt an active conversion or upload; inspect Muxarr's
+queue and output before retrying work, because partial work may need manual
+recovery.
 
 The startup checks and Podman's bind-mount creation are not atomic. A mount can
 change after the checks or while Podman performs work such as an image pull.
