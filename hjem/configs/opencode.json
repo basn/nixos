@@ -125,7 +125,9 @@
       "command": [
         "nix",
         "run",
-        "nixpkgs#ha-mcp",
+        "--inputs-from",
+        "/home/basn/nixos",
+        "nixpkgs-unstable-small#ha-mcp",
         "--"
       ],
       "environment": {
@@ -162,7 +164,9 @@
       "command": [
         "nix",
         "run",
-        "nixpkgs#mcp-nixos",
+        "--inputs-from",
+        "/home/basn/nixos",
+        "nixpkgs-unstable-small#mcp-nixos",
         "--"
       ]
     },
