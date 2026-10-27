@@ -104,7 +104,7 @@
     ];
   };
   nix.settings = {
-    max-jobs = 1;
+    max-jobs = 8;
     cores = 28;
   };
   systemd.services.nix-daemon.serviceConfig = {

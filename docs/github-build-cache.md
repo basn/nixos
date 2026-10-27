@@ -29,9 +29,10 @@ machines over SSH and never activates a NixOS configuration.
    system derivation. If no host derivation changed, the matrix job is skipped
    before matrix expansion.
 6. The runner builds each selected machine's
-   `config.system.build.toplevel` serially with one Nix job. Outputs already in
-   the Nix store or Attic cache avoid rebuilding as usual. The runner's Nix
-   daemon defaults each job to 28 cores and has a matching `2800%` CPU quota.
+   `config.system.build.toplevel` one host at a time, with up to eight concurrent
+   Nix build jobs. Outputs already in the Nix store or Attic cache avoid
+   rebuilding as usual. The runner's Nix daemon still defaults each job to 28
+   cores; concurrent jobs share its `2800%` CPU quota and existing memory limits.
 7. After each successful build, `attic push nixos <output>` uploads the full
    output closure to `https://attic.basn.se/`. Attic's normal closure upload
    behavior skips paths already present in the cache.
