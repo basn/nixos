@@ -22,6 +22,18 @@ in [`../../docs/pinepods.md`](../../docs/pinepods.md).
 The Muxarr public ingress and manual Authentik prerequisites are documented in
 [`../../docs/muxarr.md`](../../docs/muxarr.md).
 
+Network Optimizer and its companion speed-test image are pinned to 2.10.2. The
+[upstream release notes](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.10.2)
+document its fixes and the accepted rolling license change date: each release
+converts to Apache 2.0 three years after publication.
+
+## Container upgrade backups
+
+`tank/docker`, including the persisted Authentik and network optimizer state,
+is not covered by the configured ZnapZend datasets. Before deploying an image
+upgrade for either service, create and verify a recoverable backup of its
+persisted state. Repository image-pin changes do not perform that live backup.
+
 ```sh
 nix build .#nixosConfigurations.services.config.system.build.toplevel --no-link
 ```

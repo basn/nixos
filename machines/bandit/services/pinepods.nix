@@ -8,7 +8,7 @@ let
   networkName = "pinepods";
   pinepodsImage = "docker.io/madeofpendletonwool/pinepods:0.9.0@sha256:ebc258bb0c62cdb69e5fb726b247c885dac19b50d06fed68fa8d37197b88ace4";
   postgresImage = "docker.io/library/postgres:18.6-alpine@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873";
-  valkeyImage = "docker.io/valkey/valkey:8.1.10-alpine@sha256:081c2f5cb575efc901aa80ff9cdbd1ec6a301682fd35e1ebb4b0990a4a4a8507";
+  valkeyImage = "docker.io/valkey/valkey:8.1.11-alpine@sha256:2602ace2be6569bc2bbb06f873776516ab9089821525be34f4305c67eb9db02a";
 
   # The official image sources non-executable init scripts, so use its /bin/sh
   # and psql instead of referring to executables in the host Nix store.

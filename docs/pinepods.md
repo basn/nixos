@@ -1,19 +1,20 @@
 # PinePods
 
 PinePods 0.9.0 runs on `bandit` as three rootful Podman containers: PinePods,
-PostgreSQL 18.6, and non-persistent Valkey 8.1.10. The images are version and
+PostgreSQL 18.6, and non-persistent Valkey 8.1.11. The images are version and
 multi-architecture manifest digest pinned in
 `machines/bandit/services/pinepods.nix`. PostgreSQL and Valkey are on the
 private `pinepods` Podman network and publish no host ports.
 
-The PostgreSQL and Valkey pins were refreshed on 2026-09-24 from the official
-[PostgreSQL](https://hub.docker.com/_/postgres) and
-[Valkey](https://hub.docker.com/r/valkey/valkey) Docker Hub repositories. The
-selected tags were published on 2026-09-21 and are the newest stable patch tags
-in the requested PostgreSQL 18 and Valkey 8.1 lines; moving from 18.0 to 18.6 and
-8.1.3 to 8.1.10 takes accumulated fixes without changing a major or minor line.
-The digest pins the multi-architecture manifest while retaining the readable
-tag. PinePods remains at the requested 0.9.0 release.
+The PostgreSQL pin was refreshed on 2026-09-24 from the official
+[PostgreSQL](https://hub.docker.com/_/postgres) Docker Hub repository. The
+Valkey pin was refreshed on 2026-10-27 from the official
+[Valkey](https://hub.docker.com/r/valkey/valkey) repository. Valkey 8.1.11 is a
+security update that also contains standalone-relevant crash and correctness
+fixes. Its cluster Pub/Sub overflow advisory, GHSA-f4q9-j22m-xqq9, does not
+apply to this standalone configuration. The digest pins the multi-architecture
+manifest while retaining the readable tag. PinePods remains at the requested
+0.9.0 release.
 
 Public HTTPS terminates on the `services` host at `https://pods.basn.se` and is
 proxied to Bandit's port 80. Bandit's nginx only accepts that virtual host from

@@ -53,7 +53,7 @@ in
       };
 
       authentik-redis = {
-        image = "docker.io/library/redis:7.4.11-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499";
+        image = "docker.io/library/redis:7.4.12-alpine@sha256:338fbfc036dc5517ac0b04d6de21521085935336e565f223406180e9d84166e2";
         networks = [ "authentik" ];
         cmd = [
           "redis-server"
