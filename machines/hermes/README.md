@@ -39,8 +39,9 @@ path-relative resources stay in that environment.
 
 ### Local patch validation
 
-In a disposable checkout of Hermes revision
-`bac34e9e9946c9c6a9ce7ce64efadd47f8fa375b`, apply both patches with
+In a disposable checkout of the unreleased Hermes canary revision
+`085f562af53a6fedadac3681e2c498fc71316132` (a descendant of stable `v0.22.5`),
+apply both patches with
 `git apply --unidiff-zero`. The final-output regression fixture uses
 a local child process gated to finish after the first log snapshot and real
 completion publication. It covers exit codes 0, 17 and 75; missing, unreadable,
@@ -81,11 +82,11 @@ planning likewise inherit the active main route. The default MoA preset keeps
 its own cloud routes.
 
 Approval, compression, curator, Skills Hub, title generation, and web extraction
-are declared on `openai-codex:gpt-5.6-luna`. At the locked Hermes revision,
+are declared on `openai-codex:gpt-6-luna`. At the locked Hermes revision,
 `web_extract` no longer uses an auxiliary LLM, so that historical route is
 ignored. Vision has no auxiliary override and inherits the active main route.
 
-The top-level fallback route is `openai-codex:gpt-5.6-sol`. Hermes invokes it
+The top-level fallback route is `openai-codex:gpt-6.1-sol`. Hermes invokes it
 only after supported primary-route errors such as exhausted retries, server or
 connection failures, or authentication failures. It is availability fallback,
 not a quality escalation, and it is turn-scoped according to Hermes's fallback

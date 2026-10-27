@@ -53,9 +53,9 @@ let
     inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override
       {
         extraDependencyGroups = [ "firecrawl" ];
-        # This revision descends from v0.22.5 but the upstream Nix package still
-        # defaults to 0.0.0. Remove this override once upstream derives the
-        # package version from its release metadata.
+        # This unreleased canary revision descends from v0.22.5, but the upstream
+        # Nix package still defaults to 0.0.0. Keep the stable base version until
+        # upstream publishes newer release metadata and derives the package version.
         version = "0.22.5";
       };
   # The outer package references a separately sealed uv2nix environment, so
@@ -259,34 +259,34 @@ in
         fallback_providers = [
           {
             provider = "openai-codex";
-            model = "gpt-5.6-sol";
+            model = "gpt-6.1-sol";
           }
         ];
         plugins.enabled = [ "homeassistant" ];
         auxiliary = {
           approval = {
             provider = "openai-codex";
-            model = "gpt-5.6-luna";
+            model = "gpt-6-luna";
           };
           compression = {
             provider = "openai-codex";
-            model = "gpt-5.6-luna";
+            model = "gpt-6-luna";
           };
           curator = {
             provider = "openai-codex";
-            model = "gpt-5.6-luna";
+            model = "gpt-6-luna";
           };
           skills_hub = {
             provider = "openai-codex";
-            model = "gpt-5.6-luna";
+            model = "gpt-6-luna";
           };
           title_generation = {
             provider = "openai-codex";
-            model = "gpt-5.6-luna";
+            model = "gpt-6-luna";
           };
           web_extract = {
             provider = "openai-codex";
-            model = "gpt-5.6-luna";
+            model = "gpt-6-luna";
           };
         };
         timezone = "Europe/Stockholm";

@@ -1,8 +1,8 @@
 diff --git a/hermes_cli/left_core_migration.py b/hermes_cli/left_core_migration.py
-index 9525fc7d74..cc719cf14f 100644
+index aed2418592..5e50058cd9 100644
 --- a/hermes_cli/left_core_migration.py
 +++ b/hermes_cli/left_core_migration.py
-@@ -424,2 +424,7 @@ def plugin_present(plugin: str, home: Path) -> bool:
+@@ -793,2 +793,7 @@ def plugin_present(plugin: str, home: Path) -> bool:
 -    """Installed in *home* (enabled or not: a user who disabled it chose to). Read-only."""
 -    return (home / "plugins" / plugin).is_dir()
 +    """Installed in *home* under its discovery identity (enabled or not: a user who disabled it chose to).
@@ -13,10 +13,10 @@ index 9525fc7d74..cc719cf14f 100644
 +    return any(plugin in {manifest_key(manifest), manifest.name}
 +               for manifest in scan_directory(home / "plugins", "user"))
 diff --git a/tests/hermes_cli/test_left_core_migration.py b/tests/hermes_cli/test_left_core_migration.py
-index c5a83cc0e8..579dd7c871 100644
+index 170e2d9df4..eae2ffbb16 100644
 --- a/tests/hermes_cli/test_left_core_migration.py
 +++ b/tests/hermes_cli/test_left_core_migration.py
-@@ -35,0 +36,7 @@ def _home(tmp_path: Path, name: str = "home", *, env: str = "", config: str = "") -> Path:
+@@ -34,0 +35,7 @@ def _home(tmp_path: Path, name: str = "home", *, env: str = "", config: str = "") -> Path:
 +def _directory_plugin(path: Path, *, name: str = "homeassistant", manifest: str | None = None) -> Path:
 +    path.mkdir(parents=True)
 +    (path / "plugin.yaml").write_text(
@@ -24,10 +24,10 @@ index c5a83cc0e8..579dd7c871 100644
 +    return path
 +
 +
-@@ -116 +123 @@ def test_migrate_home_installs_the_catalog_plugin_once(tmp_path):
+@@ -115 +122 @@ def test_migrate_home_installs_the_catalog_plugin_once(tmp_path):
 -        (home / "plugins" / name).mkdir(parents=True)
 +        _directory_plugin(home / "plugins" / name)
-@@ -158,0 +166,21 @@ def test_home_without_homeassistant_gets_nothing_and_no_notice(tmp_path):
+@@ -157,0 +165,21 @@ def test_home_without_homeassistant_gets_nothing_and_no_notice(tmp_path):
 +@pytest.mark.parametrize("directory", ["homeassistant", "nix-managed-homeassistant"])
 +def test_plugin_present_uses_manifest_identity_not_directory_name(tmp_path, directory):
 +    home = _home(tmp_path)
@@ -49,13 +49,13 @@ index c5a83cc0e8..579dd7c871 100644
 +    assert lcm.plugin_present("homeassistant", home) is False
 +
 +
-@@ -160,2 +188,3 @@ def test_a_disabled_or_present_plugin_is_left_alone(tmp_path):
+@@ -159,2 +187,3 @@ def test_a_disabled_or_present_plugin_is_left_alone(tmp_path):
 -    home = _home(tmp_path, env="HASS_TOKEN=abc\n")
 -    (home / "plugins" / "homeassistant").mkdir(parents=True)
 +    home = _home(tmp_path, env="HASS_TOKEN=abc\n", config=(
 +        "plugins:\n  disabled: [homeassistant]\n"))
 +    _directory_plugin(home / "plugins" / "homeassistant")
-@@ -164,0 +194,16 @@ def test_a_disabled_or_present_plugin_is_left_alone(tmp_path):
+@@ -163,0 +193,16 @@ def test_a_disabled_or_present_plugin_is_left_alone(tmp_path):
 +def test_nix_managed_plugin_records_install_with_lazy_installs_off(tmp_path, monkeypatch):
 +    home = _home(tmp_path, env="HASS_TOKEN=abc\n", config="toolsets: [homeassistant]\n")
 +    source = _directory_plugin(tmp_path / "plugin-source")
@@ -72,15 +72,15 @@ index c5a83cc0e8..579dd7c871 100644
 +    assert lcm._read_config(home)["_left_core_installed"] == ["homeassistant"]
 +
 +
-@@ -171 +216 @@ def test_a_preinstalled_plugin_gets_the_scope_conversion_once(tmp_path):
+@@ -170 +215 @@ def test_a_preinstalled_plugin_gets_the_scope_conversion_once(tmp_path):
 -    (home / "plugins" / "homeassistant").mkdir(parents=True)
 +    _directory_plugin(home / "plugins" / "homeassistant")
-@@ -266 +311 @@ def test_the_migration_installs_once_so_a_removal_sticks(tmp_path, monkeypatch):
+@@ -292 +337 @@ def test_the_migration_installs_once_so_a_removal_sticks(tmp_path, monkeypatch):
 -        plugin.mkdir(parents=True)
 +        _directory_plugin(plugin)
-@@ -376 +421 @@ def test_old_spotify_commands_point_at_the_plugin(tmp_path, monkeypatch):
+@@ -402 +447 @@ def test_old_spotify_commands_point_at_the_plugin(tmp_path, monkeypatch):
 -    (home / "plugins" / "spotify").mkdir(parents=True)  # installed but disabled
 +    _directory_plugin(home / "plugins" / "spotify", name="spotify")  # installed but disabled
-@@ -397 +442 @@ def test_old_mcp_serve_spelling_names_the_plugin_command(tmp_path, monkeypatch,
+@@ -423 +468 @@ def test_old_mcp_serve_spelling_names_the_plugin_command(tmp_path, monkeypatch,
 -    (home / "plugins" / "mcp-serve").mkdir(parents=True)
 +    _directory_plugin(home / "plugins" / "mcp-serve", name="mcp-serve")
