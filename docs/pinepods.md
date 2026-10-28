@@ -23,6 +23,29 @@ OIDC; this virtual host does not use Authentik forward auth. The trusted Bandit
 hop preserves the client and original HTTPS forwarding headers normalized by
 the public ingress rather than replacing the scheme with its local HTTP hop.
 
+## Startup healthchecks
+
+Podman runs the image's `/api/health` probe immediately on container startup.
+With Podman 5.8.8 and 5.8.9, a failed probe during the image's startup grace
+period still fails its transient systemd unit, even while container health
+remains `starting`. Both an automatic upgrade and a manual activation on
+2026-10-28 returned status 4 for this reason; PinePods became healthy on the
+next probe. A healthy container later does not mean the activation succeeded.
+
+Bandit overrides PinePods' health command and timeout. Each check retries
+the same endpoint up to 31 times, with a two-second request limit and two-second
+pauses between failures. Even immediate connection failures get a retry at
+60 seconds. The worst case is 122 seconds, within a 135-second outer timeout.
+Successful readiness returns immediately; persistent failure still returns
+nonzero. The image's health interval, startup grace, and unhealthy retry count
+are explicitly preserved because a command override resets Podman's defaults.
+Ongoing failure detection can therefore take longer than
+with the original five-second probe timeout. Database and Valkey readiness
+checks remain separate and unchanged.
+
+Remove this workaround once Podman no longer reports startup-grace probe
+failures as failed systemd units, after verifying a cold start and activation.
+
 ## Deployment prerequisites
 
 Do not push or deploy the enabled configuration until all prerequisites are

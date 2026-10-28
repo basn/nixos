@@ -10,6 +10,26 @@ let
   postgresImage = "docker.io/library/postgres:18.6-alpine@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873";
   valkeyImage = "docker.io/valkey/valkey:8.1.11-alpine@sha256:2602ace2be6569bc2bbb06f873776516ab9089821525be34f4305c67eb9db02a";
 
+  # Work around Podman's immediate healthcheck failing its transient systemd
+  # unit during startup, causing NixOS activation to fail despite the image's
+  # startup grace period. Remove when Podman no longer reports grace-period
+  # probe failures as failed systemd units. Keep the image's /api/health probe.
+  # Even immediate failures get 60s of retries. Worst case is 31 * 2s requests
+  # + 30 * 2s sleeps = 122s, below the 135s timeout.
+  pinepodsHealthcheck = ''
+    attempt=1
+    while [ "$attempt" -le 31 ]; do
+      if curl -fsS --connect-timeout 1 --max-time 2 http://localhost:8040/api/health; then
+        exit 0
+      fi
+      if [ "$attempt" -lt 31 ]; then
+        sleep 2
+      fi
+      attempt=$((attempt + 1))
+    done
+    exit 1
+  '';
+
   # The official image sources non-executable init scripts, so use its /bin/sh
   # and psql instead of referring to executables in the host Nix store.
   postgresInit = pkgs.writeText "pinepods-postgres-init.sh" ''
@@ -98,6 +118,14 @@ in
 
         pinepods = {
           image = pinepodsImage;
+          extraOptions = [
+            "--health-cmd=${pinepodsHealthcheck}"
+            "--health-timeout=135s"
+            # Overriding the command resets image healthcheck defaults in Podman.
+            "--health-interval=30s"
+            "--health-start-period=30s"
+            "--health-retries=3"
+          ];
           networks = [ networkName ];
           dependsOn = [
             "pinepods-postgres"
