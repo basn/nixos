@@ -5,7 +5,7 @@ position = [0, 0]
 scale = 1.0
 vrr = "always"
 tearing = true
-workspaces = 9
+workspaces = "dynamic"
 
 [output.DP-2]
 enabled = true
@@ -14,4 +14,8 @@ position = [2560, 0]
 scale = 1.0
 vrr = "always"
 tearing = true
-workspaces = 9
+workspaces = "dynamic"
+
+[[workspace]]
+name = "discord"
+output = "DP-2"

@@ -15,6 +15,20 @@
 
   programs.umbriel.enable = true;
 
+  hjem.users.basn.files.".config/noctalia/workspaces.toml".text = ''
+    [widget.workspaces]
+    type = "taskbar"
+    group_by_workspace = true
+    workspace_group_content = "icons"
+    workspace_group_capsule = false
+    only_active_workspace = false
+    hide_empty_workspaces = false
+    show_workspace_label = true
+    workspace_label_placement = "inside"
+    group_single_icon_per_app = true
+    icon_scale = 1.125
+  '';
+
   services = {
     displayManager.noctalia-greeter = {
       enable = true;

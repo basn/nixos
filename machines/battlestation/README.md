@@ -17,6 +17,26 @@ helper commands, and SOPS-backed MCP environment.
 
 ## Configured services
 
+Umbriel defaults to dwindle with dynamic workspaces on both monitors: unused
+workspaces are pruned and a trailing empty workspace remains available.
+The persistent first workspace on DP-2 is `discord`, followed by positional
+labels `2`, `3`, and so on; this does not route Discord windows automatically.
+Numeric workspace shortcuts beyond the existing positions clamp to the last
+workspace rather than creating arbitrary positions. Master layout settings
+remain available when switching layouts.
+
+Noctalia's workspace widget is a taskbar grouped by workspace, showing app icons
+on both active and inactive workspaces with one icon per app. Empty workspaces
+remain visible. Labels are always shown inside groups, including occupied ones;
+the named workspace stays `discord` rather than becoming a numeric label.
+Workspace group backgrounds and outlines are disabled; icons, labels, and grouping
+are retained.
+The host-local Hjem-managed `~/.config/noctalia/workspaces.toml` requests
+`icon_scale = 1.125` (about 18px from a 16px base, subject to bar fit); bar thickness
+is unchanged.
+UI settings in `~/.local/state/noctalia/settings.toml` merge last and can override
+these declarative defaults.
+
 - Noctalia Greeter on greetd, Plasma 6, and the Umbriel/Noctalia session.
 - NetworkManager, PipeWire/WirePlumber, and GNOME Keyring for Umbriel sessions.
 - Steam, Gamescope support, and 32-bit graphics; the VR specialisation remains

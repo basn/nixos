@@ -14,6 +14,16 @@
 "Mod+8" = "workspace-switch:8"
 "Mod+9" = "workspace-switch:9"
 
+"Mod+Ctrl+1" = "window-move-to-workspace:1"
+"Mod+Ctrl+2" = "window-move-to-workspace:2"
+"Mod+Ctrl+3" = "window-move-to-workspace:3"
+"Mod+Ctrl+4" = "window-move-to-workspace:4"
+"Mod+Ctrl+5" = "window-move-to-workspace:5"
+"Mod+Ctrl+6" = "window-move-to-workspace:6"
+"Mod+Ctrl+7" = "window-move-to-workspace:7"
+"Mod+Ctrl+8" = "window-move-to-workspace:8"
+"Mod+Ctrl+9" = "window-move-to-workspace:9"
+
 "Mod+Tab" = "window-focus-next"
 "Alt+Left" = "window-focus-left"
 "Alt+Right" = "window-focus-right"
