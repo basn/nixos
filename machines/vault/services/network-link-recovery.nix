@@ -18,6 +18,8 @@ in
       Type = "oneshot";
       RuntimeDirectory = "vault-network-link-recovery";
       RuntimeDirectoryMode = "0700";
+      # Keep threshold/cooldown timestamps between timer-driven oneshot runs.
+      RuntimeDirectoryPreserve = "yes";
       UMask = "0077";
 
       CapabilityBoundingSet = [ "CAP_NET_ADMIN" ];

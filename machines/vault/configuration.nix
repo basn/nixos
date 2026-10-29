@@ -139,6 +139,11 @@
     systemPackages = with pkgs; [ rclone ];
   };
   services = {
+    # I226-V runtime-PM mitigation; evidence and review conditions: README.md.
+    # Match only enp1s0's PCI device, not Vault's other Intel NIC.
+    udev.extraRules = ''
+      ACTION=="add|change", SUBSYSTEM=="pci", KERNEL=="0000:01:00.0", ATTR{vendor}=="0x8086", ATTR{device}=="0x125c", TEST=="power/control", ATTR{power/control}="on"
+    '';
     zfs = {
       trim = {
         enable = true;
@@ -152,6 +157,26 @@
   powerManagement = {
     powertop = {
       enable = true;
+      # Restore only the I226-V policy after auto-tuning; review/removal: README.md.
+      postStart = ''
+        device=/sys/bus/pci/devices/0000:01:00.0
+        if [ ! -r "$device/vendor" ] || [ ! -r "$device/device" ]; then
+          echo "powertop: cannot identify expected I226-V at $device" >&2
+          exit 1
+        fi
+        if [ "$(cat "$device/vendor")" != 0x8086 ] || [ "$(cat "$device/device")" != 0x125c ]; then
+          echo "powertop: PCI identity mismatch at $device; refusing runtime-PM override" >&2
+          exit 1
+        fi
+        if [ ! -e "$device/power/control" ]; then
+          echo "powertop: missing $device/power/control; cannot restore I226-V runtime-PM policy" >&2
+          exit 1
+        fi
+        if ! printf 'on\n' > "$device/power/control"; then
+          echo "powertop: failed to restore $device/power/control to on" >&2
+          exit 1
+        fi
+      '';
     };
   };
   hardware = {
