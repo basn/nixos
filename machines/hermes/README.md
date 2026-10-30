@@ -72,6 +72,76 @@ nix build .#nixosConfigurations.hermes.config.system.build.toplevel --no-link --
 A source-level test or local recreation of the Python overlay is not a Nix
 build, host activation, or proof that the running service loaded this patch.
 
+## Desktop profile
+
+The default audit profile and the named `desktop` profile share the existing
+gateway (`gateway.multiplex_profiles: true`); there is no second gateway service
+or `profile use` operation. The audit image, container key, workspace, mounts,
+and messaging routes remain unchanged. Use the dashboard's profile selector,
+or run the CLI as the service user:
+
+```sh
+sudo -u hermes -H env HOME=/var/lib/hermes HERMES_HOME=/var/lib/hermes/.hermes hermes -p desktop
+```
+
+Desktop is dashboard/CLI-only: no messaging routes or bot credentials are
+declared. `desktop-profile.nix` selectively shares the declared model/fallback,
+auxiliary, timezone, approval, security, and compression policy, not the default
+profile's complete config. Provider login uses Hermes's supported per-provider
+fallback to the root `auth.json`; provisioning never copies or symlinks that file
+or `.env`. Named-profile secret scopes scrub secrets injected into the default
+gateway's environment. Tools needing their own credentials must be configured
+separately in the desktop profile through the normal secret-management process.
+
+State lives under `/var/lib/hermes/.hermes/profiles/desktop`; only its `workspace`
+subdirectory is mounted at `/workspace`. The desktop sandbox uses
+`nousresearch/hermes-sandbox:desktop`, a distinct `desktop-v1` shared-container
+key, persistent storage, the existing resource limits, and DNS `10.1.1.8`.
+Automatic host-cwd mounting is disabled. It has no audit SSH key, output or cron
+mount, forwarded environment names, or declared credential files. Browser Chrome
+is headed, with no host executable configured. `computer_use` and
+`bot_desktop.placement: terminal` keep screen/browser interaction inside the
+sandbox, not on the gateway host. No host desktop or firewall changes are needed.
+Profiles share a Unix account and are not an OS-level security boundary.
+
+Activation runs provisioning as `hermes` after `hermes-agent-setup`, before
+tmpfiles. It creates private directories and atomically publishes an owned,
+mode-0600 config only after workspace preparation; the gateway discovers it on
+its next profile rescan (normally within 30 seconds). Schema version comes from
+the pinned module's `mkConfigFiles`. Existing YAML must be a mapping: malformed
+config fails activation rather than being silently replaced. Declared keys win,
+maps deep-merge, lists replace, unknown runtime keys remain, and unchanged config
+is not rewritten. Removing a declared key does **not** remove old runtime values;
+review/remove such leftovers explicitly. No auth, environment, database, cron,
+or workspace state is overwritten or recursively chowned. Avoid simultaneous
+dashboard config edits during activation; its provisioning lock only serializes
+provisioning runs, not arbitrary runtime writers.
+
+Upstream `profiles/.deleted/desktop` and `desktop/gateway.parked` markers are
+respected: activation skips the profile without clearing either marker. Resume
+a parked profile using Hermes's lifecycle command only when intended; a deleted
+profile needs an explicit recreation through Hermes before provisioning resumes.
+Do not remove lifecycle markers merely to make activation recreate a profile.
+The pinned upstream `multi-profile-gateways` multiplexing guidance takes
+precedence over older per-profile service instructions.
+
+Offline provisioning tests (Python with PyYAML):
+
+```sh
+nix shell --impure --expr 'let f = builtins.getFlake "/home/basn/nixos"; in f.inputs.nixpkgs.legacyPackages.x86_64-linux.python3.withPackages (p: [ p.pyyaml ])' -c python3 -B machines/hermes/test-desktop-profile.py
+nixfmt --check machines/hermes/configuration.nix machines/hermes/desktop-profile.nix
+git diff --check
+nix build .#nixosConfigurations.hermes.config.system.build.toplevel --no-link --no-update-lock-file
+```
+
+A build cannot verify the remote Docker tag, image pull/start, screen stream,
+headed browser, profile selection, provider login, or absence of runtime secret
+leakage. After a separately approved deployment, verify both profiles, confirm
+the desktop container's mounts/environment and screen placement without printing
+secret values, and check the audit workflow is unchanged. Existing persistent
+containers do not automatically adopt changed image or mount settings; changing
+their identity or recreating them requires separate operational approval.
+
 ## Model routing
 
 The main route is `openai-codex:gpt-6-astra`. Delegated children inherit the

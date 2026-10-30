@@ -77,7 +77,10 @@ let
   mcpNixos = inputs.mcp-nixos.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in
 {
-  imports = [ ../../modules/hermes-audit.nix ];
+  imports = [
+    ../../modules/hermes-audit.nix
+    ./desktop-profile.nix
+  ];
   # Hermes launches cron workers in transient user scopes so they survive a
   # gateway restart. Keep the existing on-disk UID stable and ensure its user
   # manager and D-Bus socket exist without an interactive login.
@@ -252,6 +255,7 @@ in
         SEARXNG_URL = "https://search.basn.se";
       };
       settings = {
+        gateway.multiplex_profiles = true;
         model = {
           provider = "openai-codex";
           default = "gpt-6-astra";
