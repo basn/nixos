@@ -53,7 +53,10 @@
 
   boot = {
     zfs = {
-      extraPools = [ "osdisk" ];
+      extraPools = [
+        "osdisk"
+        "backup"
+      ];
       devNodes = "/dev/disk/by-path";
       forceImportRoot = false;
     };

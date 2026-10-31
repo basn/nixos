@@ -15,6 +15,12 @@ receiver account for backup replication.
 Service definitions are in `services/`; hardware settings are in
 `hardware-configuration.nix`.
 
+## Existing pools at boot
+
+`boot.zfs.extraPools` imports the existing `osdisk` and `backup` pools during
+boot, including the replication receiver's `backup` pool. This does not
+provision or format storage.
+
 ```sh
 nix build .#nixosConfigurations.nixos-sov2.config.system.build.toplevel --no-link
 ```
