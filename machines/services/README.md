@@ -22,8 +22,8 @@ in [`../../docs/pinepods.md`](../../docs/pinepods.md).
 The Muxarr public ingress and manual Authentik prerequisites are documented in
 [`../../docs/muxarr.md`](../../docs/muxarr.md).
 
-Network Optimizer and its companion speed-test image are pinned to 2.10.2. The
-[upstream release notes](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.10.2)
+Network Optimizer and its companion speed-test image are pinned to 2.10.4. The
+[upstream release notes](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.10.4)
 document its fixes and the accepted rolling license change date: each release
 converts to Apache 2.0 three years after publication.
 

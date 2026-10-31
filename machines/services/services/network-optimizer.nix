@@ -12,7 +12,7 @@
     backend = "podman";
     containers = {
       networkoptimizer = {
-        image = "ghcr.io/ozark-connect/network-optimizer:2.10.2@sha256:317c61691ca57d13cd03f66bf01282a121d22302464a1fbe4a8924911e13c161";
+        image = "ghcr.io/ozark-connect/network-optimizer:2.10.4@sha256:0b21b162d80478897cbf2a8dcfec1a1b3c5456387017d0e824225390398646a0";
         autoStart = true;
         extraOptions = [ "--network=host" ];
         environment = {
@@ -31,7 +31,7 @@
       };
 
       speedtest = {
-        image = "ghcr.io/ozark-connect/speedtest:2.10.2@sha256:a2ead81fd7b77ade10f4ae847147479a489b3b1e4b2867a516c9f497345d4919";
+        image = "ghcr.io/ozark-connect/speedtest:2.10.4@sha256:a97eaf99fe39589c18abe92f146933a5918a5d707284321b2fee752e0ba24271";
         autoStart = true;
         ports = [ "127.0.0.1:3005:3000" ];
         environment = {
