@@ -2,6 +2,14 @@ diff --git a/src/app/application_ui.cpp b/src/app/application_ui.cpp
 index 074800c..b23714c 100644
 --- a/src/app/application_ui.cpp
 +++ b/src/app/application_ui.cpp
+@@ -3,6 +3,7 @@
+ #include "application_internal.h"
+ #include "compositors/compositor_detect.h"
+ #include "config/config_types.h"
+ #include "core/deferred_call.h"
++#include "core/input/keybind_matcher.h"
+ #include "core/log.h"
+ #include "dbus/idle/screensaver_service.h"
 @@ -445,6 +445,10 @@ void Application::initInputDispatch() {
    m_wayland.setKeyboardEventCallback([this](const KeyboardEvent& event) {
      if (m_lockScreen.isActive()) {
