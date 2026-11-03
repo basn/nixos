@@ -1,12 +1,18 @@
 diff --git a/tools/process_registry_env_log.py b/tools/process_registry_env_log.py
-index a9cac46..3a11d27 100644
 --- a/tools/process_registry_env_log.py
 +++ b/tools/process_registry_env_log.py
-@@ -3,0 +4,3 @@
+@@ -1,4 +1,7 @@
+ """Incremental sandbox log reads for ProcessRegistry's non-local poller."""
++
++
 +FINAL_LOG_SNAPSHOT_PREFIX = "HERMES_FINAL_LOG_V1"
-+
-+
-@@ -34,0 +38,19 @@ def log_delta_command(quoted_log_path: str, offset: int) -> str:
+
+
+ def log_delta_command(quoted_log_path: str, offset: int) -> str:
+@@ -32,3 +35,22 @@
+         f'if [ "$S" -gt "$O" ]; then '
+         f"tail -c +$((O+1)) {quoted_log_path} 2>/dev/null | head -c $((S-O)); fi"
+     )
 +
 +
 +def final_log_snapshot_command(quoted_log_path: str, offset: int) -> str:
@@ -27,28 +33,47 @@ index a9cac46..3a11d27 100644
 +        'cat "$E" || exit 94'
 +    )
 diff --git a/tools/process_registry.py b/tools/process_registry.py
-index e1949b6..beef282 100644
 --- a/tools/process_registry.py
 +++ b/tools/process_registry.py
-@@ -6,0 +7,2 @@ Nothing runs on the host unless TERMINAL_ENV=local; other backends run in their
+@@ -4,6 +4,8 @@
+ Nothing runs on the host unless TERMINAL_ENV=local; other backends run in their sandbox.
+ """
+
 +import base64
 +import binascii
-@@ -41 +43,5 @@ from tools.process_registry_results import load_completed_results, save_complete
+ import codecs
+ from contextlib import suppress
+ import json
+@@ -39,7 +41,11 @@
+ from tools.process_registry_ownership import ProcessOwnershipMixin
+ from tools.process_registry_termination import ProcessTerminationMixin
+ from tools.process_registry_results import load_completed_results, save_completed_result
 -from tools.process_registry_env_log import log_delta_command
 +from tools.process_registry_env_log import (
 +    FINAL_LOG_SNAPSHOT_PREFIX,
 +    final_log_snapshot_command,
 +    log_delta_command,
 +)
-@@ -1421,0 +1428 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+ from tools.process_registry_wsl import _is_wsl_launcher_command
+
+ logger = logging.getLogger(__name__)
+@@ -1414,29 +1420,61 @@
+         self._finish_exited(session, exit_code())
+
+     _log_delta_command = staticmethod(log_delta_command)
 +    _final_log_snapshot_command = staticmethod(final_log_snapshot_command)
-@@ -1427,0 +1435 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+
+     def _env_poller_loop(self, session: ProcessSession, env: Any, log_path: str, pid_path: str, exit_path: str):
+         """Background thread: poll a sandbox log file for non-local backends."""
+         q = shlex.quote
+         # Byte offset already read from the log (bytes, not chars: the shell counts bytes).
+         prev_output_bytes = 0
 +        pending_exit_code = None
-@@ -1429 +1437,2 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+         while not session.exited:
 -            time.sleep(2)
 +            if pending_exit_code is None:
 +                time.sleep(2)
-@@ -1431,6 +1440,23 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+             try:
 -                # Read only the bytes written since the last poll.
 -                raw = env.execute(self._log_delta_command(q(log_path), prev_output_bytes),
 -                                  timeout=10).get("output", "")
@@ -78,7 +103,8 @@ index e1949b6..beef282 100644
 +                    marker, size_str, offset_str, length_str = header.split()
 +                    if marker != FINAL_LOG_SNAPSHOT_PREFIX or not separator:
 +                        raise ValueError("Invalid final sandbox log snapshot header")
-@@ -1439,6 +1465,18 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+                     new_size = int(size_str)
+                     used_offset = int(offset_str)
 -                except ValueError:
 -                    # No usable header (command failed, shell missing a tool): skip this
 -                    # poll rather than act on a half-read value.
@@ -103,22 +129,39 @@ index e1949b6..beef282 100644
 +                    # A terminal partial or invalid UTF-8 sequence is real output, not a
 +                    # reason to discard an otherwise byte-complete final snapshot.
 +                    delta = final_bytes.decode("utf-8", errors="replace")
-@@ -1464,0 +1503,6 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+                 if new_size is not None:
+                     if used_offset < prev_output_bytes:
+                         # Log rotated/truncated: what we hold no longer lines up. Restart.
+@@ -1457,6 +1495,12 @@
+                     self._check_watch_patterns(session, delta)
+                     self._emit_output(session, delta)
+
 +                if pending_exit_code is not None:
 +                    # The child can finish between the previous log snapshot and
 +                    # the liveness check. Publish only after draining that tail.
 +                    self._finish_exited(session, pending_exit_code)
 +                    return
 +
-@@ -1475,2 +1519 @@ class ProcessRegistry(ProcessTerminationMixin, ProcessCheckpointMixin, ProcessOu
+                 check = env.execute(
+                     f"kill -0 \"$(cat {q(pid_path)} 2>/dev/null)\" 2>/dev/null; echo $?", timeout=5)
+                 check_output = check.get("output", "").strip()
+@@ -1467,8 +1511,7 @@
+                         exit_code = int(exit_str.splitlines()[-1].strip())
+                     except (ValueError, IndexError):
+                         exit_code = -1
 -                    self._finish_exited(session, exit_code)
 -                    return
 +                    pending_exit_code = exit_code
+             except Exception:
+                 # Environment might be gone (sandbox reaped, etc.). A kill that already
+                 # settled the session keeps its result.
 diff --git a/tests/tools/test_process_registry.py b/tests/tools/test_process_registry.py
-index f62f7be..7fe4105 100644
 --- a/tests/tools/test_process_registry.py
 +++ b/tests/tools/test_process_registry.py
-@@ -955 +955,9 @@ class TestSpawnEnvSanitization:
+@@ -949,7 +949,15 @@
+
+             def execute(self, command, **kwargs):
+                 self.commands.append((command, kwargs))
 -                return next(self._responses)
 +                try:
 +                    return next(self._responses)
@@ -129,7 +172,13 @@ index f62f7be..7fe4105 100644
 +                    return {
 +                        "output": f"HERMES_FINAL_LOG_V1 {offset} {offset} 0\n"
 +                    }
-@@ -994 +1002,9 @@ class TestEnvPollerIncrementalRead:
+
+         env = FakeEnv()
+
+@@ -988,7 +996,15 @@
+
+             def execute(self, command, **kwargs):
+                 self.commands.append(command)
 -                return next(self._responses)
 +                try:
 +                    return next(self._responses)
@@ -140,20 +189,40 @@ index f62f7be..7fe4105 100644
 +                    return {
 +                        "output": f"HERMES_FINAL_LOG_V1 {offset} {offset} 0\n"
 +                    }
-@@ -1001,0 +1018,2 @@ class TestEnvPollerIncrementalRead:
+
+         env = FakeEnv()
+         with patch("tools.process_registry.time.sleep", return_value=None), \
+@@ -996,6 +1012,8 @@
+             registry._env_poller_loop(
+                 session, env, "/tmp/bg.log", "/tmp/bg.pid", "/tmp/bg.exit"
+             )
 +        assert session.completion_reason == "exited"
 +        assert session.exit_code == 0
+         return env.commands
+
+
 diff --git a/tests/tools/test_process_registry_write_stdin_surrogates.py b/tests/tools/test_process_registry_write_stdin_surrogates.py
 --- a/tests/tools/test_process_registry_write_stdin_surrogates.py
 +++ b/tests/tools/test_process_registry_write_stdin_surrogates.py
-@@ -3,0 +4 @@ surrogateescape content instead of crashing on the strict UTF-8 encode."""
+@@ -1,6 +1,7 @@
+ """Sibling regression test for #79178: background-PTY stdin must round-trip
+ surrogateescape content instead of crashing on the strict UTF-8 encode."""
+ import shlex
 +import sys
-@@ -22 +23 @@ def test_write_stdin_pty_surrogateescape_roundtrip(tmp_path):
+ import time
+
+ import pytest
+@@ -19,7 +20,7 @@
+         f"import sys\nopen({str(out)!r}, 'wb').write(sys.stdin.buffer.readline())\n"
+     )
+     session = registry.spawn_local(
 -        f"python3 {shlex.quote(str(script))}",
 +        f"{shlex.quote(sys.executable)} {shlex.quote(str(script))}",
+         cwd=str(tmp_path),
+         use_pty=True,
+     )
 diff --git a/tests/tools/test_process_registry_final_drain.py b/tests/tools/test_process_registry_final_drain.py
 new file mode 100644
-index 0000000..41ad224
 --- /dev/null
 +++ b/tests/tools/test_process_registry_final_drain.py
 @@ -0,0 +1,191 @@

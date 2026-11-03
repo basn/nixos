@@ -40,10 +40,12 @@ path-relative resources stay in that environment.
 
 ### Local patch validation
 
-In a disposable checkout of the unreleased Hermes canary revision
-`085f562af53a6fedadac3681e2c498fc71316132` (a descendant of stable `v0.22.5`),
-apply both patches with
-`git apply --unidiff-zero`. The final-output regression fixture uses
+In a disposable checkout of the locked Hermes canary revision
+`4131fd95700685444c3522bf1ea07578c4003523` (a descendant of stable `v0.22.5`),
+apply `homeassistant-plugin-presence.patch` with `git apply --unidiff-zero`,
+then `final-output-drain.patch` with ordinary `git apply`. The final-output patch
+uses contextual hunks so source movement cannot silently misplace insertions.
+The final-output regression fixture uses
 a local child process gated to finish after the first log snapshot and real
 completion publication. It covers exit codes 0, 17 and 75; missing, unreadable,
 short and malformed snapshots; empty and truncated logs; split, incomplete and
