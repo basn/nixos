@@ -1,6 +1,6 @@
 # PinePods
 
-PinePods 0.9.0 runs on `bandit` as three rootful Podman containers: PinePods,
+PinePods 0.9.1 is configured on `bandit` as three rootful Podman containers: PinePods,
 PostgreSQL 18.6, and non-persistent Valkey 8.1.11. The images are version and
 multi-architecture manifest digest pinned in
 `machines/bandit/services/pinepods.nix`. PostgreSQL and Valkey are on the
@@ -13,8 +13,40 @@ Valkey pin was refreshed on 2026-10-27 from the official
 security update that also contains standalone-relevant crash and correctness
 fixes. Its cluster Pub/Sub overflow advisory, GHSA-f4q9-j22m-xqq9, does not
 apply to this standalone configuration. The digest pins the multi-architecture
-manifest while retaining the readable tag. PinePods remains at the requested
-0.9.0 release.
+manifest while retaining the readable tag. The PinePods 0.9.1 pin was verified
+on 2026-11-04 against Docker Hub's registry manifest endpoint; the returned
+digest matched a locally calculated SHA-256 of the multi-architecture index.
+
+## Upgrading to 0.9.1
+
+Read the [upstream release notes](https://github.com/madeofpendletonwool/PinePods/releases/tag/0.9.1)
+before an authorized deployment. This release fixes eight security advisories,
+including OIDC, authorization, SQL injection, and SSRF issues affecting 0.9.0
+and earlier. It also makes compatibility changes:
+
+- Back up and verify recoverability first. The shared-feed/episode migration
+  merges user copies irreversibly; upstream warns that pre-upgrade PinePods
+  backups cannot be restored afterwards. Preserve a pre-upgrade logical database
+  dump, downloads, and the matching old image pin for a separately tested rollback
+  to the old version, not an in-place restore into the upgraded application.
+- First startup may take substantially longer while migrations merge duplicates
+  and feeds are read in full. Check migration progress and cold-start activation
+  during deployment; the retained healthcheck retry window is not proof that a
+  large library will migrate within that window.
+- The gpodder sync API moves into the main API; port 8042 is removed (this
+  configuration only publishes 8040 already). Sync apps using the account password
+  must switch to app passwords from Settings → Podcast Sync. Existing sync tokens
+  remain valid. External gpodder/Nextcloud users may need to re-enter their server
+  settings, especially if they previously used "both" sync modes.
+- `PINEPODS_REFRESH_CRON` is deprecated in favor of
+  `PINEPODS_REFRESH_MAX_INTERVAL`; neither is overridden here. The configured
+  hosted search and people services are already updated upstream for 0.9.1.
+  The new AI companion is optional and is not enabled here.
+
+The bootstrap and OIDC observations below explicitly referencing 0.9.0 are from
+the original review, not claims of 0.9.1 runtime verification. Recheck recovery
+login, self-registration denial, provider initialization, and browser/mobile OIDC
+after an authorized upgrade; 0.9.1 changes OIDC validation and adds web PKCE.
 
 Public HTTPS terminates on the `services` host at `https://pods.basn.se` and is
 proxied to Bandit's port 80. Bandit's nginx only accepts that virtual host from
@@ -45,6 +77,9 @@ checks remain separate and unchanged.
 
 Remove this workaround once Podman no longer reports startup-grace probe
 failures as failed systemd units, after verifying a cold start and activation.
+The 0.9.1 Dockerfile still uses the same endpoint, interval, startup grace, and
+retry count. Its application changes do not establish that the Podman failure
+condition is resolved; the workaround is retained pending runtime verification.
 
 ## Deployment prerequisites
 

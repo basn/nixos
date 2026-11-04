@@ -22,10 +22,20 @@ in [`../../docs/pinepods.md`](../../docs/pinepods.md).
 The Muxarr public ingress and manual Authentik prerequisites are documented in
 [`../../docs/muxarr.md`](../../docs/muxarr.md).
 
-Network Optimizer and its companion speed-test image are pinned to 2.10.4. The
-[upstream release notes](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.10.4)
-document its fixes and the accepted rolling license change date: each release
-converts to Apache 2.0 three years after publication.
+Network Optimizer and its companion speed-test image are pinned to 2.10.6.
+Both multi-architecture index digests were verified on 2026-11-04 against GHCR's
+registry manifest endpoints and locally calculated SHA-256 hashes. The
+[2.10.6 release notes](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.10.6)
+cover Path Localization, server-side logout, and nginx security updates in the
+speed-test image. The intervening
+[2.10.5 release notes](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.10.5)
+also describe alert behavior changes, including automatically enabling WAN
+degradation alerts on a site's first successful WAN speed test unless customized.
+Existing 2.10.3–2.10.5 On-Site Agents remain compatible; upgrading those agents
+is optional for five-probe Path Localization traces and is not performed here.
+The accepted rolling license policy remains documented in the
+[2.10.4 release notes](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.10.4):
+each release converts to Apache 2.0 three years after publication.
 
 ## Container upgrade backups
 
