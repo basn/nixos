@@ -30,6 +30,7 @@
     netbirdUnits = [ "netbird.service" ];
     worker = {
       enable = true;
+      onCalendar = "*-*-* *:05:00";
       ingestUrl = "http://services.netbird.basn.se:18111";
       serverId = "1ed9f69d-4ee3-6dac-b18b-ea5e938a80e2";
       detailConcurrency = 8;
@@ -49,6 +50,12 @@
       apiKeyCredentialPath = "/var/lib/dayzweb-secrets/steam-api-key";
       intervalSeconds = 120;
     };
+  };
+
+  systemd.timers.dayzweb-collector.timerConfig = {
+    RandomizedDelaySec = "10min";
+    FixedRandomDelay = false;
+    AccuracySec = "1s";
   };
 
   boot = {
