@@ -8,6 +8,12 @@
   basn.boot.useLatestZfsCompatibleKernel = true;
 
   boot = {
+    plymouth = {
+      enable = true;
+      theme = "nixos-bgrt";
+      themePackages = [ pkgs.nixos-bgrt-plymouth ];
+    };
+    consoleLogLevel = 3;
     loader = {
       systemd-boot = {
         enable = true;
@@ -27,7 +33,12 @@
     supportedFilesystems = [ "zfs" ];
     # Linux 6.18's hid_alps path duplicates this touchpad with the reliable
     # PS/2 device; retain the latter through psmouse.
-    kernelParams = [ "module_blacklist=hid_alps" ];
+    kernelParams = [
+      "module_blacklist=hid_alps"
+      "quiet"
+      "rd.udev.log_level=3"
+      "rd.systemd.show_status=auto"
+    ];
   };
   networking = {
     hostName = "laptop";
