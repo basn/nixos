@@ -1,6 +1,6 @@
 # PinePods
 
-PinePods 0.9.1 is configured on `bandit` as three rootful Podman containers: PinePods,
+PinePods 0.9.2 is configured on `bandit` as three rootful Podman containers: PinePods,
 PostgreSQL 18.6, and non-persistent Valkey 8.1.11. The images are version and
 multi-architecture manifest digest pinned in
 `machines/bandit/services/pinepods.nix`. PostgreSQL and Valkey are on the
@@ -13,9 +13,23 @@ Valkey pin was refreshed on 2026-10-27 from the official
 security update that also contains standalone-relevant crash and correctness
 fixes. Its cluster Pub/Sub overflow advisory, GHSA-f4q9-j22m-xqq9, does not
 apply to this standalone configuration. The digest pins the multi-architecture
-manifest while retaining the readable tag. The PinePods 0.9.1 pin was verified
-on 2026-11-04 against Docker Hub's registry manifest endpoint; the returned
-digest matched a locally calculated SHA-256 of the multi-architecture index.
+manifest while retaining the readable tag. PinePods 0.9.2 was confirmed as the
+latest stable GitHub release on 2026-11-05, and its tag was verified against
+Docker Hub's registry manifest endpoint; the returned digest matched a locally
+calculated SHA-256 of the multi-architecture index, which includes linux/amd64
+and linux/arm64.
+
+## Upgrading to 0.9.2
+
+The [0.9.2 release notes](https://github.com/madeofpendletonwool/PinePods/releases/tag/0.9.2)
+recommend upgrading from 0.9.1 to fix incorrect or missing episode audio URLs.
+The first feed refresh repairs those URLs automatically while retaining listening
+history. Server downloads made on 0.9.1 may contain HTML instead of audio and are
+not repaired automatically: after an authorized deployment, inspect downloads for
+`text/html` or XHTML content, then delete affected downloads through PinePods and
+download them again. The forthcoming iOS app requires iOS 15 or later.
+The 0.9.1 migration and backup warnings below still apply when upgrading from an
+older release; this patch does not undo that migration.
 
 ## Upgrading to 0.9.1
 
@@ -46,7 +60,9 @@ and earlier. It also makes compatibility changes:
 The bootstrap and OIDC observations below explicitly referencing 0.9.0 are from
 the original review, not claims of 0.9.1 runtime verification. Recheck recovery
 login, self-registration denial, provider initialization, and browser/mobile OIDC
-after an authorized upgrade; 0.9.1 changes OIDC validation and adds web PKCE.
+after an authorized upgrade; 0.9.1 changes OIDC validation and adds web PKCE,
+and 0.9.2 improves errors when OIDC login cannot start. These observations are
+not claims of 0.9.2 runtime verification either.
 
 Public HTTPS terminates on the `services` host at `https://pods.basn.se` and is
 proxied to Bandit's port 80. Bandit's nginx only accepts that virtual host from
@@ -77,7 +93,7 @@ checks remain separate and unchanged.
 
 Remove this workaround once Podman no longer reports startup-grace probe
 failures as failed systemd units, after verifying a cold start and activation.
-The 0.9.1 Dockerfile still uses the same endpoint, interval, startup grace, and
+The 0.9.2 Dockerfiles still use the same endpoint, interval, startup grace, and
 retry count. Its application changes do not establish that the Podman failure
 condition is resolved; the workaround is retained pending runtime verification.
 

@@ -6,7 +6,7 @@
 let
   dataRoot = "/data/pinepods";
   networkName = "pinepods";
-  pinepodsImage = "docker.io/madeofpendletonwool/pinepods:0.9.1@sha256:01688a4d5138ce6acc54a1b10df1814edf531de35015c5276068257b9ad133fc";
+  pinepodsImage = "docker.io/madeofpendletonwool/pinepods:0.9.2@sha256:a0463a3a2d7762ba198f94c6aee8856feb0393594792ad0466ae4c170e4bb86c";
   postgresImage = "docker.io/library/postgres:18.6-alpine@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873";
   valkeyImage = "docker.io/valkey/valkey:8.1.11-alpine@sha256:2602ace2be6569bc2bbb06f873776516ab9089821525be34f4305c67eb9db02a";
 

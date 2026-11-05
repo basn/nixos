@@ -1,10 +1,41 @@
 # Muxarr
 
-Muxarr 0.9.12 runs on `bandit` as a rootful Podman container. The image is
+Muxarr 0.9.13 runs on `bandit` as a rootful Podman container. The image is
 pinned by release tag and multi-architecture manifest digest in
 `machines/bandit/services/muxarr.nix`; the digest was verified against GHCR on
-2026-10-20 and identifies upstream commit
-`9293fa9d83c663a3f0b80af621cffc4def9f5722`.
+2026-11-05 and identifies upstream commit
+`7d1c6bb0609db0ca6a4b0e2e723a7a244562a916`.
+GitHub confirmed 0.9.13 as the latest stable release on that date. GHCR's
+reported digest matched a locally calculated SHA-256 of the version-tagged OCI
+index, which includes linux/amd64 and linux/arm64; the amd64 image's revision
+label matches the release commit.
+
+## Upgrading to 0.9.13
+
+The [0.9.13 release notes](https://github.com/KirovAir/muxarr/releases/tag/v0.9.13)
+include a fix preventing filenames from executing shell commands during
+post-processing, Dolby Vision preservation when ffmpeg rewrites MP4 files,
+container-timezone timestamps, live conversion progress fixes, and updated
+EF Core 10.0.13 and mkvtoolnix 103 dependencies that clear the reported
+Cryptography.Xml advisories. Track selection now retains explicitly allowed
+undetermined tracks and applies codec exclusions before the "only option"
+checks; review profile previews on backed-up test files before resuming jobs.
+
+The release also migrates conversion logs from the database's text column to a
+separate table. Before an authorized deployment, take a consistent backup of
+`/var/lib/muxarr` (including SQLite state and settings). Do not assume reverting
+the image also reverts the schema; retain the pre-upgrade backup for rollback.
+Conversions now check available space beside the source before writing a copy
+and fail if reported free space is less than the source size. Verify this on
+both ZFS and the rclone mount after deployment; a free-space check is not a
+reservation or a replacement for the storage safeguards below.
+
+The upstream Dockerfile and entrypoint retain port 8183, `/config`, and the
+`PUID`/`PGID`/`UMASK` interface. This pin update does not change mounts, media
+identity, ingress, or startup safeguards, and does not establish runtime
+compatibility through a build alone.
+
+## Container configuration
 
 The container persists its SQLite database and settings in `/var/lib/muxarr`
 on the host, mounted at `/config`. It receives the evaluated `plex` UID and GID

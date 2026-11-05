@@ -5,7 +5,7 @@
 }:
 let
   dataDir = "/var/lib/muxarr";
-  muxarrImage = "ghcr.io/kirovair/muxarr:0.9.12@sha256:42ac4d69d3fff77da94a1b7b544a05a8ea3c16a79d77e2f3558b0959d239f341";
+  muxarrImage = "ghcr.io/kirovair/muxarr:0.9.13@sha256:95e3141156bbe18e2d8e7f3036a9b110fad2eda9ede3f82640c6ecff87bc877f";
   plexUid = toString config.users.users.plex.uid;
   plexGid = toString config.users.groups.plex.gid;
 in
