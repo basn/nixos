@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "plugins": ["@dietrichgebert/ponytail"],
   "model": "openai/gpt-6.1-terra",
   "default_agent": "astra-orchestrator",
   "subagent_depth": 1,

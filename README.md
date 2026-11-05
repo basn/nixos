@@ -16,6 +16,8 @@ commands, and SOPS-backed MCP environment remain host-specific; currently only
 battlestation provides that system setup and its credentials. The shared
 OpenCode configuration uses `astra-orchestrator` to delegate implementation to
 `sol-coder` and repository research to `explore`.
+It also loads the native V2 `@dietrichgebert/ponytail` plugin in its default
+`full` mode, with `/ponytail` commands for switching levels.
 The Home Assistant and NixOS MCP launchers use the locked
 `nixpkgs-unstable-small` input from the checkout at `/home/basn/nixos`, regardless
 of OpenCode's working directory; keep that checkout available at this path.
