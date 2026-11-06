@@ -206,6 +206,38 @@ in
     })
 
     (lib.mkIf cfg.ingest.enable {
+      systemd.services.dayzweb-maintenance = {
+        description = "DayZWeb local Steam presence retention";
+        environment = {
+          DAYZWEB_DATABASE = cfg.ingest.database;
+          PYTHONPATH = cfg.sourcePath;
+        };
+        unitConfig.RequiresMountsFor = [ cfg.ingest.database ];
+        serviceConfig = hardening // {
+          Type = "oneshot";
+          User = cfg.user;
+          Group = cfg.user;
+          WorkingDirectory = cfg.sourcePath;
+          ExecStart = lib.escapeShellArgs [
+            "${python}/bin/python"
+            "-m"
+            "app.maintenance"
+          ];
+          PrivateNetwork = true;
+          ReadOnlyPaths = [ cfg.sourcePath ];
+          ReadWritePaths = [ (builtins.dirOf cfg.ingest.database) ];
+        };
+      };
+
+      systemd.timers.dayzweb-maintenance = {
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "hourly";
+          Persistent = true;
+          Unit = "dayzweb-maintenance.service";
+        };
+      };
+
       systemd.services.dayzweb-ingest = {
         description = "DayZWeb private collection ingest API";
         wantedBy = lib.optionals tokenProvisioned [ "multi-user.target" ];
@@ -321,7 +353,8 @@ in
           ];
           LoadCredential = "ingest-token:${cfg.population.tokenCredentialPath}";
           ReadOnlyPaths = [ cfg.sourcePath ];
-          TimeoutStartSec = "90s";
+          # Query and ingest retries need up to 80s, plus scheduling margin.
+          TimeoutStartSec = "120s";
         };
       };
 
@@ -368,7 +401,8 @@ in
             "steam-api-key:${cfg.steam.apiKeyCredentialPath}"
           ];
           ReadOnlyPaths = [ cfg.sourcePath ];
-          TimeoutStartSec = "45s";
+          # Three sequential HTTP requests at 20s each, plus scheduling margin.
+          TimeoutStartSec = "90s";
         };
       };
 
