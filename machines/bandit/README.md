@@ -13,8 +13,9 @@ Unpackerr, Immich, PinePods, Attic, rclone, and Nginx.
 - Storage and applications: Attic, Immich, PinePods, rclone, ZFS scrubs, and
   Nginx.
 - Automation: the host chassis-fan service.
-- Local inference: CUDA-backed `llama-server` serves the Qwen3.5-9B Q8 model
-  as `qwen3.5-9b-local` on TCP/8080.
+- Local inference: CUDA-backed `llama-server` serves Gemma 4 12B IT Q8_0
+  (`unsloth/gemma-4-12b-it-GGUF`, `gemma-4-12b-it-Q8_0.gguf`)
+  as `gemma-4-12b-local` on TCP/8080.
 
 ## Local inference networking
 
@@ -31,6 +32,9 @@ TCP/8080 because that would intercept traffic before `llama-server`.
 Hermes uses `http://bandit.netbird.basn.se:8080/v1`, so that hostname must
 resolve to Bandit's NetBird address and NetBird connectivity must already work
 between the hosts. NetBird configuration is not managed here.
+
+After deploying the model switch, clients (including Hermes) must change their
+model name from `qwen3.5-9b-local` to `gemma-4-12b-local`; the API URL is unchanged.
 
 The server keeps `--ctx-size 131072 --parallel 2`. llama.cpp divides that
 server context across the two slots, yielding 65,536 tokens per concurrent
