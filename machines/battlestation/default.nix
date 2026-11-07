@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   unstableSmall,
   ...
@@ -9,7 +10,6 @@
     ./audio.nix
     ./cachyos-proton.nix
     ./desktop.nix
-    ./ollama.nix
     ./opencode.nix
     ./specialisation.nix
     ./user.nix
@@ -75,6 +75,14 @@
       "ntsync"
     ];
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto-x86_64-v3;
+    kernelPatches = [
+      {
+        # Work around missing rnull_mod.ko.BTF.1; remove when CachyOS Rust module BTF linking is fixed.
+        name = "disable-rust-null-block";
+        patch = null;
+        structuredExtraConfig.BLK_DEV_RUST_NULL = lib.mkForce lib.kernel.no;
+      }
+    ];
     kernelParams = [
       "split_lock_detect=off"
       "intel_iommu=on"

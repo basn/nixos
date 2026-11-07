@@ -9,8 +9,7 @@ specialisation is retained in `specialisation.nix`; it is currently disabled.
 
 `audio.nix` contains PipeWire and device rules, `desktop.nix` contains the
 Wayland desktop and greeter setup, `cachyos-proton.nix` provides the local
-Proton helper, `ollama.nix` configures the local Ollama service, and
-`opencode.nix` defines the OpenCode integration.
+Proton helper, and `opencode.nix` defines the OpenCode integration.
 The OpenCode configuration and certificate are deployed through the shared
 `hjem/tooling.nix` module, while this host alone provides the OpenCode package,
 helper commands, and SOPS-backed MCP environment.

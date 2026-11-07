@@ -10,30 +10,6 @@
     }
   },
   "provider": {
-    "ollama": {
-      "name": "Ollama (local)",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "baseURL": "http://127.0.0.1:11434/v1"
-      },
-      "models": {
-        "qwen3:8b": {
-          "name": "Qwen3 8B (local)"
-        }
-      }
-    },
-    "local": {
-      "name": "local",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "baseURL": "http://localhost:11434/v1"
-      },
-      "models": {
-        "qwen3:8b": {
-          "name": "Qwen3 8B (local worker)"
-        }
-      }
-    },
     "openai": {
       "models": {
         "gpt-6.1-terra": {
