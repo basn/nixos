@@ -41,28 +41,6 @@ let
   '';
 in
 {
-  # Temporary workaround for https://github.com/NixOS/nixpkgs/issues/582673
-  # (fix: https://github.com/NixOS/nixpkgs/pull/582675). Remove once the locked
-  # nixpkgs includes the upstream fix and battlestation builds successfully.
-  nixpkgs.overlays = [
-    (_final: prev: {
-      opencode = prev.opencode.overrideAttrs (
-        old:
-        if
-          old.version == "2.2.5"
-          && old.node_modules.outputHash == "sha256-xfOVcw1+waLVNhFDwzOtzxrUSQEogvn88YomydOlhwc="
-        then
-          {
-            node_modules = old.node_modules.overrideAttrs (_: {
-              outputHash = "sha256-prx9dX7kUvs/E3zopkaPk5LXh3xJAy5sZeum/W8L7cA=";
-            });
-          }
-        else
-          { }
-      );
-    })
-  ];
-
   sops = {
     defaultSopsFile = ./secrets/opencode-mcp.env;
     secrets.opencode-mcp-env = {

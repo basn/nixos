@@ -22,13 +22,6 @@ The Home Assistant and NixOS MCP launchers use the locked
 `nixpkgs-unstable-small` input from the checkout at `/home/basn/nixos`, regardless
 of OpenCode's working directory; keep that checkout available at this path.
 
-Battlestation temporarily overrides OpenCode 2.2.5's `node_modules` hash in
-`machines/battlestation/opencode.nix` for both `opencode` and `oc`, guarded by
-the affected version and original hash. Track [nixpkgs issue #582673](https://github.com/NixOS/nixpkgs/issues/582673)
-and [fix PR #582675](https://github.com/NixOS/nixpkgs/pull/582675); remove the
-override once the locked nixpkgs includes the fix and battlestation builds
-successfully.
-
 ## Flake Outputs
 
 `flake.nix` is the authoritative inventory of NixOS hosts and installation
