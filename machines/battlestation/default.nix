@@ -77,10 +77,10 @@
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto-x86_64-v3;
     kernelPatches = [
       {
-        # Work around missing rnull_mod.ko.BTF.1; remove when CachyOS Rust module BTF linking is fixed.
-        name = "disable-rust-null-block";
+        # Rust modules lack .ko.BTF.1 in gen-btf.sh; remove when CachyOS Rust module BTF generation is fixed.
+        name = "disable-kernel-rust";
         patch = null;
-        structuredExtraConfig.BLK_DEV_RUST_NULL = lib.mkForce lib.kernel.no;
+        structuredExtraConfig.RUST = lib.mkForce lib.kernel.no;
       }
     ];
     kernelParams = [

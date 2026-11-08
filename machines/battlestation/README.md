@@ -7,6 +7,11 @@ sessions for Plasma 6 and Umbriel/Noctalia, Steam with 32-bit graphics support,
 PipeWire, and the CachyOS kernel with ZFS support. The optional VR
 specialisation is retained in `specialisation.nix`; it is currently disabled.
 
+Kernel Rust support is temporarily disabled: the pinned kernel fails BTF
+generation for Rust modules (`rnull_mod` and `rcpufreq_dt`). This host does not
+require those drivers; CachyOS BORE/ThinLTO, x86-64-v3, BTF, and ZFS remain
+enabled. Remove the workaround once upstream Rust module BTF generation works.
+
 `audio.nix` contains PipeWire and device rules, `desktop.nix` contains the
 Wayland desktop and greeter setup, `cachyos-proton.nix` provides the local
 Proton helper, and `opencode.nix` defines the OpenCode integration.
