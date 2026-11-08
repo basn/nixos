@@ -1,19 +1,27 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
 let
   typetypeSecrets = config.sops.secrets.typetype.path;
-  typetypeDownloaderEnv = config.sops.templates.typetype-downloader-env.path;
+  typetypeDownloaderEnv = "/run/typetype-downloader/s3.env";
+  # Generate aliases until sops-nix supports selecting dotenv keys.
+  typetypeDownloaderEnvScript = pkgs.writeShellScript "typetype-downloader-env" ''
+    set -eu
+    for key in DOWNLOADER_S3_ACCESS_KEY DOWNLOADER_S3_SECRET_KEY; do
+      [ "$(grep -c "^$key=" "$1")" = 1 ]
+    done
+    umask 077
+    sed -n 's/^DOWNLOADER_S3_ACCESS_KEY=/S3_ACCESS_KEY=/p; s/^DOWNLOADER_S3_SECRET_KEY=/S3_SECRET_KEY=/p' "$1" > "$2"
+  '';
   typetypeNginx = pkgs.writeText "typetype-nginx.conf" ''
     map $http_upgrade $connection_upgrade {
       default upgrade;
       ''' close;
     }
 
-    resolver 10.89.0.1 valid=10s ipv6=off;
+    resolver 10.91.0.1 valid=10s ipv6=off;
 
     upstream typetype_server_backend {
       zone typetype_server_backend 64k;
@@ -106,22 +114,38 @@ let
   '';
 in
 {
-  sops.templates.typetype-downloader-env = {
-    content = ''
-      S3_ACCESS_KEY=${config.sops.placeholder.typetype-s3-access-key}
-      S3_SECRET_KEY=${config.sops.placeholder.typetype-s3-secret-key}
-    '';
-    mode = "0400";
-  };
+  system.build.typetypeDownloaderEnvTest = pkgs.runCommand "typetype-downloader-env-test" { } ''
+    printf 'OTHER=ignored\nDOWNLOADER_S3_ACCESS_KEY=test-access\nDOWNLOADER_S3_SECRET_KEY=test-secret\n' > input
+    ${typetypeDownloaderEnvScript} input result
+    printf 'S3_ACCESS_KEY=test-access\nS3_SECRET_KEY=test-secret\n' > expected
+    cmp expected result
+    test "$(stat -c %a result)" = 600
+    printf 'DOWNLOADER_S3_ACCESS_KEY=duplicate\n' >> input
+    if ${typetypeDownloaderEnvScript} input result; then exit 1; fi
+    printf 'DOWNLOADER_S3_ACCESS_KEY=missing-secret\n' > input
+    if ${typetypeDownloaderEnvScript} input result; then exit 1; fi
+    touch "$out"
+  '';
 
-  systemd.tmpfiles.rules = [
-    "d /docker/typetype 0750 root root - -"
-    # PostgreSQL's container user is UID 999.  Keep the bind-mount root
-    # traversable across activation, rather than resetting it to root:root.
-    "d /docker/typetype/postgres 0700 999 root - -"
-    "d /docker/typetype/garage-meta 0750 root root - -"
-    "d /docker/typetype/garage-data 0750 root root - -"
-  ];
+  system.build.typetypeStorageGuardTest = pkgs.runCommand "typetype-storage-guard-test" { } ''
+    ${pkgs.bash}/bin/bash ${./typetype-storage-guard-test.sh} ${./typetype-storage-guard.sh}
+    touch "$out"
+  '';
+
+  systemd.services.typetype-storage = {
+    description = "Prepare TypeType storage on its destination dataset";
+    unitConfig.RequiresMountsFor = [ "/data/typetype" ];
+    serviceConfig.Type = "oneshot";
+    path = [
+      pkgs.util-linux
+      pkgs.coreutils
+    ];
+    script = builtins.readFile ./typetype-storage-guard.sh + ''
+      install -d -m 0750 -o root -g root /data/typetype
+      install -d -m 0700 -o 999 -g 0 /data/typetype/postgres
+      install -d -m 0750 -o root -g root /data/typetype/garage-meta /data/typetype/garage-data
+    '';
+  };
 
   systemd.services.typetype-network = {
     description = "TypeType Podman network";
@@ -137,7 +161,7 @@ in
     ];
     serviceConfig.Type = "oneshot";
     path = [ config.virtualisation.podman.package ];
-    script = "podman network create --ignore --subnet 10.89.0.0/16 --gateway 10.89.0.1 typetype";
+    script = "podman network create --ignore --subnet 10.91.0.0/24 --gateway 10.91.0.1 typetype";
   };
 
   systemd.services.typetype-postgres-init = {
@@ -302,7 +326,7 @@ in
           POSTGRES_USER = "typetype";
         };
         environmentFiles = [ typetypeSecrets ];
-        volumes = [ "/docker/typetype/postgres:/var/lib/postgresql/data:U" ];
+        volumes = [ "/data/typetype/postgres:/var/lib/postgresql/data" ];
       };
 
       typetype-dragonfly = {
@@ -320,8 +344,8 @@ in
         environmentFiles = [ typetypeSecrets ];
         volumes = [
           "${garageConfig}:/etc/garage.toml:ro"
-          "/docker/typetype/garage-meta:/var/lib/garage/meta:U"
-          "/docker/typetype/garage-data:/var/lib/garage/data:U"
+          "/data/typetype/garage-meta:/var/lib/garage/meta"
+          "/data/typetype/garage-data:/var/lib/garage/data"
         ];
       };
     };
@@ -349,6 +373,15 @@ in
   };
 
   systemd.services.podman-typetype-downloader = {
+    path = [
+      pkgs.gnugrep
+      pkgs.gnused
+    ];
+    serviceConfig = {
+      RuntimeDirectory = "typetype-downloader";
+      RuntimeDirectoryMode = "0700";
+    };
+    preStart = "${typetypeDownloaderEnvScript} ${typetypeSecrets} ${typetypeDownloaderEnv}";
     requires = [
       "typetype-network.service"
       "typetype-garage-init.service"
@@ -362,8 +395,18 @@ in
   };
 
   systemd.services.podman-typetype-postgres = {
-    requires = [ "typetype-network.service" ];
-    after = [ "typetype-network.service" ];
+    path = [ pkgs.util-linux ];
+    requires = [
+      "typetype-network.service"
+      "typetype-storage.service"
+    ];
+    after = [
+      "typetype-network.service"
+      "typetype-storage.service"
+    ];
+    bindsTo = [ "data-typetype.mount" ];
+    unitConfig.RequiresMountsFor = [ "/data/typetype" ];
+    preStart = builtins.readFile ./typetype-storage-guard.sh;
   };
 
   systemd.services.podman-typetype-dragonfly = {
@@ -372,18 +415,17 @@ in
   };
 
   systemd.services.podman-typetype-garage = {
-    requires = [ "typetype-network.service" ];
-    after = [ "typetype-network.service" ];
+    path = [ pkgs.util-linux ];
+    requires = [
+      "typetype-network.service"
+      "typetype-storage.service"
+    ];
+    after = [
+      "typetype-network.service"
+      "typetype-storage.service"
+    ];
+    bindsTo = [ "data-typetype.mount" ];
+    unitConfig.RequiresMountsFor = [ "/data/typetype" ];
+    preStart = builtins.readFile ./typetype-storage-guard.sh;
   };
-
-  systemd.services.podman-container-refresh.script = lib.mkAfter ''
-    systemctl restart \
-      podman-typetype.service \
-      podman-typetype-server.service \
-      podman-typetype-token.service \
-      podman-typetype-downloader.service \
-      podman-typetype-postgres.service \
-      podman-typetype-dragonfly.service \
-      podman-typetype-garage.service
-  '';
 }

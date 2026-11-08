@@ -4,6 +4,10 @@
   sops = {
     defaultSopsFile = ./secrets/bandit.yaml;
     secrets = {
+      typetype = {
+        sopsFile = ./secrets/typetype.env;
+        format = "dotenv";
+      };
       wg = {
         format = "binary";
         sopsFile = ./secrets/wg.conf;

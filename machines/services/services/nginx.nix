@@ -300,7 +300,7 @@ in
         enableACME = true;
         forceSSL = true;
         locations."/" = authentikAuthStrictTypeType // {
-          proxyPass = "http://127.0.0.1:18082";
+          proxyPass = "http://192.168.180.10:80";
           proxyWebsockets = true;
         };
       };

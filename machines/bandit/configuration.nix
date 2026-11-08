@@ -20,6 +20,7 @@
     ./sops.nix
     ./services/immich.nix
     ./services/pinepods.nix
+    ./services/typetype.nix
     ./services/muxarr.nix
     ./nvidia.nix
     inputs.sops_nix.nixosModules.sops
@@ -109,6 +110,10 @@
     };
   };
   fileSystems = {
+    "/data/typetype" = {
+      device = "data/typetype";
+      fsType = "zfs";
+    };
     "/" = {
       device = "osdata/root";
       fsType = "zfs";

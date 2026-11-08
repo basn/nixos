@@ -11,7 +11,9 @@ Unpackerr, Immich, PinePods, Attic, rclone, and Nginx.
 - Media and automation: Plex, Jellyfin, Sonarr, Radarr, Prowlarr, Muxarr,
   Unpackerr, and qBittorrent in a WireGuard-constrained network namespace.
 - Storage and applications: Attic, Immich, PinePods, rclone, ZFS scrubs, and
-  Nginx.
+  Nginx. TypeType's seven containers run here after the authorized migration;
+  see [`../../docs/typetype.md`](../../docs/typetype.md) for validation and the
+  temporary auto-upgrade pause.
 - Automation: the host chassis-fan service.
 - Local inference: CUDA-backed `llama-server` serves Gemma 4 12B IT Q8_0
   (`unsloth/gemma-4-12b-it-GGUF`, `gemma-4-12b-it-Q8_0.gguf`)

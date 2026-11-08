@@ -21,6 +21,9 @@ The PinePods public ingress and declarative Authentik application are documented
 in [`../../docs/pinepods.md`](../../docs/pinepods.md).
 The Muxarr public ingress and manual Authentik prerequisites are documented in
 [`../../docs/muxarr.md`](../../docs/muxarr.md).
+TypeType's public TLS/auth ingress remains here and relays to Bandit; the
+completed cold cutover, user-reported functionality and auto-upgrade pause are documented in
+[`../../docs/typetype.md`](../../docs/typetype.md).
 
 Network Optimizer and its companion speed-test image are pinned to 2.10.7,
 confirmed as the latest stable GitHub release on 2026-11-05 (2.11 previews are
