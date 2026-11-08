@@ -77,20 +77,25 @@ build, host activation, or proof that the running service loaded this patch.
 
 ## Firecrawl image snapshot
 
-The registry snapshot checked on 2026-11-03 pins API `2.11.672` (build
-`5ca5e53bde538864e0ddcf359992583f381ea119`), Playwright `sha-d803057d3602`,
+The registry snapshot checked on 2026-11-08 pins API `2.11.704` (build
+`9965df2b1d4e2bef848feee475b61124cea7902d`), Playwright `sha-37a85335cdd6`,
 and NuQ PostgreSQL `sha-a7a63b4bfabf`, each with its multi-architecture digest
-in `configuration.nix`. These matched the respective GHCR `latest` manifests.
+in `configuration.nix`. The API and Playwright tag digests were reverified
+against GHCR; NuQ PostgreSQL is unchanged.
 API registry versions are published independently of GitHub releases: the
 [latest GitHub release, v2.11.0](https://github.com/firecrawl/firecrawl/releases/tag/v2.11.0),
 is not this image snapshot. The upstream
-[image publishing workflow](https://github.com/firecrawl/firecrawl/blob/5ca5e53bde538864e0ddcf359992583f381ea119/.github/workflows/deploy-image.yml)
+[image publishing workflow](https://github.com/firecrawl/firecrawl/blob/9965df2b1d4e2bef848feee475b61124cea7902d/.github/workflows/deploy-image.yml)
 records the API build SHA and publishes versioned manifests from `main`.
 
 This retains the PostgreSQL queue backend, PostgreSQL 17.11, Redis/RabbitMQ
 pins, persistent storage, secrets, networking, and resource limits; it does not
 adopt upstream's experimental FoundationDB backend. The API harness and NuQ
-initialization SQL are unchanged from the previous API build. A NixOS build
+initialization SQL and Compose configuration are unchanged from the previous API
+build. The [API changes](https://github.com/firecrawl/firecrawl/compare/5ca5e53bde538864e0ddcf359992583f381ea119...9965df2b1d4e2bef848feee475b61124cea7902d)
+enable TLS certificate verification by default; scraping targets with invalid or
+self-signed certificates may now fail. Certificate verification remains enabled.
+A NixOS build
 does not pull or start these images or test existing database state. After a
 separately approved deployment, verify container startup and a scrape/crawl
 against the existing data before treating the update as runtime-validated.
