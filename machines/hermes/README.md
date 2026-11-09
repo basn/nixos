@@ -41,7 +41,8 @@ path-relative resources stay in that environment.
 ### Local patch validation
 
 In a disposable checkout of the locked Hermes canary revision
-`4131fd95700685444c3522bf1ea07578c4003523` (a descendant of stable `v0.22.5`),
+`0329638c2bf0438552145589787e355bf23343fe` (a descendant of stable `v0.22.5`,
+pinned before the incompatible upstream patchelf override),
 apply `homeassistant-plugin-presence.patch` with `git apply --unidiff-zero`,
 then `final-output-drain.patch` with ordinary `git apply`. The final-output patch
 uses contextual hunks so source movement cannot silently misplace insertions.

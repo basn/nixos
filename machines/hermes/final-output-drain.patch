@@ -44,8 +44,8 @@ diff --git a/tools/process_registry.py b/tools/process_registry.py
  import codecs
  from contextlib import suppress
  import json
-@@ -39,7 +41,11 @@
- from tools.process_registry_ownership import ProcessOwnershipMixin
+@@ -38,7 +40,11 @@
+ from tools.process_registry_output_log import ProcessOutputLogMixin, open_output_log, record_exit_command, worker_output_log
  from tools.process_registry_termination import ProcessTerminationMixin
  from tools.process_registry_results import load_completed_results, save_completed_result
 -from tools.process_registry_env_log import log_delta_command
