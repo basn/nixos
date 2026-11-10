@@ -10,6 +10,10 @@
     nixpkgs-unstable-small = {
       url = "github:nixos/nixpkgs?ref=nixos-unstable-small";
     };
+    bootvine = {
+      url = "git+https://codeberg.org/wvhulle/bootvine";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     sops_nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -126,6 +130,7 @@
           extraSpecialArgs = { inherit unstableSmall; };
           modules = baseModules ++ [
             ./machines/laptop/configuration.nix
+            inputs.bootvine.nixosModules.default
             inputs.hjem.nixosModules.default
             ./hjem/default.nix
           ];
@@ -138,6 +143,7 @@
           extraSpecialArgs = { inherit unstableSmall; };
           modules = baseModules ++ [
             ./machines/battlestation/default.nix
+            inputs.bootvine.nixosModules.default
             inputs.hjem.nixosModules.default
             ({ ... }: { nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ]; })
             ./hjem/default.nix

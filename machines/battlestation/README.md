@@ -46,6 +46,21 @@ these declarative defaults.
 - Steam, Gamescope support, and 32-bit graphics; the VR specialisation remains
   available but disabled.
 
+## Boot console
+
+Bootvine replaces Plymouth with a live systemd dependency tree on tty12 during
+the systemd initrd, stage 2, and shutdown. Its default ANSI colors use the
+OneDarkPro `onedark_dark` terminal palette, matching Neovim: black background
+(`#000000`) and foreground `#abb2bf`. `console.colors` also applies this palette
+to all virtual consoles. Quiet/log parameters, the kernel, ZFS credential
+requests, and the greeter are unchanged.
+
+Keep a known-good boot generation before trying this on hardware. Real boot
+has not been tested: check encrypted ZFS unlock through systemd-ask-password,
+the Swedish console keymap (including password punctuation), wrong-password
+retry, handoff to the Noctalia greeter, and the shutdown display. Build success
+alone does not verify the ZFS password interaction or console handoff.
+
 ```sh
 nix build .#nixosConfigurations.battlestation.config.system.build.toplevel --no-link
 ```

@@ -8,11 +8,6 @@
   basn.boot.useLatestZfsCompatibleKernel = true;
 
   boot = {
-    plymouth = {
-      enable = true;
-      theme = "nixos-bgrt";
-      themePackages = [ pkgs.nixos-bgrt-plymouth ];
-    };
     consoleLogLevel = 3;
     loader = {
       systemd-boot = {
@@ -65,6 +60,7 @@
     };
   };
   services = {
+    bootvine.enable = true;
     thermald = {
       enable = true;
     };
@@ -98,6 +94,25 @@
     };
   };
   console.keyMap = "sv-latin1";
+  # OneDarkPro onedark_dark terminal palette, matching common/neovim.nix.
+  console.colors = [
+    "000000"
+    "ef596f"
+    "89ca78"
+    "e5c07b"
+    "61afef"
+    "d55fde"
+    "2bbac5"
+    "abb2bf"
+    "434852"
+    "f38897"
+    "a9d89d"
+    "edd4a6"
+    "8fc6f4"
+    "e089e7"
+    "4bced8"
+    "c8cdd5"
+  ];
   security.rtkit.enable = true;
   users.users.basn = {
     isNormalUser = true;
