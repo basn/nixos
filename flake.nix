@@ -171,6 +171,11 @@
           extraSpecialArgs = { inherit unstablePkgs unstableSmall; };
           modules = baseModules ++ [ ./machines/cygate2/configuration.nix ];
         };
+        skynet = mkHost {
+          nixpkgsLib = inputs.nixpkgs-unstable-small.lib;
+          includeAutoUpgradeRole = true;
+          modules = baseModules ++ [ ./machines/skynet/configuration.nix ];
+        };
         hermes = mkHost {
           nixpkgsLib = inputs.nixpkgs-unstable.lib;
           includeAutoUpgradeRole = true;
