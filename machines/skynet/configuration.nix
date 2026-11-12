@@ -1,6 +1,9 @@
 { ... }:
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [
+    ./hardware-configuration.nix
+    ./inference.nix
+  ];
 
   boot = {
     zfs = {
@@ -42,9 +45,8 @@
     nvidiaSettings = false;
   };
 
-  # Defer notifications until Skynet has SOPS authorization.
+  # Only ZFS mail is authorized; defer upgrade webhook enrollment.
   basn.nixosUpgradeNotify.enable = false;
-  services.zfs.autoScrub.enable = true;
 
   services.openssh.settings.PasswordAuthentication = false;
 

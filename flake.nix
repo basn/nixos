@@ -173,6 +173,7 @@
         };
         skynet = mkHost {
           nixpkgsLib = inputs.nixpkgs-unstable-small.lib;
+          includeZfsRole = true;
           includeAutoUpgradeRole = true;
           modules = baseModules ++ [ ./machines/skynet/configuration.nix ];
         };

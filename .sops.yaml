@@ -11,7 +11,13 @@ keys:
   - &server_lenovo age19ctltmx5axzgvrgke9y5e7v3dnrxdx745hw08qnrk6l0vfut43lq0c32wm
   - &server_skullcanyon age1vu6x0k0r2mvj8lgw54w8xq69956emeaa549zgjg9y8xqhmpvqpfsanmmt6
   - &server_hermes age1spcakwpad69z58xgjdtnq2e59hm78rsygqn0s6dz2rd4mqf6gqls2w9y63
+  - &server_skynet age1q0fvq5659zrqusxyjq4sdg5gvud5jmx45xfweugzapup6a5eky0q8v2u8r
 creation_rules:
+  - path_regex: ^machines/skynet/secrets/inference\.yaml$
+    key_groups:
+      - age:
+        - *basn
+        - *server_skynet
   - path_regex: ^machines/battlestation/secrets/[^/]+\.(yaml|json|env|ini|conf)$
     key_groups:
       - age:
@@ -37,6 +43,20 @@ creation_rules:
       - age:
         - *basn
         - *server_nixossov
+  - path_regex: ^secrets/zfs\.yaml$
+    key_groups:
+      - age:
+        - *basn
+        - *server_bandit
+        - *server_services
+        - *server_netbird
+        - *server_vault
+        - *server_nixossov
+        - *ws_battlestation
+        - *server_lenovo
+        - *server_skullcanyon
+        - *server_nixossov2
+        - *server_skynet
   - path_regex: ^secrets/[^/]+\.(yaml|json|env|ini|conf)$
     key_groups:
       - age:
