@@ -38,9 +38,9 @@ nix build .#nixosConfigurations.<host>.config.system.build.toplevel --no-link
 nix build .#nixosConfigurations.<iso>.config.system.build.isoImage --no-link
 ```
 
-Each active host directory under `machines/` includes a README describing its
-role, configured services, primary configuration files, and matching build
-command. The Cygate directories document their `nixos-sov` output names.
+Where present, host READMEs under `machines/` describe their role, configured
+services, primary configuration files, and matching build command.
+The Cygate directories document their `nixos-sov` output names.
 
 ## Repository Layout
 

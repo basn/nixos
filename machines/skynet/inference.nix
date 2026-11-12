@@ -9,14 +9,6 @@ in
       key = "VLLM_API_KEY";
       mode = "0400";
     };
-    inference-tls-key = {
-      sopsFile = ./secrets/inference.yaml;
-      key = "tls_private_key";
-      owner = "root";
-      group = "nginx";
-      mode = "0440";
-      restartUnits = [ "nginx.service" ];
-    };
   };
   sops.templates.inference-env = {
     mode = "0400";
@@ -26,18 +18,28 @@ in
     restartUnits = [ "podman-skynet-inference.service" ];
   };
 
-  networking.firewall.interfaces.ens33.allowedTCPPorts = [ 443 ];
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "basn@lan2k.org";
+  };
+  networking.firewall.interfaces.ens33.allowedTCPPorts = [
+    80
+    443
+  ];
   services.nginx = {
     enable = true;
     recommendedTlsSettings = true;
     recommendedProxySettings = true;
-    virtualHosts."81.91.1.125" = {
+    virtualHosts."skynet.basn.se" = {
       default = true;
-      onlySSL = true;
+      forceSSL = true;
+      enableACME = true;
       listenAddresses = [ "10.136.48.5" ];
-      # shortcut: self-signed certificate expires after one year; renew and redistribute trust before expiry.
-      sslCertificate = ./inference.crt;
-      sslCertificateKey = config.sops.secrets.inference-tls-key.path;
+      extraConfig = ''
+        allow 193.183.116.216/32;
+        allow 193.108.5.135/32;
+        deny all;
+      '';
       locations = {
         "/".return = "404";
         "= /v1/models" = {
