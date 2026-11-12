@@ -101,7 +101,7 @@ in
         "--tensor-parallel-size=2"
         "--distributed-executor-backend=mp"
         "--max-model-len=32768"
-        "--max-num-seqs=1"
+        "--max-num-seqs=4"
         "--gpu-memory-utilization=0.85"
         "--reasoning-parser=qwen3"
         "--enable-auto-tool-choice"
