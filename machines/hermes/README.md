@@ -40,6 +40,12 @@ path-relative resources stay in that environment.
 
 ### Local patch validation
 
+The lock-only rollback avoids an upstream patchelf override whose patches target
+0.19.2 but are applied to 0.15.2. Remove the rollback once a newer Hermes revision
+builds the configured package and the `hermes`, `laptop`, and `battlestation`
+toplevels and passes the regressions below. A general lock update can reintroduce
+the incompatible revision; `flake.nix` intentionally has no hard pin.
+
 In a disposable checkout of the locked Hermes canary revision
 `0329638c2bf0438552145589787e355bf23343fe` (a descendant of stable `v0.22.5`,
 pinned before the incompatible upstream patchelf override),
