@@ -36,10 +36,10 @@ machines over SSH and never activates a NixOS configuration.
 7. After each successful build, `attic push nixos <output>` uploads the full
    output closure to `https://attic.basn.se/`. Attic's normal closure upload
    behavior skips paths already present in the cache.
-8. Each machine independently follows `git+https://github.com/basn/nixos` and
-   runs `nixos-upgrade.service` nightly. It downloads matching paths from the
-   `nixos` Attic cache and switches only after evaluation and realization
-   succeed.
+8. Machines with the auto-upgrade role independently follow
+   `git+https://github.com/basn/nixos` and run `nixos-upgrade.service` nightly.
+   Each downloads matching paths from the `nixos` Attic cache and switches only
+   after evaluation and realization succeed.
 
 The workflow runs only trusted `main` code. Do not add `pull_request`,
 `pull_request_target`, fork, or other untrusted-code triggers to the persistent
@@ -63,9 +63,9 @@ GitHub.
 
 ## Scheduling and failure behavior
 
-All real machines enable `system.autoUpgrade` at 02:00 in their configured
-`Europe/Stockholm` timezone with a stable per-machine randomized delay of up
-to four hours. The persistent timer catches up after downtime and still
+Machines with the auto-upgrade role enable `system.autoUpgrade` at 02:00 in
+their configured `Europe/Stockholm` timezone with a stable per-machine
+randomized delay of up to four hours. The persistent timer catches up after downtime and still
 applies the randomized delay. Automatic reboots are disabled.
 
 The shared Nix configuration already trusts and uses
