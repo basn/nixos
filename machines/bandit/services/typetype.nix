@@ -91,6 +91,36 @@ let
         proxy_send_timeout 300;
         proxy_buffering off;
       }
+      location ^~ /streams/ {
+        proxy_pass http://typetype_server_backend/streams/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 300;
+        proxy_send_timeout 300;
+        proxy_buffering off;
+      }
+      location = /proxy {
+        proxy_pass http://typetype_server_backend/proxy;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 300;
+        proxy_send_timeout 300;
+        proxy_buffering off;
+      }
+      location ^~ /proxy/ {
+        proxy_pass http://typetype_server_backend/proxy/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 300;
+        proxy_send_timeout 300;
+        proxy_buffering off;
+      }
       location / {
         try_files $uri $uri/ /index.html;
       }
@@ -237,7 +267,7 @@ in
     backend = "podman";
     containers = {
       typetype = {
-        image = "ghcr.io/typetype-video/typetype:1.10.0@sha256:e339425a82f340c42ad67e1e55b88e95e2e9e4565f33c47a63b2b4ba63d19869";
+        image = "ghcr.io/typetype-video/typetype:1.17.0@sha256:7748dd2365ecc99cbdff96ab1afdfb3d7386949b3fa3603dbc4a369b9d6aaff1";
         networks = [ "typetype" ];
         ports = [ "127.0.0.1:18082:80" ];
         volumes = [ "${typetypeNginx}:/etc/nginx/templates/default.conf.template:ro" ];
@@ -245,7 +275,7 @@ in
       };
 
       typetype-server = {
-        image = "ghcr.io/typetype-video/typetype-server:1.10.0@sha256:aec23107e58bae16133af4ff3ecaf6c0c4cd621e030811129c11dfe6b3bebf37";
+        image = "ghcr.io/typetype-video/typetype-server:1.17.0@sha256:de3d41df141fefa026e7f3036e9187e3e1daf5dd30c78a7c1c94ed1b44306d73";
         networks = [ "typetype" ];
         environment = {
           ALLOWED_ORIGINS = "https://tube.basn.se";
@@ -271,7 +301,7 @@ in
       };
 
       typetype-downloader = {
-        image = "ghcr.io/typetype-video/typetype-downloader:1.10.0@sha256:2e38afac2b25e4c2ddf1624fd15605498595ca6f558f14fcbe78623366e77e41";
+        image = "ghcr.io/typetype-video/typetype-downloader:1.17.0@sha256:7bf51d86e9079c00e0d183d193837d9a421232734512c4ac72e82f0cf8f71119";
         networks = [ "typetype" ];
         environment = {
           HTTP_PORT = "18093";
@@ -305,7 +335,7 @@ in
       };
 
       typetype-token = {
-        image = "ghcr.io/typetype-video/typetype-token:1.10.0@sha256:25a6571359522d07dcbef11931e318280c945b06baac004452ccf4595ea612dd";
+        image = "ghcr.io/typetype-video/typetype-token:1.17.0@sha256:a97d3e142de3befa763fd56ef4f0405f2b6021933418da870131f20f93610544";
         networks = [ "typetype" ];
         extraOptions = [ "--ipc=host" ];
         environment = {

@@ -25,6 +25,16 @@ destination. The following preparation/checklist sections describe the plan.
 - No TypeType refresh hook or new Bandit refresh service/timer is included.
   Services' existing network-optimizer refresh implementation is unchanged.
 
+## Repository update — TypeType 1.17.0
+
+Bandit's four application images are pinned together to 1.17.0 with verified
+GHCR digests and Linux/amd64 availability. Supporting images are unchanged.
+The local nginx template now relays `/streams/`, `/proxy`, and `/proxy/`, matching
+the upstream 1.17.0 template: server-generated manifest and proxy URLs use these
+root-level paths as well as `/api/`. Remote login remains disabled, and the
+downloader still requires the existing `S3_ACCESS_KEY`/`S3_SECRET_KEY` aliases.
+This repository update does not deploy or establish live application behavior.
+
 ## Storage prerequisite (performed during cutover)
 
 Create a single `data/typetype` ZFS dataset with **inherited encryption** and
