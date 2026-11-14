@@ -228,6 +228,26 @@ in
             + "proxy_set_header Connection $connection_upgrade;";
         };
       };
+      "api.hermes.basn.se" = {
+        enableACME = true;
+        forceSSL = true;
+        locations."= /v1/models" = {
+          proxyPass = "http://10.1.1.10:8642";
+          extraConfig = ''
+            proxy_set_header Authorization $http_authorization;
+          '';
+        };
+        locations."= /v1/chat/completions" = {
+          proxyPass = "http://10.1.1.10:8642";
+          extraConfig = ''
+            proxy_set_header Authorization $http_authorization;
+            proxy_buffering off;
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+          '';
+        };
+        locations."/".return = "404";
+      };
       "hermes.basn.se" = {
         enableACME = true;
         forceSSL = true;

@@ -16,6 +16,10 @@ commands, and SOPS-backed MCP environment remain host-specific; currently only
 battlestation provides that system setup and its credentials. The shared
 OpenCode configuration uses `astra-orchestrator` to delegate implementation to
 `sol-coder` and repository research to `explore`.
+Explicit remote work can use `@hermes` or requested delegation to `hermes` via
+the native API at `https://api.hermes.basn.se/v1`; see
+[Hermes API setup and authority](machines/hermes/README.md#opencode-api).
+The shared config alone does not provision credentials on laptop or other clients.
 It also loads the native V2 `@dietrichgebert/ponytail` plugin in its default
 `full` mode, with `/ponytail` commands for switching levels.
 The Home Assistant and NixOS MCP launchers use the locked

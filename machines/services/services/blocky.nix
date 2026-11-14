@@ -58,6 +58,7 @@
           customTTL = "30m";
           filterUnmappedTypes = false;
           mapping = {
+            "api.hermes.basn.se" = "10.1.1.8";
             "auth.basn.se" = "10.1.1.8";
             "bandit.basn.se" = "192.168.180.10";
             "hass.basn.se" = "10.1.1.8";

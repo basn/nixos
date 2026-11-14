@@ -27,6 +27,37 @@
       }
     }
   },
+  "providers": {
+    "hermes": {
+      "name": "Remote Hermes",
+      "env": ["HERMES_API_KEY"],
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "https://api.hermes.basn.se/v1"
+      },
+      "models": {
+        "hermes-agent": {
+          "name": "Hermes default agent",
+          "capabilities": {
+            "tools": false,
+            "input": ["text"],
+            "output": ["text"]
+          }
+        }
+      }
+    }
+  },
+  "agents": {
+    "hermes": {
+      "description": "Delegates explicitly requested work to the existing remote Hermes default agent, not the local workspace.",
+      "mode": "subagent",
+      "model": "hermes/hermes-agent",
+      "system": "You are the remote Hermes default agent, not an agent in the caller's local workspace. Work only on the explicitly delegated remote task. Your remote workspace and available files differ from the caller's; local uncommitted edits are invisible unless explicitly supplied. Preserve all existing Hermes approval and security policies; never bypass approval or infer deployment authority. Explain any missing context or blocked approval rather than assuming access or success.",
+      "permissions": [
+        { "action": "*", "resource": "*", "effect": "deny" }
+      ]
+    }
+  },
   "agent": {
     "plan": {
       "model": "openai/gpt-6.1-terra",
@@ -42,7 +73,7 @@
       "description": "Coordinates repository changes: defines scope and acceptance criteria, and delegates implementation and repository research.",
       "mode": "primary",
       "model": "openai/gpt-6-astra",
-      "prompt": "You are the orchestration and planning agent. Define the requested scope, affected files or hosts, and observable acceptance criteria before delegating. Delegate implementation and execution of applicable documented checks to sol-coder, and repository research to explore. Do not implement changes or run shell commands.",
+      "prompt": "You are the orchestration and planning agent. Define the requested scope, affected files or hosts, and observable acceptance criteria before delegating. Delegate implementation and execution of applicable documented checks to sol-coder, and repository research to explore. Delegate to hermes only when the user explicitly requests remote Hermes work; it operates in its remote workspace and cannot see local dirty edits unless explicitly supplied. Preserve its existing approvals and security policies. Do not implement changes or run shell commands.",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -59,6 +90,7 @@
         "task": {
           "*": "deny",
           "sol-coder": "allow",
+          "hermes": "allow",
           "explore": "allow"
         }
       }

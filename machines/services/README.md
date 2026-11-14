@@ -7,6 +7,12 @@ Nginx, Uptime Kuma, py-kms, Vaultwarden, Vikunja, the AC service, monitoring,
 Authentik, FreshRSS, SearxNG, the network optimizer, and ZnapZend. Service
 modules live in `services/`; SOPS declarations are in `sops.nix`.
 
+The Hermes API ingress `api.hermes.basn.se` proxies only the exact model-list
+and chat-completion routes to Hermes, using its bearer auth rather than the
+Authentik helper. Blocky maps it to `10.1.1.8` internally. Public DNS and ACME
+validation remain deployment prerequisites; the dashboard/OIDC are unchanged.
+See [Hermes API details](../hermes/README.md#opencode-api).
+
 ## Configured services
 
 - Podman and managed container refresh/prune jobs; Blocky; Nginx; and Uptime

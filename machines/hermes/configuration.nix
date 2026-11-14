@@ -208,6 +208,7 @@ in
         ip saddr 172.16.0.0/12 tcp dport 22 accept
         ip saddr 192.168.0.0/16 tcp dport 22 accept
         ip saddr 10.1.1.8 tcp dport 9119 accept
+        ip saddr 10.1.1.8 tcp dport 8642 accept
       '';
     };
   };
@@ -256,6 +257,15 @@ in
       };
       settings = {
         gateway.multiplex_profiles = true;
+        platforms.api_server = {
+          enabled = true;
+          extra = {
+            host = "10.1.1.10";
+            port = 8642;
+            model_name = "hermes-agent";
+            tool_progress_events = false;
+          };
+        };
         model = {
           provider = "openai-codex";
           default = "gpt-6-astra";

@@ -19,6 +19,21 @@ The OpenCode configuration and certificate are deployed through the shared
 `hjem/tooling.nix` module, while this host alone provides the OpenCode package,
 helper commands, and SOPS-backed MCP environment.
 
+## Hermes client
+
+`oc` exports the mode-0400 SOPS `opencode-mcp-env` file, now including
+`HERMES_API_KEY` for the native remote provider. After an authorized deployment,
+use `oc --standalone` when the V2 shared background server was started without
+that environment: exporting a key in a later client does not update an existing
+server's environment. No background service is restarted by this change.
+Use `@hermes` or explicitly ask Astra to delegate remote work to Hermes.
+See [remote authority and prerequisites](../hermes/README.md#opencode-api).
+
+Laptop receives the shared JSON but has no corresponding SOPS environment or
+`oc` wrapper. Before using Hermes there, securely provision the same
+`HERMES_API_KEY` into its OpenCode server environment (or an authorized provider
+connection); do not copy it into the JSON or the Nix store.
+
 ## Configured services
 
 Umbriel defaults to dwindle with dynamic workspaces on both monitors: unused
