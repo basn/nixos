@@ -345,6 +345,21 @@ zfs list -t snapshot -r osdisk/hermes
 
 ## Flake and runtime audit tools
 
+The terminal image also provides the read-only deterministic `hockey` CLI:
+`hockey`, `hockey --json`, or `hockey player-key`. It checks fresh official
+Swehockey schedules and rosters; team fixtures are not proof of player participation.
+See [hockey usage, coverage and mapping renewal](../../docs/hockey.md). This is
+terminal-backend only, not a host-shell or desktop-profile command. Existing
+manual approvals and unattended/cron deny behavior are unchanged.
+Only SOPS-encrypted hockey configuration is stored in the repository; binary
+encryption hides selector keys too. Successful activation/boot provisions a
+root:root mode-0400 runtime secret mounted read-only into the sandbox; builds do
+not decrypt or deploy it. Before separately authorized recreation, verify the
+secret resolves to a regular file with that ownership and mode, without reading
+its contents. Initial migration and renewals need sandbox recreation under the
+activation policy below: existing file bind mounts retain the old generation.
+See the linked renewal instructions. No plaintext player JSON is packaged in the image.
+
 `terminal-image.nix` builds the Docker **terminal backend** image, including
 Git, `gh`, `skopeo`, SSH, Python, Node, DNS tools, and `basn-audit`.
 `hermes-terminal-image.service` loads it before Hermes starts. The image includes

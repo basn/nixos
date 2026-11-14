@@ -325,6 +325,7 @@ in
             "/var/lib/hermes/output:/output"
             "/var/lib/hermes/.hermes/cron/output:/cron-output:ro"
             "${config.sops.secrets.hermes-audit-ssh.path}:/run/hermes-audit/id_ed25519:ro"
+            "${config.sops.secrets.hockey-players.path}:/run/hockey-players.json:ro"
           ];
           container_cpu = 2;
           container_memory = 6144;
@@ -430,6 +431,13 @@ in
     defaultSopsFile = ./secrets/hermes.env;
     defaultSopsFormat = "dotenv";
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    secrets.hockey-players = {
+      sopsFile = ./secrets/hockey-players.json;
+      format = "binary";
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
     secrets.hermes-audit-ssh = {
       sopsFile = ./secrets/audit-ssh.yaml;
       format = "yaml";
