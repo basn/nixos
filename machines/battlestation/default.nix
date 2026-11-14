@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   unstableSmall,
@@ -179,6 +180,7 @@
   };
   environment = {
     systemPackages = with pkgs; [
+      inputs.dzgui.packages.${pkgs.stdenv.hostPlatform.system}.default
       protonup-ng
       playerctl
       rocmPackages.rocm-smi

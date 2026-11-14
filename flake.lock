@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "a2sSrc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1679346231,
+        "narHash": "sha256-cbXqDeVfAJyk5PeZWBSmi6G4ynYC3L34LFofKPdlwGo=",
+        "owner": "yepoleb",
+        "repo": "python-a2s",
+        "rev": "c7590ffa9a6d0c6912e17ceeab15b832a1090640",
+        "type": "github"
+      },
+      "original": {
+        "owner": "yepoleb",
+        "repo": "python-a2s",
+        "rev": "c7590ffa9a6d0c6912e17ceeab15b832a1090640",
+        "type": "github"
+      }
+    },
     "bootvine": {
       "inputs": {
         "crane": "crane",
@@ -37,6 +54,22 @@
         "type": "github"
       }
     },
+    "dayzquerySrc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1753658787,
+        "narHash": "sha256-mWNAtGPfmdW1ZxBrkRTqNkkw3zqbYeGvZrZKV9zu8vw=",
+        "owner": "yepoleb",
+        "repo": "dayzquery",
+        "rev": "a22a9f428cbe075d7dda62f78000296955eea92a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "yepoleb",
+        "repo": "dayzquery",
+        "type": "github"
+      }
+    },
     "devshell": {
       "inputs": {
         "nixpkgs": [
@@ -56,6 +89,64 @@
         "owner": "numtide",
         "repo": "devshell",
         "type": "github"
+      }
+    },
+    "dzgui": {
+      "inputs": {
+        "a2sSrc": "a2sSrc",
+        "dayzquerySrc": "dayzquerySrc",
+        "dzguiSrc": "dzguiSrc",
+        "dzguiSrc-testing": "dzguiSrc-testing",
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1764441811,
+        "narHash": "sha256-rnhUzyAnjXD0iQHxQl8yebfV12sI9EQMB5kpSXBdK9Q=",
+        "owner": "jiriks74",
+        "repo": "dzgui.flake",
+        "rev": "cc4b020a67845541e307eb0726b5a5d2d3b04fb1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jiriks74",
+        "repo": "dzgui.flake",
+        "type": "github"
+      }
+    },
+    "dzguiSrc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1761792544,
+        "narHash": "sha256-o00Qon4lB/RICiHT/MI0hXUMmyctnYH469rOGB8V/HI=",
+        "ref": "dzgui",
+        "rev": "a1d14669c7139c764bf14fceeac9f26e7d38750d",
+        "revCount": 1161,
+        "type": "git",
+        "url": "https://codeberg.org/aclist/dztui"
+      },
+      "original": {
+        "ref": "dzgui",
+        "type": "git",
+        "url": "https://codeberg.org/aclist/dztui"
+      }
+    },
+    "dzguiSrc-testing": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1763741099,
+        "narHash": "sha256-+a/AzZiXDn8wRKGW4zlTBrp8S04ylGl0aq4Wd0PSIJM=",
+        "ref": "testing",
+        "rev": "4edf71aa0aadf797fe0a5c8d555ca419ad8cda46",
+        "revCount": 1306,
+        "type": "git",
+        "url": "https://codeberg.org/aclist/dztui"
+      },
+      "original": {
+        "ref": "testing",
+        "type": "git",
+        "url": "https://codeberg.org/aclist/dztui"
       }
     },
     "flake-compat": {
@@ -496,6 +587,7 @@
     "root": {
       "inputs": {
         "bootvine": "bootvine",
+        "dzgui": "dzgui",
         "helium": "helium",
         "hermes-agent": "hermes-agent",
         "hjem": "hjem",

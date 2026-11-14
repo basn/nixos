@@ -29,6 +29,10 @@
       url = "github:amaanq/helium-flake";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    dzgui = {
+      url = "github:jiriks74/dzgui.flake";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     nvf = {
       url = "github:notashelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs-unstable";

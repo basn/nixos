@@ -23,8 +23,8 @@ settings remain in `hardware-configuration.nix`.
 
 Laptop-local Hjem overrides use Umbriel's automatic output discovery, preferred
 modes, automatic positioning, and dynamic workspaces instead of battlestation's
-DP-1/DP-2 modes and Discord workspace placement. Run `umbriel outputs` inside a
-session before adding panel scaling or docking-specific rules. Displays without
+DP-1/DP-2 modes and fixed nine-workspace inventories. Run `umbriel outputs` inside
+a session before adding panel scaling or docking-specific rules. Displays without
 a preferred mode or identity may need an explicit output rule.
 
 The existing Swedish layout with dead keys is retained for Plasma, Umbriel, and

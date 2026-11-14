@@ -36,18 +36,15 @@ connection); do not copy it into the JSON or the Nix store.
 
 ## Configured services
 
-Umbriel defaults to dwindle with dynamic workspaces on both monitors: unused
-workspaces are pruned and a trailing empty workspace remains available.
-The persistent first workspace on DP-2 is `discord`, followed by positional
-labels `2`, `3`, and so on; this does not route Discord windows automatically.
-Numeric workspace shortcuts beyond the existing positions clamp to the last
-workspace rather than creating arbitrary positions. Master layout settings
-remain available when switching layouts.
+Umbriel defaults to dwindle with nine fixed workspaces numbered `1`–`9` on each
+monitor (DP-1 and DP-2). Empty workspaces are retained; there is no named Discord
+workspace. Existing numeric shortcuts select or move windows to positions `1`–`9`.
+Master layout settings remain available when switching layouts.
 
 Noctalia's workspace widget is a taskbar grouped by workspace, showing app icons
 on both active and inactive workspaces with one icon per app. Empty workspaces
-remain visible. Labels are always shown inside groups, including occupied ones;
-the named workspace stays `discord` rather than becoming a numeric label.
+remain visible. Numeric labels are always shown inside groups, including occupied
+ones.
 Workspace group backgrounds and outlines are disabled; icons, labels, and grouping
 are retained.
 The host-local Hjem-managed `~/.config/noctalia/workspaces.toml` requests
