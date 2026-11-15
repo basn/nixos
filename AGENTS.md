@@ -4,6 +4,14 @@ This repository is a personal multi-host NixOS flake. Work conservatively:
 identify the affected host, keep changes narrowly scoped, validate them, and
 separate repository changes from live-machine operations.
 
+## Fresh Session Checklist
+
+- Read `README.md`, relevant `docs/`, and the affected host's README.
+- Inspect `git status` and `git diff`; preserve existing changes.
+- Identify affected flake outputs and follow their imports before editing.
+- Confirm authorization and check scope: installed non-build checks first,
+  GitHub Actions for builds by default; ask before any local build.
+
 ## Repository Layout
 
 - `flake.nix` defines the supported `nixosConfigurations` and their inputs.
@@ -42,7 +50,9 @@ second hard-coded host inventory in documentation.
 
 - Troubleshooting permits read-only local and remote inspection.
 - Read-only SSH diagnostics are allowed by default.
-- A request to fix or implement permits repository edits and validation.
+- A request to fix or implement permits repository edits and non-build checks,
+  not local builds. A validation request alone also does not authorize local
+  builds. Explain why one would help and ask for explicit permission first.
 - Repository edits do not authorize deploying them to a live host.
 - Require an explicit request before:
   - running `nixos-rebuild switch` against a remote machine;
@@ -50,6 +60,7 @@ second hard-coded host inventory in documentation.
   - rebooting or shutting down a machine;
   - changing live networking, firewall, storage, or authentication state;
   - committing, pushing, or opening a pull request;
+  - manually dispatching a GitHub Actions workflow;
   - updating `flake.lock` or changing flake inputs.
 - Do not disable authentication, TLS, firewalls, or other safety controls just
   to make a test pass.
@@ -68,8 +79,11 @@ second hard-coded host inventory in documentation.
 
 ## Troubleshooting Tools
 
-Do not permanently install a utility merely because it is missing during
-diagnostics. Use an ephemeral Nix environment.
+Use existing installed tools first. Do not permanently install a utility merely
+because it is missing during diagnostics. `nix shell` and `nix run` can build
+tools; ask before fetching a tool if doing so would require a build. The
+ephemeral examples below are conditional on that authorization, not permission
+to build.
 
 From this repository, prefer its locked inputs:
 
@@ -103,31 +117,44 @@ nix shell nixpkgs#usbutils -c lsusb -t
 
 ## Validation
 
-Validate in proportion to the change and begin with the narrowest affected
-output.
+Validate in proportion to the change. GitHub Actions is the default build path:
+every push to `main` starts derivation-based host selection in
+`.github/workflows/build-cache.yml`. See [build-cache behavior](docs/github-build-cache.md).
+Committing, pushing, and manual dispatch still require explicit authorization.
 
-For edited Nix files:
+Run installed non-build checks where applicable (skip and report missing tools):
 
 ```sh
 nixfmt --check path/to/file.nix
 git diff --check
+actionlint .github/workflows/build-cache.yml
 ```
 
-For a host configuration:
+Do not run local builds without explicit permission, including builds triggered
+by `nix shell`, `nix run`, or import-from-derivation during evaluation.
+`nix flake check --no-build` and evaluation commands are not a guarantee against
+such builds. A generic implementation or validation request is not permission.
+If a local build would help, explain the reason and affected outputs, then ask.
+
+Only after explicit local-build permission, for a host configuration:
 
 ```sh
 nix build .#nixosConfigurations.<host>.config.system.build.toplevel --no-link
 ```
 
-For installation media:
+Or, with explicit local-build permission, for installation media:
 
 ```sh
 nix build .#nixosConfigurations.<iso>.config.system.build.isoImage --no-link
 ```
 
-- Build every affected host when changing `common/`, a shared module,
-  `flake.nix`, or `flake.lock`.
-- Do not build all hosts for a change isolated to one machine.
+- Cover every affected host when changing shared configuration; keep authorized
+  local builds scoped to affected outputs, not the entire fleet for one host.
+- CI compares every current non-ISO host's system derivation and builds only
+  changed hosts on ordinary pushes; documentation-only pushes can select none.
+  Manual dispatch and missing-baseline fallbacks select the full fleet.
+- Fleet CI does not build ISO images or dedicated test outputs. Its conditional
+  `nix flake check --no-build` is not evidence that those outputs were built.
 - Do not run formatters in rewrite mode across unrelated files.
 - Report any skipped or failed validation clearly.
 
@@ -139,7 +166,8 @@ Before a requested remote switch:
 - Check `systemctl status nixos-upgrade.service` and related timers. Several
   hosts auto-upgrade from `github:basn/nixos`, which can race and revert a
   local deployment.
-- Build successfully before switching.
+- Confirm a successful build of the intended revision and output before
+  switching. Deployment permission alone does not authorize a local build.
 - Avoid combining unrelated host changes in one deployment.
 
 After switching:
@@ -152,7 +180,9 @@ After switching:
 
 ## Completion Report
 
-State what changed, which host outputs were validated, and whether anything
-was deployed. Mention remaining warnings or manual actions. Use clickable file
-paths where useful, and do not claim a live fix when only the repository was
-changed.
+State what changed, checks run, and whether anything was deployed. Distinguish
+pending or unobserved CI from passed CI; when available, report the exact
+revision and outputs covered by the run, including skipped builds and uncovered
+ISO/test outputs. CI is not a deployment gate. Mention remaining warnings or
+manual actions, use clickable file paths where useful, and do not claim a live
+fix when only the repository was changed.

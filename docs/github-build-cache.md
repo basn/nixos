@@ -3,10 +3,25 @@
 The repository uses a build-and-cache model. GitHub Actions never connects to
 machines over SSH and never activates a NixOS configuration.
 
+## Default validation path
+
+Use GitHub Actions for builds by default and installed non-build checks locally.
+Local builds require explicit permission: explain why and ask first; a generic
+implementation or validation request is not permission. This includes incidental
+builds through `nix shell`, `nix run`, or import-from-derivation during evaluation.
+Do not fetch missing check tools if that would require an unauthorized build.
+Commit, push, PR creation, manual workflow dispatch, and deployment still require
+explicit authorization.
+
+Distinguish pending or unobserved CI from passed CI. When available, report the
+run's exact revision and selected, built, and unchanged outputs. Fleet CI does
+not build ISO images or dedicated test outputs; even the conditional
+`nix flake check --no-build` is not a build of those outputs.
+
 ## Architecture
 
-1. A push to trusted `main` that changes `flake.lock`, or a manual dispatch
-   from `main`, starts the `Build and cache NixOS systems` workflow.
+1. Every push to trusted `main`, regardless of changed paths, or a manual
+   dispatch from `main`, starts the `Build and cache NixOS systems` workflow.
 2. The persistent `nixos-sov` runner evaluates the current flake and obtains
    its host inventory from the flake-owned `machine-build-matrix` package.
    Installation media outputs whose names end in `Iso` are excluded.
@@ -27,7 +42,9 @@ machines over SSH and never activates a NixOS configuration.
    that global check, so it does not validate other flake outputs, including
    installation media outputs. It still evaluates every current real-machine
    system derivation. If no host derivation changed, the matrix job is skipped
-   before matrix expansion.
+   before matrix expansion. Documentation-only pushes can therefore evaluate
+   the fleet without building hosts, provided comparison succeeds and no host
+   derivation changes; the full-fleet fallback still applies otherwise.
 6. The runner builds each selected machine's
    `config.system.build.toplevel` one host at a time, with up to eight concurrent
    Nix build jobs. Outputs already in the Nix store or Attic cache avoid
@@ -67,6 +84,8 @@ Machines with the auto-upgrade role enable `system.autoUpgrade` at 02:00 in
 their configured `Europe/Stockholm` timezone with a stable per-machine
 randomized delay of up to four hours. The persistent timer catches up after downtime and still
 applies the randomized delay. Automatic reboots are disabled.
+
+CI is not a deployment gate: auto-upgrades run independently of workflow success.
 
 The shared Nix configuration already trusts and uses
 `https://attic.basn.se/nixos`. If a GitHub Actions host build or cache upload
