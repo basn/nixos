@@ -79,7 +79,11 @@ path-relative resources stay in that environment.
 ### Local patch validation
 
 The lock-only rollback avoids an upstream patchelf override whose patches target
-0.19.2 but are applied to 0.15.2. Remove the rollback once a newer Hermes revision
+0.19.2 but are applied to 0.15.2 ([issue #154275](https://github.com/NousResearch/hermes-agent/issues/154275),
+[fix PR #152542](https://github.com/NousResearch/hermes-agent/pull/152542), still
+open and unmerged on 2026-11-15). Retain this input and its private dependencies
+during named-input updates; its followed `nixpkgs-unstable` can still change.
+Remove the rollback once the fix is merged and a newer Hermes revision
 builds the configured package and the `hermes`, `laptop`, and `battlestation`
 toplevels and passes the regressions below. A general lock update can reintroduce
 the incompatible revision; `flake.nix` intentionally has no hard pin.

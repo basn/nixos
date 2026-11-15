@@ -1,13 +1,15 @@
 # PinePods
 
 PinePods 0.9.2 is configured on `bandit` as three rootful Podman containers: PinePods,
-PostgreSQL 18.6, and non-persistent Valkey 8.1.11. The images are version and
+PostgreSQL 18.7, and non-persistent Valkey 8.1.11. The images are version and
 multi-architecture manifest digest pinned in
 `machines/bandit/services/pinepods.nix`. PostgreSQL and Valkey are on the
 private `pinepods` Podman network and publish no host ports.
 
-The PostgreSQL pin was refreshed on 2026-09-24 from the official
-[PostgreSQL](https://hub.docker.com/_/postgres) Docker Hub repository. The
+The PostgreSQL 18.7-alpine pin was verified on 2026-11-15 against the official
+[PostgreSQL](https://hub.docker.com/_/postgres) Docker Hub registry: the index
+digest matches a locally calculated SHA-256 and includes a verified linux/amd64
+manifest/configuration. The Alpine variant, PGDATA and UID/GID remain unchanged. The
 Valkey pin was refreshed on 2026-10-27 from the official
 [Valkey](https://hub.docker.com/r/valkey/valkey) repository. Valkey 8.1.11 is a
 security update that also contains standalone-relevant crash and correctness
@@ -18,6 +20,23 @@ latest stable GitHub release on 2026-11-05, and its tag was verified against
 Docker Hub's registry manifest endpoint; the returned digest matched a locally
 calculated SHA-256 of the multi-architecture index, which includes linux/amd64
 and linux/arm64.
+
+## PostgreSQL 18.7 maintenance gate
+
+This repository-only update addresses
+[CVE-2026-6460](https://www.postgresql.org/support/security/CVE-2026-6460/).
+Before deployment, follow the shared
+[PostgreSQL maintenance gates](../machines/services/README.md#postgresql-security-maintenance-gate)
+and [18.7 release notes](https://www.postgresql.org/docs/release/18.7/), including
+C-extension/preload inventory in every database, target rebuilds, index review
+(also parallel GIN builds with keys over 65535 bytes), and restore tests.
+Take a fresh recoverable `pinepods_database` backup **and cluster roles/globals**,
+plus downloads, and verify independent recovery with the target image first.
+The daily logical `pg_dump` has 14-day same-pool retention, omits roles/globals,
+and does not establish off-host recovery coverage. It is not an incremental
+backup. Live inventory and recovery remain unverified; this patch performs no
+backup, restore, database change or deployment. Live operations need explicit
+authorization.
 
 ## Upgrading to 0.9.2
 

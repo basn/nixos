@@ -31,11 +31,26 @@ TypeType's public TLS/auth ingress remains here and relays to Bandit; the
 completed cold cutover, user-reported functionality and auto-upgrade pause are documented in
 [`../../docs/typetype.md`](../../docs/typetype.md).
 
-Network Optimizer and its companion speed-test image are pinned to 2.10.7,
-confirmed as the latest stable GitHub release on 2026-11-05 (2.11 previews are
-excluded). Both multi-architecture index digests were verified on that date
-against GHCR's registry manifest endpoints and locally calculated SHA-256 hashes;
-both include linux/amd64 and linux/arm64. The
+Network Optimizer and its companion speed-test image are pinned to 2.11.2.
+The [2.11.2 stable release](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.2)
+and both GHCR index digests were verified on 2026-11-15: registry digests match
+locally calculated SHA-256 hashes, both include linux/amd64 and linux/arm64,
+and amd64 revision labels match release commit
+`3bdd96f84769ef243041a3a325554a34aef41ad7`.
+This release fixes SNMP readings, snapshots and dashboard status and precompiles
+pages. Review the [2.11.0](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.0)
+and [2.11.1](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.1)
+notes before deployment; back up persisted
+state and test recovery first. The SNMP fix needs no On-Site Agent upgrade;
+agent upgrades and gateway traceroute installation are separate live operations.
+2.11 adds Change Control writes and optional CAKE shaping; do not apply plans or
+deploy shaping without separate authorization (the first Adaptive SQM deploy
+after upgrading can drop packets on every WAN for about a second). Review the
+default-enabled per-site Live Traffic/DNS capture setting before upgrading an
+On-Gateway Agent; flows and lookups are held in memory while the page is open.
+No deployment or runtime compatibility is established by these pins.
+
+Earlier upgrade context: the
 [2.10.7 release notes](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.10.7)
 cover connection recovery, Multi-WAN tracing, monitoring and alert fixes, Go
 security updates, and Alpine brotli/curl/expat security fixes in the speed-test
@@ -63,6 +78,48 @@ each release converts to Apache 2.0 three years after publication.
 is not covered by the configured ZnapZend datasets. Before deploying an image
 upgrade for either service, create and verify a recoverable backup of its
 persisted state. Repository image-pin changes do not perform that live backup.
+
+## PostgreSQL security maintenance gate
+
+Authentik's PostgreSQL pin is 17.12 (previously 17.11). Its official Docker Hub
+multi-architecture index digest was checked against the registry and a local
+SHA-256 on 2026-11-15, including the linux/amd64 manifest and configuration.
+[CVE-2026-6460](https://www.postgresql.org/support/security/CVE-2026-6460/)
+is fixed in 17.12 and 18.7. The
+[17.12](https://www.postgresql.org/docs/release/17.12/) and
+[18.7](https://www.postgresql.org/docs/release/18.7/) release notes require these
+gates for Authentik, [TypeType](../../docs/typetype.md) and
+[PinePods](../../docs/pinepods.md), not just an image replacement:
+
+- Before deployment, obtain fresh recoverable backups of every application
+  database and cluster roles/globals; test restoration with the target image and
+  retain independent recovery copies. Authentik's `/docker/authentik/backups`
+  directory is provisioned, but no recurring backup is configured here.
+- Inventory extensions and C-language functions in **every database**, plus
+  shared/session/local preloads and their libraries. No custom extensions or
+  preloads are declared here; the live inventory is unknown. Rebuild C extensions
+  against the target PostgreSQL release for full protection; some require source
+  changes. Verify target builds and compatibility before switching. Do not disable
+  `composite_type_mismatch` protections to make an extension work.
+- Minor upgrades within each major do not require dump/restore. Review affected
+  indexes and plan authorized `REINDEX` after updating: unconstrained `bpchar`
+  btree columns (not `CHAR(n)`), suspected GIN vacuum/page-split corruption, and
+  TOAST indexes affected by concurrent reindexing/"missing chunk" errors.
+  PostgreSQL 18 also needs review of parallel GIN builds with keys over 65535 bytes.
+- No PostgreSQL incremental backup is configured here, but verify live usage.
+  Existing incremental files are untrusted; if used, take a new full backup
+  **after updating** as the next incremental baseline. Updating alone does not
+  repair existing WAL summaries. PinePods' logical dumps are not incremental.
+
+All backups, restores, reindexing, restarts and deployment require explicit live
+authorization. This repository patch performs none and is not live remediation.
+
+## Grafana package update
+
+After the 2026-11-15 named-input lock refresh, Services' configured native
+Grafana package evaluates to 13.0.13 from the primary stable nixpkgs input
+(previously 13.0.12). No host package override is needed. Evaluation alone does
+not establish a successful system build or deployment; nothing live was changed.
 
 ```sh
 nix build .#nixosConfigurations.services.config.system.build.toplevel --no-link

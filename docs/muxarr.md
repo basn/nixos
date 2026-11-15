@@ -1,16 +1,27 @@
 # Muxarr
 
-Muxarr 0.9.13 runs on `bandit` as a rootful Podman container. The image is
+Muxarr 0.9.14 is configured on `bandit` as a rootful Podman container. The image is
 pinned by release tag and multi-architecture manifest digest in
 `machines/bandit/services/muxarr.nix`; the digest was verified against GHCR on
-2026-11-05 and identifies upstream commit
-`7d1c6bb0609db0ca6a4b0e2e723a7a244562a916`.
-GitHub confirmed 0.9.13 as the latest stable release on that date. GHCR's
+2026-11-15 and identifies upstream commit
+`f496e832539b4dd27a2fe200127fd17749dd1485`.
+GitHub confirmed 0.9.14 as a stable release on that date. GHCR's
 reported digest matched a locally calculated SHA-256 of the version-tagged OCI
 index, which includes linux/amd64 and linux/arm64; the amd64 image's revision
 label matches the release commit.
 
-## Upgrading to 0.9.13
+## Upgrading to 0.9.14
+
+The [0.9.14 release notes](https://github.com/KirovAir/muxarr/releases/tag/v0.9.14)
+fix replacement of damaged/truncated sources, Matroska accessibility flags,
+false hearing-impaired track-name detection, and paused-queue persistence.
+Before explicitly authorized deployment, take a consistent recoverable backup
+of `/var/lib/muxarr` and media, test restoration, then use backed-up test files
+to check track handling, damaged-source rejection and paused queues. The
+existing mount/identity/authentication safeguards are unchanged. This repository
+pin is not live remediation or runtime verification; no backups or jobs were run.
+
+## Earlier upgrade — 0.9.13
 
 The [0.9.13 release notes](https://github.com/KirovAir/muxarr/releases/tag/v0.9.13)
 include a fix preventing filenames from executing shell commands during

@@ -36,6 +36,25 @@ URLs use these root-level paths as well as `/api/`. Remote login remains disable
 downloader still requires the existing `S3_ACCESS_KEY`/`S3_SECRET_KEY` aliases.
 This repository update does not deploy or establish live application behavior.
 
+## Repository update — PostgreSQL 17.12
+
+The PostgreSQL pin moves from 17.11 to 17.12 for
+[CVE-2026-6460](https://www.postgresql.org/support/security/CVE-2026-6460/),
+retaining the non-Alpine variant, data path and ownership. On 2026-11-15 the
+Docker Hub index digest matched its locally calculated SHA-256 and its
+linux/amd64 manifest/configuration was verified. This is not a deployment.
+
+Before deployment, follow the shared
+[PostgreSQL maintenance gates](../machines/services/README.md#postgresql-security-maintenance-gate)
+and [17.12 release notes](https://www.postgresql.org/docs/release/17.12/).
+Back up **both `typetype` and `typetype_downloader`**, cluster roles/globals,
+and consistent Garage metadata/objects; verify recovery using the target image.
+The 2026-11-08 recovery material below is historical, not a fresh or recurring
+backup. Ongoing backup destination/retention remains unresolved. Inventory C
+extensions and preloads across every database and verify rebuilt target libraries
+before deployment; live inventory is unknown. No backup or database changes are
+performed by this patch; all live operations require explicit authorization.
+
 ## Storage prerequisite (performed during cutover)
 
 Create a single `data/typetype` ZFS dataset with **inherited encryption** and
