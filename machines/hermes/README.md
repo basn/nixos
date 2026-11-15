@@ -500,6 +500,10 @@ Replacing the SSH key requires rotating both the SOPS secret and the public key
 in `../../modules/hermes-audit-key.pub`, then recreating the sandbox's secret
 mount as part of an approved activation.
 
+The default operational profile enables `cron.allow_agent_scheduling`: agents
+using that profile can create and manage scheduled jobs, not just this session.
+This does not enable scheduling in the separate desktop profile or relax approvals.
+
 Manual approvals remain enabled. The response window is 300 seconds; cron and
 unattended approval requests deny rather than wait for an absent operator.
 No Python, shell, or `execute_code` wildcard is allowlisted. In the dashboard's

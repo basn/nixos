@@ -367,6 +367,7 @@ in
           record_sessions = false;
           auto_local_for_private_urls = false;
         };
+        cron.allow_agent_scheduling = true;
         approvals = {
           mode = "manual";
           timeout = 300;
