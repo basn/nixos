@@ -221,12 +221,60 @@ their identity or recreating them requires separate operational approval.
 
 ## Model routing
 
-The main route is `openai-codex:gpt-6-astra`. Delegated children inherit the
+The main route is `openai-codex:gpt-6-astra`. Unnamed delegated children inherit the
 parent's actual route because `delegation.provider`, `delegation.model`, and the
 endpoint override fields remain unset; the existing delegation concurrency,
 depth, and orchestrator settings are unchanged. Review, background review, and
 planning likewise inherit the active main route. The default MoA preset keeps
 its own cloud routes.
+
+### Silicon Valley team
+
+The default operational profile enables the local `team-plugin` delegation
+backend. Its tool guidance names the lead **Richard**, retaining the main Astra
+route above; it does not provision a head identity or overwrite live `SOUL.md`,
+memory, or sessions. Monica and Jared are named routes, not separate profiles or
+permission isolation:
+
+- **Monica**: documentation—writes docs, records decisions, and checks docs
+  against changes—explicitly
+  `openai-codex:gpt-6.1-sol` using the existing Codex authentication.
+- **Jared**: routine review and summaries only, directly on
+  `http://bandit.netbird.basn.se:8080/v1` with `gemma-4-12b-local`,
+  `chat_completions`, and a non-secret dummy key (never the parent's credential).
+  His explicit empty fallback chain forbids cloud fallback; endpoint failure
+  fails his task. This is HTTP over the private NetBird network, not public TLS.
+
+For example, use `delegate_task(tasks=[{"goal": "Summarize this supplied report",
+"context": "...", "teammate": "jared"}])`, or select `"monica"`. Names are
+lowercase and enum-validated; unknown names are rejected, not silently inherited.
+Omitting `teammate` returns the existing delegation config unchanged. The
+`delegation.backends.silicon-valley-team.members` block is this plugin's schema,
+not a built-in Hermes members feature. Existing concurrency 2, depth 1, and
+orchestrator behavior stay unchanged.
+
+Hermes core excludes `cronjob_manage` from all children (including Jared);
+Richard handles user-approved schedule changes in the parent. No existing cron
+jobs, cron model/provider defaults, approvals, security policies, or desktop
+settings are changed. Desktop's selective sharing excludes delegation/plugins.
+Roles are guidance only: children otherwise retain core's inherited tool policy.
+
+Offline tests use an existing Python with Hermes dependencies (including PyYAML)
+and an already available checkout of the locked Hermes source (no Nix evaluation,
+dependency installation or build):
+
+```sh
+python3 -B machines/hermes/test-team-plugin.py /path/to/locked/hermes-agent
+python3 -B machines/hermes/test-desktop-profile.py
+nixfmt --check machines/hermes/configuration.nix
+git diff --check
+```
+
+The team tests exercise real upstream plugin discovery, the ABC/registry/schema
+boundary, and credential/fallback resolution with Codex credential lookup mocked;
+they do not authenticate Codex or contact Bandit. Activation and
+live route tests require separate approval. Start a new session after an approved
+activation so its cached delegation tool schema includes `teammate`.
 
 Approval, compression, curator, Skills Hub, title generation, and web extraction
 are declared on `openai-codex:gpt-6-luna`. At the locked Hermes revision,

@@ -239,7 +239,10 @@ in
       addToSystemPackages = true;
       stateDir = "/var/lib/hermes";
       workingDirectory = "/var/lib/hermes/workspace";
-      extraPlugins = [ homeAssistantPlugin ];
+      extraPlugins = [
+        homeAssistantPlugin
+        ./team-plugin
+      ];
       extraPackages = [
         agentBrowser
         pkgs.chromium
@@ -276,7 +279,10 @@ in
             model = "gpt-6.1-sol";
           }
         ];
-        plugins.enabled = [ "homeassistant" ];
+        plugins.enabled = [
+          "homeassistant"
+          "silicon-valley-team"
+        ];
         auxiliary = {
           approval = {
             provider = "openai-codex";
@@ -397,6 +403,23 @@ in
           threshold = 0.85;
         };
         delegation = {
+          backend = "silicon-valley-team";
+          backends.silicon-valley-team.members = {
+            monica = {
+              description = "Documentation: writes docs, records decisions, checks docs against changes.";
+              provider = "openai-codex";
+              model = "gpt-6.1-sol";
+            };
+            jared = {
+              description = "Routine review and summaries only; no schedule changes.";
+              model = "gemma-4-12b-local";
+              base_url = "http://bandit.netbird.basn.se:8080/v1";
+              # A nonempty dummy prevents inheriting the parent's real API key.
+              api_key = "no-key-required";
+              api_mode = "chat_completions";
+              fallback_providers = [ ];
+            };
+          };
           max_concurrent_children = 2;
           max_spawn_depth = 1;
           orchestrator_enabled = true;
