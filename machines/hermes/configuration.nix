@@ -241,7 +241,9 @@ in
       workingDirectory = "/var/lib/hermes/workspace";
       extraPlugins = [
         homeAssistantPlugin
-        ./team-plugin
+        (pkgs.runCommand "team-plugin" { } ''
+          cp -r ${./team-plugin} "$out"
+        '')
       ];
       extraPackages = [
         agentBrowser
