@@ -352,6 +352,13 @@ zfs list -t snapshot -r osdisk/hermes
 The terminal image also provides the read-only deterministic `hockey` CLI:
 `hockey`, `hockey --json`, or `hockey player-key`. It checks fresh official
 Swehockey schedules and rosters; team fixtures are not proof of player participation.
+`hockey --match FIXTURE_ID` returns one read-only JSON snapshot for all configured
+players (positional keys narrow selection), resolving the exact game link from
+the schedule. It separates official panel status/score, lineup and direct goal/
+assist evidence; missing sources retain partial results and exit nonzero. Event
+keys are deterministic derived keys, not official immutable IDs; reconcile
+corrections/removals only using the documented snapshot completeness flags.
+This adds no polling, notifications or persistent snapshot state.
 See [hockey usage, coverage and mapping renewal](../../docs/hockey.md). This is
 terminal-backend only, not a host-shell or desktop-profile command. Existing
 manual approvals and unattended/cron deny behavior are unchanged.

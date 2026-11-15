@@ -2,6 +2,7 @@
 """Read-only Swehockey team fixtures; no inference about player ice time."""
 
 import argparse
+import hashlib
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 import json
@@ -183,7 +184,10 @@ def schedule(source, url, season):
         for a in fields[3].find("a"):
             href = a.attrs.get("href", "").strip()
             emitted = re.fullmatch(r"javascript:openonlinewindow\('(/Game/Events/[0-9]+)',''\)", href)
-            links.append(official_url(emitted[1] if emitted else href))
+            link = official_url(emitted[1] if emitted else href)
+            if not re.fullmatch(r"/Game/Events/[0-9]+", urllib.parse.urlsplit(link).path):
+                raise ValueError("schedule match link is not an Events endpoint")
+            links.append(link)
         if len(set(links)) > 1:
             raise ValueError("conflicting match links")
         marker = (date_text + " " + score + " " + annotation.text()).casefold()
@@ -253,6 +257,249 @@ def participation(sources, fixture, team, name):
     return {"status": status, "source_url": url,
             "reason": "official lineup name/team match; not proof of ice time" if status == "listed"
             else "not in published lineup" if status == "not_listed" else "lineup unavailable or empty"}
+
+
+def fingerprint(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
+def match_panel(doc):
+    panels = [n for n in doc.root.find("td") if "tdInfoArea" in n.attrs.get("class", "").split()]
+    if len(panels) != 1:
+        raise ValueError("official match status panel missing or ambiguous")
+    texts = [n.text() for n in panels[0].children if isinstance(n, Node) and n.tag == "div"]
+    scores = [re.fullmatch(r"(\d+)\s*-\s*(\d+)", t) for t in texts]
+    scores = [s for s in scores if s]
+    if len(scores) > 1:
+        raise ValueError("ambiguous panel score")
+    summary = {"status": "unknown", "score": [int(v) for v in scores[0].groups()] if scores else None,
+               "period": None, "clock": None, "panel_text": texts}
+    if "Final Score" in texts:
+        summary["status"] = "final"
+    elif any(re.fullmatch(r"Postponed|Uppskjuten", t, re.I) for t in texts):
+        summary["status"] = "postponed"
+    elif any(re.fullmatch(r"Cancelled|Inställd", t, re.I) for t in texts):
+        summary["status"] = "cancelled"
+    elif any(re.fullmatch(r"Not started|Scheduled|Waiting for 1st period", t, re.I) for t in texts):
+        summary["status"] = "scheduled"
+    for text in texts:
+        period = re.fullmatch(r"(\d+(?:st|nd|rd|th) (?:period|overtime))(?:\s*[-:]?\s*(\d{1,3}:[0-5]\d))?", text, re.I)
+        if period:
+            summary.update(period=period[1], clock=period[2])
+            if summary["status"] == "unknown":
+                summary["status"] = "live"
+        elif re.fullmatch(r"\d{1,3}:[0-5]\d", text):
+            summary["clock"] = text
+    return summary
+
+
+def event_name(text):
+    match = re.fullmatch(r"\d+\.\s+([^()]+?)(?:\s+\([^)]*\))?", " ".join(text.split()))
+    return match[1].strip() if match else None
+
+
+def goal_events(doc, fixture):
+    candidates = [t for t in tables(doc) if any(h.text() == "Actions" for h in t.find("h2"))]
+    if len(candidates) != 1:
+        raise ValueError("Actions table missing or ambiguous")
+    events, errors, period = [], [], None
+    latest = {"period": None, "time": None}
+    for row in candidates[0].find("tr"):
+        fields = cells(row)
+        headings = [h.text() for h in row.find("h3")]
+        if headings:
+            period = headings[0] if re.fullmatch(r"\d+(?:st|nd|rd|th) (?:period|overtime)", headings[0], re.I) else None
+            continue
+        if not fields or fields[0].tag == "th":
+            continue
+        if len(fields) < 4:
+            errors.append("unrecognized Actions row")
+            continue
+        time, action, team = [f.text() for f in fields[:3]]
+        if not time and not action:  # Goalkeeper summary, not an event.
+            continue
+        valid_time = bool(re.fullmatch(r"\d{1,3}:[0-5]\d", time))
+        if not valid_time or period is None:
+            errors.append("unrecognized event time/period")
+        elif latest["time"] is None or tuple(map(int, time.split(":"))) > tuple(map(int, latest["time"].split(":"))):
+            latest = {"period": period, "time": time}
+        score = re.fullmatch(r"(\d+)\s*-\s*(\d+)(?:\s*\(([^)]*)\))?", action)
+        if not score:
+            if re.search(r"\d\s*-\s*\d|goal", action, re.I):
+                errors.append("unrecognized scoring action")
+            continue
+        # Details may be nested inside the player td; only direct text is the scorer.
+        scorer = event_name(" ".join(c for c in fields[3].children if isinstance(c, str)))
+        assist_nodes = [n for n in fields[3].find("div")
+                        if re.search(r"padding-left\s*:\s*10px", n.attrs.get("style", ""))]
+        assists = [event_name(n.text()) for n in assist_nodes]
+        unexpected = [n for n in fields[3].children if isinstance(n, Node) and not (
+            n.tag == "td" or n in assist_nodes or n.tag == "span" and (
+                re.fullmatch(r"\(\d+\)", n.text()) or list(n.find("div")) and
+                all(d in assist_nodes for d in n.find("div"))))]
+        known = scorer is not None and all(assists) and len(assists) <= 2 and bool(team) and not unexpected
+        event = {"type": "goal", "period": period, "time": time, "time_basis": "cumulative",
+                 "score": [int(score[1]), int(score[2])], "strength": score[3], "team_code": team,
+                 "scorer": scorer, "assists": assists, "attribution_complete": known,
+                 "source_url": fixture["match_url"]}
+        # shortcut: no official event IDs; score corrections can replace keys, reconcile complete snapshots.
+        event["id"] = f'{fixture["fixture_id"]}:goal:{score[1]}-{score[2]}'
+        event["id_kind"] = "derived_score_transition"
+        event["revision"] = fingerprint(event)
+        events.append(event)
+    unique = {}
+    for event in events:
+        unique.setdefault(event["id"], {})[event["revision"]] = event
+    result = []
+    for revisions in unique.values():
+        if len(revisions) > 1:
+            errors.append("ambiguous repeated scoring transition")
+            result.extend(dict(event, id=event["id"] + ":ambiguous:" + event["revision"]) for event in revisions.values())
+        else:
+            result.extend(revisions.values())
+    return result, latest, errors
+
+
+def match_lookup(config, selected, fixture_id, now, sources):
+    output = {"status": "unavailable", "checked_at": now.astimezone(STOCKHOLM).isoformat(),
+              "season": config["season"], "fixture_id": fixture_id, "match": None,
+              "players": [], "errors": [], "sources": sources.coverage}
+    candidates, verified = [], {}
+    valid = config["valid_from"] <= now.astimezone(STOCKHOLM).date().isoformat() < config["valid_until"]
+    for key in selected:
+        player = config["players"][key]
+        report = {"player": key, "name": player["official_name"], "identity": "unknown", "errors": [],
+                  "lineup": {"status": "unconfirmed", "source_url": None},
+                  "direct_events": [], "event_evidence": "unknown", "goals": None, "assists": None}
+        output["players"].append(report)
+        verified[key] = set()
+        if not valid or not player["teams"]:
+            report["errors"].append("expired/not yet valid mapping or no verified teams")
+            continue
+        for mapping in player["teams"]:
+            try:
+                games = schedule(sources.get(mapping["schedule"]), mapping["schedule"], config["season"])
+                candidates.extend(g for g in games if g["fixture_id"] == fixture_id
+                                  and mapping["team"] in (g["home"], g["away"]))
+            except (ValueError, OSError) as exc:
+                report["errors"].append(str(exc))
+            try:
+                raw = sources.get(mapping["roster"])
+                roster(raw, mapping, player, config["season"])
+                # Names alone cannot distinguish same-name teammates in match events.
+                doc = Document(raw)
+                names = [cells(r)[1].text() for t in tables(doc) for r in t.find("tr")
+                         if len(cells(r)) >= 3 and cells(r)[1].text() == player["official_name"]]
+                if len(names) != 1:
+                    raise ValueError("ambiguous roster name for event attribution")
+                verified[key].add(mapping["team"])
+            except (ValueError, OSError) as exc:
+                report["errors"].append(str(exc))
+    if not candidates:
+        output["errors"].append("fixture not found in successfully checked configured-team schedules; failed coverage is unknown")
+        return output
+    fixture = candidates[0]
+    if any({k: v for k, v in g.items() if k != "source_url"} !=
+           {k: v for k, v in fixture.items() if k != "source_url"} for g in candidates):
+        output["errors"].append("conflicting official fixture " + fixture_id)
+        return output
+    match = dict(fixture, summary={"status": "unknown", "score": None, "period": None, "clock": None},
+                 events=[], events_complete=False, attribution_complete=False,
+                 latest_event={"period": None, "time": None}, errors=[])
+    output["match"] = match
+    doc, lineup_source, lineup_url, codes = None, None, None, {}
+    team_events = set()
+    try:
+        if not fixture["match_url"]:
+            raise ValueError("no official match link; game ID must not be inferred")
+        doc = Document(sources.get(fixture["match_url"]))
+        verify_game(doc, fixture)
+    except (ValueError, OSError) as exc:
+        match["errors"].append(str(exc))
+        doc = None
+    if doc:
+        titles = [n.text() for n in doc.root.find("title")]
+        if len(titles) == 1:
+            pairing = re.fullmatch(r"(.+?)\s+-\s+(.+?)(?:\s+\([^)]*\))?", titles[0])
+            if pairing and pairing[1] != pairing[2]:
+                codes = dict(zip(pairing.groups(), (fixture["home"], fixture["away"])))
+        try:
+            match["summary"] = match_panel(doc)
+            if match["summary"]["status"] == "unknown":
+                match["errors"].append("unsupported or unpublished official panel status")
+            if fixture["status"] in {"postponed", "cancelled"} and match["summary"]["status"] != fixture["status"]:
+                match["errors"].append("schedule and panel statuses conflict")
+        except ValueError as exc:
+            match["errors"].append(str(exc))
+        try:
+            events, latest, errors = goal_events(doc, fixture)
+            match.update(events=events, latest_event=latest)
+            match["errors"].extend(errors)
+            score = match["summary"]["score"]
+            ordered = sorted(events, key=lambda e: sum(e["score"]))
+            previous, consistent = [0, 0], True
+            for event in ordered:
+                transition = event["score"]
+                delta = [transition[i] - previous[i] for i in (0, 1)]
+                expected = fixture["home"] if delta == [1, 0] else fixture["away"] if delta == [0, 1] else None
+                if expected and codes.get(event["team_code"]) == expected:
+                    team_events.add(event["id"])
+                else:
+                    consistent = False
+                previous = transition
+            match["events_complete"] = not errors and score is not None and consistent and previous == score
+            match["attribution_complete"] = match["events_complete"] and all(e["attribution_complete"] for e in events)
+            if not match["events_complete"]:
+                match["errors"].append("goal snapshot incomplete or inconsistent with panel score")
+            elif not match["attribution_complete"]:
+                match["errors"].append("goal attribution incomplete")
+        except ValueError as exc:
+            match["errors"].append(str(exc))
+        try:
+            links = {official_url(a.attrs["href"]) for a in doc.root.find("a")
+                     if re.fullmatch(r"/Game/LineUps/[0-9]+", a.attrs.get("href", ""))}
+            if len(links) != 1:
+                raise ValueError("official lineup link missing or ambiguous")
+            lineup_url = links.pop()
+            if lineup_url.rsplit("/", 1)[1] != fixture["match_url"].rsplit("/", 1)[1]:
+                raise ValueError("lineup link identifies a different game")
+            lineup_source = sources.get(lineup_url)
+        except (ValueError, OSError) as exc:
+            match["errors"].append(str(exc))
+    for report in output["players"]:
+        configured = {m["team"] for m in config["players"][report["player"]]["teams"]}
+        if not configured & {fixture["home"], fixture["away"]}:
+            report["event_evidence"] = "not_applicable"
+            report["lineup"]["reason"] = "fixture does not involve a configured team"
+            continue
+        teams = verified[report["player"]] & {fixture["home"], fixture["away"]}
+        report["identity"] = "verified" if teams else "unknown"
+        if not teams:
+            report["errors"].append("player identity not verified for this fixture")
+            continue
+        if lineup_source:
+            try:
+                statuses = [lineup(lineup_source, fixture, team, report["name"]) for team in teams]
+                status = "listed" if "listed" in statuses else "not_listed" if all(s == "not_listed" for s in statuses) else "unconfirmed"
+                report["lineup"] = {"status": status, "source_url": lineup_url}
+            except ValueError as exc:
+                report["errors"].append(str(exc))
+        if report["lineup"]["status"] == "unconfirmed":
+            report["errors"].append("lineup unpublished/unavailable; not proof of ice time")
+        for event in match["events"]:
+            if event["id"] not in team_events or codes.get(event["team_code"]) not in teams:
+                continue
+            roles = (["goal"] if event["scorer"] == report["name"] else []) + (["assist"] if report["name"] in event["assists"] else [])
+            report["direct_events"].extend({"event_id": event["id"], "revision": event["revision"], "role": role} for role in roles)
+        complete = match["attribution_complete"] and all(e["team_code"] in codes for e in match["events"])
+        report["event_evidence"] = "direct_event" if report["direct_events"] else "none_in_snapshot" if complete else "unknown"
+        if complete:
+            report["goals"] = sum(e["role"] == "goal" for e in report["direct_events"])
+            report["assists"] = sum(e["role"] == "assist" for e in report["direct_events"])
+        else:
+            report["errors"].append("player goal/assist totals unknown; retained direct evidence is a lower bound")
+    output["status"] = "partial" if match["errors"] or any(p["errors"] for p in output["players"]) else "ok"
+    return output
 
 
 def lookup(config, selected, now, sources):
@@ -333,6 +580,7 @@ def main():
     parser.add_argument("players", nargs="*", help="configured keys (default: all)")
     parser.add_argument("--config", type=Path, required=True, help="private runtime JSON path")
     parser.add_argument("--json", action="store_true", help="structured coverage and results")
+    parser.add_argument("--match", metavar="FIXTURE_ID", help="official fixture number from schedule; implies JSON")
     args = parser.parse_args()
     try:
         config = json.loads(args.config.read_text())
@@ -340,10 +588,13 @@ def main():
         unknown = set(selected) - config["players"].keys()
         if unknown or not selected:
             raise ValueError("unknown/empty player selection: " + ", ".join(sorted(unknown)))
-        result = lookup(config, selected, datetime.now(timezone.utc), Sources())
+        if args.match is not None and not re.fullmatch(r"[0-9]+", args.match):
+            raise ValueError("fixture ID must contain only digits")
+        result = (match_lookup(config, selected, args.match, datetime.now(timezone.utc), Sources()) if args.match is not None
+                  else lookup(config, selected, datetime.now(timezone.utc), Sources()))
     except (OSError, ValueError, KeyError, TypeError) as exc:
         result = {"status": "unavailable", "errors": [str(exc)]}
-    if args.json:
+    if args.json or args.match is not None:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:
         print(f'Hockey: {result["status"]} — {result.get("checked_at", "lookup failed")}')
