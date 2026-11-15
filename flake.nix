@@ -31,7 +31,7 @@
     };
     dzgui = {
       url = "github:jiriks74/dzgui.flake";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      # Retain upstream's pin until its bundled a2s helper supports Python 3.14.
     };
     nvf = {
       url = "github:notashelf/nvf";
