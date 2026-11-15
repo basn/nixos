@@ -45,6 +45,62 @@ import-from-derivation. Commit, push, PR creation, workflow dispatch, and
 deployment each still require explicit authorization. Report pending CI as
 pending, not passed, and give the exact revision and covered outputs when known.
 
+### Standalone validation (local or CI)
+
+From the checkout root, use the same entry point locally or in CI:
+
+```sh
+bash scripts/validate-flake.sh
+bash scripts/validate-flake.sh --host services --host hermes
+bash scripts/validate-flake.sh --all-hosts
+bash scripts/validate-flake.sh --json --host services
+# Only with explicit build permission:
+bash scripts/validate-flake.sh --build-checks --host services --build-hosts
+```
+
+The default runs `nix flake check --no-build`. There is currently no `checks`
+output; this is flake validation, not a build of all system closures.
+`--build-checks` allows flake check to build declared checks, if present.
+`--host` separately evaluates each selected `config.system.build.toplevel.drvPath`;
+`--all-hosts` discovers names from `nixosConfigurations`, including ISO configs.
+`--build-hosts` requires host selection and builds their toplevels sequentially
+with `--no-link`. It never activates anything. ISO images and custom
+`system.build` test outputs are not built by this command.
+
+Every Nix call forbids lock writes and updates. Evaluation-only calls also set
+`allow-import-from-derivation = false`: evaluations requiring IFD fail rather
+than realizing derivations, even with `--no-build`. This can block otherwise
+valid configurations; it does not prohibit input downloads, store writes, or
+evaluation caches. Explicit build stages retain normal Nix IFD behavior.
+Independent stages continue after failures and the final status is nonzero if
+any requested stage fails. Interruptions exit 130 (INT) or 143 (TERM), mark the
+running stage failed, and report work not started as skipped.
+Full stdout/stderr files persist in a unique ignored
+`.ci/validate-flake.*` directory, with per-stage paths in the summary; review
+logs before sharing them. Unknown or non-simple host names are rejected safely.
+This standalone runner does not change the existing CI selection/build policy.
+
+`--json` requires an installed `python3` (standard-library JSON encoding only;
+not needed for human output). Once validation starts, stdout contains exactly
+one JSON document on success, failure, or handled INT/TERM interruption; Nix
+diagnostics stay in persistent logs. The top-level `exit_code` matches the
+process exit code: 0 for success, 1 for validation failure, or the signal codes
+above. `stages` entries contain `stage` (`flake_check`, `host_discovery`,
+`host_evaluation`, `host_build`, or `host_selection` when inventory is unavailable),
+`host` (string or null), `status` (`passed`, `failed`, `skipped`), `exit_code`,
+`log_path`, and `detail`. Stage exit codes are actual child results (including
+the terminated child on interruption), null if not run, or synthetic 64 for an
+unknown/unsupported host. `log_path` is a directory containing `stdout` and
+`stderr` for executed stages; skipped stages have empty directories, and
+rejected hosts have a `stderr` explanation.
+
+`--help` prints human help and exits 0 even with `--json`. Argument errors
+(exit 64) and pre-validation setup failures (exit 1, including missing Python
+or log-directory creation failure) may emit stderr and no JSON. JSON encoding
+failure itself exits nonzero and may leave stdout empty or incomplete.
+
+Offline runner tests: `python3 tests/validate-flake.py` (Python standard library).
+
 Only with explicit local-build permission, build the affected host or image
 without creating a `result` symlink:
 
