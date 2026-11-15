@@ -23,7 +23,9 @@ assert astra["permission"]["task"] == {
     "*": "deny", "sol-coder": "allow", "explore": "allow", "hermes": "allow"
 }
 assert astra["permission"]["edit"] == astra["permission"]["bash"] == "deny"
-assert oc["agent"]["sol-coder"]["permission"]["task"] == "deny"
+assert {"action": "subagent", "resource": "*", "effect": "deny"} in (
+    oc["agents"]["sol-coder"]["permissions"]
+)
 
 expression = r'''
 let
