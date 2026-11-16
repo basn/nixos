@@ -22,13 +22,14 @@ the native API at `https://api.hermes.basn.se/v1`; see
 The shared config alone does not provision credentials on laptop or other clients.
 It also loads the native V2 `@dietrichgebert/ponytail` plugin in its default
 `full` mode, with `/ponytail` commands for switching levels.
-Sol uses native V2 ordered permissions: shell commands ask by default, with
-exact exceptions for `pwd`, two Git status forms, no-pager Git diffs with
-external diff/textconv disabled, and installed `nixfmt --check hjem/tooling.nix`.
-Other checks, builds, mutations, and arbitrary command arguments need approval.
-Saved project **Allow always** approvals can bypass `ask`; they are preserved.
-This is not a sandbox: shell runs with the user's authority, and compound
-commands depend on OpenCode's scanner checking each extracted command.
+Local agents use OpenCode's built-in permission defaults, without custom global
+or local-agent permission rules. The base policy allows tools, including shell
+commands, and asks before reading `.env` and `.env.*` files (except
+`.env.example`). Built-in agent restrictions still apply, including read-only
+`explore`. Delegation instructions and depth are unchanged, as are Hermes's
+approval and security policies and saved project approvals. Repository
+authorization rules in `AGENTS.md` still apply; tool access is not deployment
+authority. This is not a sandbox: shell runs with the user's authority.
 Built-in formatters are enabled when available; no formatter is installed here.
 
 Hjem also manages `~/.config/opencode/cli.json` from
@@ -38,8 +39,8 @@ scrollbar, visible thinking, animations). Laptop preferences were not inspected.
 Activation replaces existing files (`clobberFiles = true`), including laptop's
 CLI preferences. Change preferences in the repository: the store-backed file
 may prevent persistent UI setting changes, or activation may replace them.
-Offline policy checks: `python3 tests/opencode-config.py`; these simulate rule
-matching, not the actual shell scanner or runtime approval behavior.
+Offline config checks: `python3 tests/opencode-config.py`; these verify that
+local permission overrides are absent, not runtime approval behavior.
 
 The Home Assistant and NixOS MCP launchers use the locked
 `nixpkgs-unstable-small` input from the checkout at `/home/basn/nixos`, regardless

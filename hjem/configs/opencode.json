@@ -5,11 +5,6 @@
   "model": "openai/gpt-6.1-terra",
   "default_agent": "astra-orchestrator",
   "subagent_depth": 1,
-  "permission": {
-    "external_directory": {
-      "/nix/store/**": "allow"
-    }
-  },
   "provider": {
     "openai": {
       "models": {
@@ -52,28 +47,7 @@
     "sol-coder": {
       "description": "Implements changes and runs tests under direction from the Astra orchestrator; cannot delegate further.",
       "mode": "subagent",
-      "model": "openai/gpt-6.1-sol",
-      "permissions": [
-        { "action": "read", "resource": "*", "effect": "allow" },
-        { "action": "glob", "resource": "*", "effect": "allow" },
-        { "action": "grep", "resource": "*", "effect": "allow" },
-        { "action": "list", "resource": "*", "effect": "allow" },
-        { "action": "external_directory", "resource": "*", "effect": "ask" },
-        { "action": "external_directory", "resource": "/nix/store/**", "effect": "allow" },
-        { "action": "edit", "resource": "*", "effect": "allow" },
-        { "action": "shell", "resource": "*", "effect": "ask" },
-        { "action": "shell", "resource": "pwd", "effect": "allow" },
-        { "action": "shell", "resource": "git status --short", "effect": "allow" },
-        { "action": "shell", "resource": "git status --porcelain=v1", "effect": "allow" },
-        { "action": "shell", "resource": "git --no-pager diff --no-ext-diff --no-textconv", "effect": "allow" },
-        { "action": "shell", "resource": "git --no-pager diff --no-ext-diff --no-textconv --cached", "effect": "allow" },
-        { "action": "shell", "resource": "git --no-pager diff --no-ext-diff --no-textconv --check", "effect": "allow" },
-        { "action": "shell", "resource": "nixfmt --check hjem/tooling.nix", "effect": "allow" },
-        { "action": "subagent", "resource": "*", "effect": "deny" },
-        { "action": "homeassistant_*", "resource": "*", "effect": "deny" },
-        { "action": "unifi_*", "resource": "*", "effect": "deny" },
-        { "action": "drawio_*", "resource": "*", "effect": "deny" }
-      ]
+      "model": "openai/gpt-6.1-sol"
     },
     "hermes": {
       "description": "Delegates explicitly requested work to the existing remote Hermes default agent, not the local workspace.",
@@ -100,38 +74,10 @@
       "description": "Coordinates repository changes: defines scope and acceptance criteria, and delegates implementation and repository research.",
       "mode": "primary",
       "model": "openai/gpt-6-astra",
-      "prompt": "You are the orchestration and planning agent. Define the requested scope, affected files or hosts, and observable acceptance criteria before delegating. Delegate implementation and execution of applicable documented checks to sol-coder, and repository research to explore. Delegate to hermes only when the user explicitly requests remote Hermes work; it operates in its remote workspace and cannot see local dirty edits unless explicitly supplied. Preserve its existing approvals and security policies. Do not implement changes or run shell commands.",
-      "permission": {
-        "read": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "list": "allow",
-        "external_directory": {
-          "/nix/store/**": "allow"
-        },
-        "edit": "deny",
-        "bash": "deny",
-        "homeassistant_*": "deny",
-        "unifi_*": "deny",
-        "drawio_*": "deny",
-        "task": {
-          "*": "deny",
-          "sol-coder": "allow",
-          "hermes": "allow",
-          "explore": "allow"
-        }
-      }
+      "prompt": "You are the orchestration and planning agent. Define the requested scope, affected files or hosts, and observable acceptance criteria before delegating. Delegate implementation and execution of applicable documented checks to sol-coder, and repository research to explore. Delegate to hermes only when the user explicitly requests remote Hermes work; it operates in its remote workspace and cannot see local dirty edits unless explicitly supplied. Preserve its existing approvals and security policies. Do not implement changes or run shell commands."
     },
     "explore": {
-      "description": "Read-only repository exploration for focused research and file discovery.",
-      "permission": {
-        "edit": "deny",
-        "bash": "deny",
-        "task": "deny",
-        "homeassistant_*": "deny",
-        "unifi_*": "deny",
-        "drawio_*": "deny"
-      }
+      "description": "Read-only repository exploration for focused research and file discovery."
     }
   },
   "mcp": {
