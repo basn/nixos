@@ -68,7 +68,7 @@ in
   virtualisation.oci-containers = {
     backend = "podman";
     containers.skynet-inference = {
-      image = "docker.io/vllm/vllm-openai:v0.33.0@sha256:d825baf9ce4b1b6bfc5ecc7b79880c7e6748c65a72d697ce3d47607aafa84c6e";
+      image = "docker.io/vllm/vllm-openai:v0.34.0@sha256:20fdb089454afbb324efa4110a2c025ff7b27cc1a086e07aa580b18df8ad1ce1";
       networks = [ "none" ];
       environment = {
         HF_HOME = "/cache";
@@ -102,6 +102,8 @@ in
         "--distributed-executor-backend=mp"
         "--max-model-len=32768"
         "--max-num-seqs=4"
+        # Retain the pre-0.34 base size; hybrid-cache alignment may increase it.
+        "--block-size=16"
         "--gpu-memory-utilization=0.85"
         "--reasoning-parser=qwen3"
         "--enable-auto-tool-choice"

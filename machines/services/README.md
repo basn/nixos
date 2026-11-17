@@ -31,24 +31,31 @@ TypeType's public TLS/auth ingress remains here and relays to Bandit; the
 completed cold cutover, user-reported functionality and auto-upgrade pause are documented in
 [`../../docs/typetype.md`](../../docs/typetype.md).
 
-Network Optimizer and its companion speed-test image are pinned to 2.11.2.
-The [2.11.2 stable release](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.2)
-and both GHCR index digests were verified on 2026-11-15: registry digests match
-locally calculated SHA-256 hashes, both include linux/amd64 and linux/arm64,
-and amd64 revision labels match release commit
-`3bdd96f84769ef243041a3a325554a34aef41ad7`.
-This release fixes SNMP readings, snapshots and dashboard status and precompiles
-pages. Review the [2.11.0](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.0)
+Network Optimizer and its companion speed-test image are pinned to 2.11.4.
+Both GHCR index digests were independently verified before this pin update.
+The [2.11.4 release](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.4)
+fixes gateway public-block-list policies, traceroutes, invalid RTT samples and
+Wi-Fi recommendations. Already persisted bad RTT values remain; upgrading does
+not repair them. If gateway Automatic Blocking is enabled, existing UniFi
+policies are corrected automatically within minutes of upgrading: review live
+settings and authorize that policy mutation before deployment.
+Review the [2.11.3](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.3),
+[2.11.2](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.2),
+[2.11.0](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.0)
 and [2.11.1](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.1)
 notes before deployment; back up persisted
-state and test recovery first. The SNMP fix needs no On-Site Agent upgrade;
-agent upgrades and gateway traceroute installation are separate live operations.
+state at `/docker/networkoptimizer` and test recovery first (see backups below).
+The invalid-RTT fix needs no Agent upgrade. The optional On-Site Agent update
+from 2.11.3 fixes Upstream Path Discovery; agent upgrades and gateway traceroute
+installation remain separate live operations.
 2.11 adds Change Control writes and optional CAKE shaping; do not apply plans or
 deploy shaping without separate authorization (the first Adaptive SQM deploy
 after upgrading can drop packets on every WAN for about a second). Review the
 default-enabled per-site Live Traffic/DNS capture setting before upgrading an
 On-Gateway Agent; flows and lookups are held in memory while the page is open.
-No deployment or runtime compatibility is established by these pins.
+After an authorized deployment, verify both containers, authenticated UI,
+persisted state, speed tests, RTT/traceroute results and any enabled blocking
+policies. No deployment or runtime compatibility is established by these pins.
 
 Earlier upgrade context: the
 [2.10.7 release notes](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.10.7)
