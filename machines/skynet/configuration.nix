@@ -6,6 +6,7 @@
   ];
 
   boot = {
+    extraModprobeConfig = "options zfs zfs_arc_max=34359738368";
     zfs = {
       devNodes = "/dev/disk/by-path";
       forceImportRoot = false;
