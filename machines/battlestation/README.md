@@ -15,11 +15,14 @@ enabled. Remove the workaround once upstream Rust module BTF generation works.
 `audio.nix` contains PipeWire and device rules, `desktop.nix` contains the
 Wayland desktop and greeter setup, `cachyos-proton.nix` provides the local
 Proton helper, and `opencode.nix` defines the OpenCode integration.
-The OpenCode server configuration, CLI preferences, and certificate are managed
+The OpenCode server configuration, CLI preferences, custom theme, and certificate are managed
 through the shared `hjem/tooling.nix` module, while this host alone provides the
 OpenCode package, helper commands, and SOPS-backed MCP environment.
 Edit CLI preferences in `hjem/configs/opencode-cli.json`, not the store-backed
 live file; see the [shared permission and preference behavior](../../README.md#what-is-in-this-repo).
+The shared `hjem/configs/opencode-onedark-dark.json` installs
+`~/.config/opencode/themes/onedark-dark.json`, selected in dark mode and matching
+Neovim's OneDarkPro `onedark_dark` colors with a true-black background.
 
 ## Hermes client
 

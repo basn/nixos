@@ -34,13 +34,19 @@ Built-in formatters are enabled when available; no formatter is installed here.
 
 Hjem also manages `~/.config/opencode/cli.json` from
 `hjem/configs/opencode-cli.json`, preserving the inspected battlestation
-preferences (GitHub dark, word-wrapped unified diffs, automatic sidebar, hidden
+preferences (word-wrapped unified diffs, automatic sidebar, hidden
 scrollbar, visible thinking, animations). Laptop preferences were not inspected.
+The theme is explicitly `onedark-dark` in dark mode, not built-in `one-dark`:
+`hjem/configs/opencode-onedark-dark.json` is installed as
+`~/.config/opencode/themes/onedark-dark.json` on laptop and battlestation.
+This native V2 theme matches Neovim's OneDarkPro `onedark_dark` palette
+([pinned v2.29.0 palette](https://github.com/olimorris/onedarkpro.nvim/blob/v2.29.0/lua/onedarkpro/themes/onedark_dark.lua)),
+with true-black `#000000` background, `#abb2bf` foreground, and dark raised
+surfaces. Neovim and terminal settings are unchanged. After activation, a new
+theme file requires restarting the OpenCode client for discovery.
 Activation replaces existing files (`clobberFiles = true`), including laptop's
 CLI preferences. Change preferences in the repository: the store-backed file
 may prevent persistent UI setting changes, or activation may replace them.
-Offline config checks: `python3 tests/opencode-config.py`; these verify that
-local permission overrides are absent, not runtime approval behavior.
 
 The Home Assistant and NixOS MCP launchers use the locked
 `nixpkgs-unstable-small` input from the checkout at `/home/basn/nixos`, regardless

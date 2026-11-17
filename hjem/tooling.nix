@@ -9,6 +9,7 @@
     '';
     ".config/opencode/opencode.json".source = ./configs/opencode.json;
     ".config/opencode/cli.json".source = ./configs/opencode-cli.json;
+    ".config/opencode/themes/onedark-dark.json".source = ./configs/opencode-onedark-dark.json;
     ".config/opencode/unifi-controller.pem".source = ./certs/unifi-controller.pem;
   };
 }
