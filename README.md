@@ -16,6 +16,14 @@ commands, and SOPS-backed MCP environment remain host-specific; currently only
 battlestation provides that system setup and its credentials. The shared
 OpenCode configuration uses `astra-orchestrator` to delegate implementation to
 `sol-coder` and repository research to `explore`.
+The orchestrator uses `openai/gpt-6.2-astra` and the coder uses
+`openai/gpt-6.2-sol`, [available in API and Codex](https://openai.com/index/introducing-gpt-6-2-astra-sol/).
+Both IDs are explicitly registered under `providers.openai.models` because the
+OpenCode catalog may lag releases. No capabilities or limits are guessed:
+[OpenCode's custom-model defaults](https://opencode.ai/docs/models#aliases)
+apply until catalog metadata arrives (200k context, 32k output, text/image input,
+text output, JSON tools). Existing Terra/Luna choices remain unchanged.
+Offline routing declarations check: `python3 -B tests/opencode-models.py`.
 Explicit remote work can use `@hermes` or requested delegation to `hermes` via
 the native API at `https://api.hermes.basn.se/v1`; see
 [Hermes API setup and authority](machines/hermes/README.md#opencode-api).

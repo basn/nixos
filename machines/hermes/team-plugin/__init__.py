@@ -24,7 +24,7 @@ class Team(DelegationProvider):
             "Richard handles approved schedule changes. Set teammate to monica for "
             "documentation: writes docs, records decisions, checks docs against changes; "
             "or jared for routine review/summaries only. "
-            "Jared cannot manage cron jobs and has no cloud fallback. "
+            "Jared cannot manage cron jobs and has no fallback escalation. "
             "These are working roles, not permission isolation. "
             "Omit teammate to preserve ordinary inherited delegation."
         )

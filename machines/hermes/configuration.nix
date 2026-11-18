@@ -273,12 +273,12 @@ in
         };
         model = {
           provider = "openai-codex";
-          default = "gpt-6-astra";
+          default = "gpt-6.2-astra";
         };
         fallback_providers = [
           {
             provider = "openai-codex";
-            model = "gpt-6.1-sol";
+            model = "gpt-6.2-sol";
           }
         ];
         plugins.enabled = [
@@ -410,15 +410,16 @@ in
             monica = {
               description = "Documentation: writes docs, records decisions, checks docs against changes.";
               provider = "openai-codex";
-              model = "gpt-6.1-sol";
+              model = "gpt-6.2-sol";
             };
             jared = {
               description = "Routine review and summaries only; no schedule changes.";
-              model = "gemma-4-12b-local";
-              base_url = "http://bandit.netbird.basn.se:8080/v1";
-              # A nonempty dummy prevents inheriting the parent's real API key.
-              api_key = "no-key-required";
-              api_mode = "chat_completions";
+              provider = "openai-codex";
+              model = "gpt-6-luna";
+              # Explicit nulls clear the old local route during runtime YAML deep-merge.
+              base_url = null;
+              api_key = null;
+              api_mode = null;
               fallback_providers = [ ];
             };
           };

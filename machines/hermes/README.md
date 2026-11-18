@@ -221,7 +221,7 @@ their identity or recreating them requires separate operational approval.
 
 ## Model routing
 
-The main route is `openai-codex:gpt-6-astra`. Unnamed delegated children inherit the
+The main route is `openai-codex:gpt-6.2-astra`. Unnamed delegated children inherit the
 parent's actual route because `delegation.provider`, `delegation.model`, and the
 endpoint override fields remain unset; the existing delegation concurrency,
 depth, and orchestrator settings are unchanged. Review, background review, and
@@ -238,12 +238,13 @@ permission isolation:
 
 - **Monica**: documentation—writes docs, records decisions, and checks docs
   against changes—explicitly
-  `openai-codex:gpt-6.1-sol` using the existing Codex authentication.
-- **Jared**: routine review and summaries only, directly on
-  `http://bandit.netbird.basn.se:8080/v1` with `gemma-4-12b-local`,
-  `chat_completions`, and a non-secret dummy key (never the parent's credential).
-  His explicit empty fallback chain forbids cloud fallback; endpoint failure
-  fails his task. This is HTTP over the private NetBird network, not public TLS.
+  `openai-codex:gpt-6.2-sol` using the existing Codex authentication.
+- **Jared**: routine review and summaries only, on the cheaper
+  `openai-codex:gpt-6-luna` route using existing Codex OAuth authentication,
+  like the auxiliaries. His explicit empty fallback chain forbids fallback
+  escalation; route failure fails his task. Explicit nulls for `base_url`,
+  `api_key`, and `api_mode` clear the previous Bandit endpoint, dummy key, and
+  transport during the runtime YAML deep-merge; they must not simply be omitted.
 
 For example, use `delegate_task(tasks=[{"goal": "Summarize this supplied report",
 "context": "...", "teammate": "jared"}])`, or select `"monica"`. Names are
@@ -259,7 +260,8 @@ jobs, cron model/provider defaults, approvals, security policies, or desktop
 settings are changed. Desktop's selective sharing excludes delegation/plugins.
 Roles are guidance only: children otherwise retain core's inherited tool policy.
 
-Offline tests use an existing Python with Hermes dependencies (including PyYAML)
+Offline tests use an existing Python with Hermes dependencies (including PyYAML
+and `ruamel.yaml` for the runtime merge regression)
 and an already available checkout of the locked Hermes source (no Nix evaluation,
 dependency installation or build):
 
@@ -271,8 +273,9 @@ git diff --check
 ```
 
 The team tests exercise real upstream plugin discovery, the ABC/registry/schema
-boundary, and credential/fallback resolution with Codex credential lookup mocked;
-they do not authenticate Codex or contact Bandit. Activation and
+boundary, migration from the old local endpoint using the pinned YAML merger,
+and credential/fallback resolution with Codex credential lookup mocked;
+they do not authenticate Codex or run live inference. Activation and
 live route tests require separate approval. Start a new session after an approved
 activation so its cached delegation tool schema includes `teammate`.
 
@@ -281,7 +284,7 @@ are declared on `openai-codex:gpt-6-luna`. At the locked Hermes revision,
 `web_extract` no longer uses an auxiliary LLM, so that historical route is
 ignored. Vision has no auxiliary override and inherits the active main route.
 
-The top-level fallback route is `openai-codex:gpt-6.1-sol`. Hermes invokes it
+The top-level fallback route is `openai-codex:gpt-6.2-sol`. Hermes invokes it
 only after supported primary-route errors such as exhausted retries, server or
 connection failures, or authentication failures. It is availability fallback,
 not a quality escalation, and it is turn-scoped according to Hermes's fallback

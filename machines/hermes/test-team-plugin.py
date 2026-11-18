@@ -12,6 +12,7 @@ from pathlib import Path
 import re
 import sys
 import tempfile
+import textwrap
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -27,7 +28,7 @@ from agent.agent_init_fallback import _fallback_entries
 from agent.delegation_registry import get_active_provider
 from hermes_cli import plugins, runtime_provider
 from tools import delegate_tool as dt
-from tools.delegate_tool_config import _resolve_child_runtime, _resolve_child_credential_pool
+from tools.delegate_tool_config import _resolve_child_runtime
 from tools.delegate_tool_routes import resolve_task_routes, schema_extension
 from tools.delegate_tool_toolsets import DELEGATE_BLOCKED_TOOLS, _resolve_child_toolsets
 
@@ -40,7 +41,7 @@ def declared_members():
         assert block, f"Missing declaration for {name}"
         members[name] = {
             key: [] if value.startswith("[") else json.loads(value)
-            for key, value in re.findall(r'(\w+) = ("[^"\n]*"|\[\s*\]);', block[1])
+            for key, value in re.findall(r'(\w+) = ("[^"\n]*"|\[\s*\]|null);', block[1])
         }
     return members
 
@@ -80,10 +81,10 @@ class TeamTests(unittest.TestCase):
 
     def parent(self):
         return SimpleNamespace(
-            model="gpt-6-astra", provider="openai-codex", base_url="https://parent.invalid/v1",
+            model="gpt-6.2-astra", provider="openai-codex", base_url="https://parent.invalid/v1",
             api_key="synthetic-parent-key", api_mode="codex_responses", request_overrides={},
             _credential_pool=object(), _fallback_chain=[{
-                "provider": "openai-codex", "model": "gpt-6.1-sol",
+                "provider": "openai-codex", "model": "gpt-6.2-sol",
             }], enabled_toolsets=["terminal", "file", "web", "cronjob"],
         )
 
@@ -128,38 +129,79 @@ class TeamTests(unittest.TestCase):
             routes, error = resolve_task_routes([{"teammate": "monica"}], self.config, self.parent())
         self.assertIsNone(error)
         self.assertIsNone(routes[0].error)
-        resolve.assert_called_once_with(requested="openai-codex", target_model="gpt-6.1-sol")
-        self.assertEqual(routes[0].creds["model"], "gpt-6.1-sol")
+        resolve.assert_called_once_with(requested="openai-codex", target_model="gpt-6.2-sol")
+        self.assertEqual(routes[0].creds["model"], "gpt-6.2-sol")
         self.assertEqual(routes[0].creds["provider"], "openai-codex")
         self.assertEqual(routes[0].label, "Monica")
 
-    def test_jared_direct_dummy_key_no_fallback(self):
-        config = {**self.config, "fallback_providers": self.parent()._fallback_chain}
-        with patch.object(runtime_provider, "resolve_runtime_provider", side_effect=AssertionError("cloud lookup")):
+    def assert_jared_codex_no_fallback(self, config):
+        config = {**config, "fallback_providers": self.parent()._fallback_chain}
+        with patch.object(runtime_provider, "resolve_codex_runtime_credentials", return_value={
+            "base_url": "https://chatgpt.com/backend-api/codex",
+            "api_key": "synthetic-codex-key",
+        }) as resolve:
             routes, error = resolve_task_routes([{"teammate": "jared"}], config, self.parent())
+        resolve.assert_called_once_with()
         self.assertIsNone(error)
         route = routes[0]
         self.assertIsNone(route.error)
         self.assertEqual(route.label, "Jared")
         creds = route.creds
-        self.assertEqual(creds["provider"], "custom")
-        self.assertEqual(creds["base_url"], "http://bandit.netbird.basn.se:8080/v1")
-        self.assertEqual(creds["api_key"], "no-key-required")
-        self.assertEqual(creds["model"], "gemma-4-12b-local")
-        self.assertEqual(creds["api_mode"], "chat_completions")
+        self.assertEqual(creds["provider"], "openai-codex")
+        self.assertEqual(creds["base_url"], "https://chatgpt.com/backend-api/codex")
+        self.assertEqual(creds["api_key"], "synthetic-codex-key")
+        self.assertEqual(creds["model"], "gpt-6-luna")
+        self.assertEqual(creds["api_mode"], "codex_responses")
         runtime = _resolve_child_runtime(
             self.parent(), config, "synthetic-parent-key", model=creds["model"],
             override_provider=creds["provider"], override_base_url=creds["base_url"],
             override_api_key=creds["api_key"], override_api_mode=creds["api_mode"],
             override_acp_command=None, override_acp_args=None, routing_cfg=route.routing_cfg,
         )
-        self.assertEqual(runtime["api_key"], "no-key-required")
+        self.assertEqual(runtime["api_key"], "synthetic-codex-key")
+        self.assertEqual(runtime["provider"], "openai-codex")
+        self.assertEqual(runtime["base_url"], creds["base_url"])
+        self.assertEqual(runtime["model"], "gpt-6-luna")
+        self.assertEqual(runtime["api_mode"], "codex_responses")
         self.assertEqual(route.routing_cfg["fallback_providers"], [])
         self.assertIsNone(runtime["fallback_model"])
         self.assertEqual(_fallback_entries(runtime["fallback_model"]), [])
-        # No custom provider registration: the child's fixed dummy key keeps ownership.
-        self.assertIsNone(_resolve_child_credential_pool("custom", self.parent(), creds["base_url"]))
         self.assertNotIn("api_key", route.report())
+
+    def test_jared_codex_no_fallback(self):
+        self.assert_jared_codex_no_fallback(self.config)
+
+    def test_jared_auth_failure_refuses_route(self):
+        with patch.object(runtime_provider, "resolve_codex_runtime_credentials",
+                          side_effect=RuntimeError("synthetic authentication failure")):
+            routes, error = resolve_task_routes([{"teammate": "jared"}], self.config, self.parent())
+        self.assertIsNone(error)
+        self.assertTrue(routes[0].error)
+        self.assertEqual(routes[0].creds, {})
+
+    def test_jared_migrates_stale_local_endpoint(self):
+        existing = copy.deepcopy(self.config)
+        existing["backends"]["silicon-valley-team"]["members"]["jared"] = {
+            "model": "gemma-4-12b-local",
+            "base_url": "http://bandit.netbird.basn.se:8080/v1",
+            "api_key": "no-key-required",
+            "api_mode": "chat_completions",
+            "fallback_providers": [],
+        }
+        with tempfile.TemporaryDirectory(prefix="hermes-team-merge-") as tmp:
+            generated, runtime = Path(tmp) / "settings.json", Path(tmp) / "config.yaml"
+            generated.write_text(json.dumps({"delegation": self.config}))
+            runtime.write_text(yaml.safe_dump({"delegation": existing}))
+            # Execute the pinned module's real merger without evaluating or building Nix.
+            script = (SOURCE / "nix" / "configMergeScript.nix").read_text()
+            script = textwrap.dedent(script.split("''\n", 1)[1].rsplit("''", 1)[0])
+            with patch.object(sys, "argv", ["hermes-config-merge", str(generated), str(runtime)]):
+                exec(compile(script, "hermes-config-merge", "exec"), {})
+            merged = yaml.safe_load(runtime.read_text())["delegation"]
+        member = merged["backends"]["silicon-valley-team"]["members"]["jared"]
+        for key in ("base_url", "api_key", "api_mode"):
+            self.assertIsNone(member[key])
+        self.assert_jared_codex_no_fallback(merged)
 
     def test_core_blocks_child_scheduling(self):
         self.assertIn("cronjob_manage", DELEGATE_BLOCKED_TOOLS)

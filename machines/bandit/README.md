@@ -31,11 +31,12 @@ qBittorrent remains available through the existing `rt.basn.se` Nginx route,
 which connects directly to its VPN namespace. It has no host port mapping on
 TCP/8080 because that would intercept traffic before `llama-server`.
 
-Hermes uses `http://bandit.netbird.basn.se:8080/v1`, so that hostname must
-resolve to Bandit's NetBird address and NetBird connectivity must already work
-between the hosts. NetBird configuration is not managed here.
+Clients using `http://bandit.netbird.basn.se:8080/v1` need that hostname to
+resolve to Bandit's NetBird address and working NetBird connectivity.
+NetBird configuration is not managed here. Hermes's declared routes, including
+Jared, use OpenAI Codex instead; this local server remains available unchanged.
 
-After deploying the model switch, clients (including Hermes) must change their
+After deploying the model switch, remaining local clients must change their
 model name from `qwen3.5-9b-local` to `gemma-4-12b-local`; the API URL is unchanged.
 
 The server keeps `--ctx-size 131072 --parallel 2`. llama.cpp divides that

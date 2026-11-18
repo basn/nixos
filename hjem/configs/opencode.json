@@ -24,6 +24,16 @@
     }
   },
   "providers": {
+    "openai": {
+      "models": {
+        "gpt-6.2-astra": {
+          "modelID": "gpt-6.2-astra"
+        },
+        "gpt-6.2-sol": {
+          "modelID": "gpt-6.2-sol"
+        }
+      }
+    },
     "hermes": {
       "name": "Remote Hermes",
       "env": ["HERMES_API_KEY"],
@@ -47,7 +57,7 @@
     "sol-coder": {
       "description": "Implements changes and runs tests under direction from the Astra orchestrator; cannot delegate further.",
       "mode": "subagent",
-      "model": "openai/gpt-6.1-sol"
+      "model": "openai/gpt-6.2-sol"
     },
     "hermes": {
       "description": "Delegates explicitly requested work to the existing remote Hermes default agent, not the local workspace.",
@@ -73,7 +83,7 @@
     "astra-orchestrator": {
       "description": "Coordinates repository changes: defines scope and acceptance criteria, and delegates implementation and repository research.",
       "mode": "primary",
-      "model": "openai/gpt-6-astra",
+      "model": "openai/gpt-6.2-astra",
       "prompt": "You are the orchestration and planning agent. Define the requested scope, affected files or hosts, and observable acceptance criteria before delegating. Delegate implementation and execution of applicable documented checks to sol-coder, and repository research to explore. Delegate to hermes only when the user explicitly requests remote Hermes work; it operates in its remote workspace and cannot see local dirty edits unless explicitly supplied. Preserve its existing approvals and security policies. Do not implement changes or run shell commands."
     },
     "explore": {
