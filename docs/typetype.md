@@ -25,16 +25,35 @@ destination. The following preparation/checklist sections describe the plan.
 - No TypeType refresh hook or new Bandit refresh service/timer is included.
   Services' existing network-optimizer refresh implementation is unchanged.
 
-## Repository update — TypeType 1.17.1
+## Repository update — TypeType 1.18.0
 
-Bandit's four application images are pinned together to 1.17.1 with verified
-GHCR digests and Linux/amd64 availability. Supporting images are unchanged.
-The upstream 1.17.0-to-1.17.1 release and component changes require no configuration
-adjustments. The local nginx template retains the `/streams/`, `/proxy`, and `/proxy/`
-relays added for the upstream 1.17.0 template: server-generated manifest and proxy
-URLs use these root-level paths as well as `/api/`. Remote login remains disabled, and the
-downloader still requires the existing `S3_ACCESS_KEY`/`S3_SECRET_KEY` aliases.
-This repository update does not deploy or establish live application behavior.
+Bandit's four application images move together from 1.17.1 to
+[1.18.0](https://github.com/TypeType-Video/TypeType/releases/tag/v1.18.0).
+All four tag digests and Linux/amd64 manifest/configuration checks were
+independently registry-verified on 2026-11-18. PostgreSQL, Dragonfly and Garage pins
+are unchanged. Optional Twitch/Live is not added; the classic player stays default.
+
+Release-tag Compose, component environment handling and nginx templates require
+no changes to the existing auth, `/api/`, `/sabr/`, `/streams/`, `/proxy` and
+version routes. Remote login remains disabled; the downloader still requires
+the existing `S3_ACCESS_KEY`/`S3_SECRET_KEY` aliases. Storage guards are unchanged.
+The new `/api/server/events` stream and `/api/admin/server/notice` routes use the
+existing API relay. Server events send 15-second heartbeats and request unbuffered
+responses; the container and Bandit relays disable buffering, but Services' public
+ingress does not explicitly do so. Verify prompt authenticated event delivery and
+restart recovery through the full public path; buffering/header propagation may
+need a separately scoped ingress adjustment. Do not bypass Authentik to test it.
+
+Server startup adds focus/Twitch tables and settings columns, including
+`player_engine` defaulting to `vidstack`; downloader migrations are unchanged.
+Before coordinated deployment, obtain fresh recoverable backups of **both
+`typetype` and `typetype_downloader`**, roles/globals and consistent Garage
+metadata/objects, and test restoration. Drain Dragonfly's nonpersistent queues
+or explicitly accept queued/in-flight job loss. No fresh backups are established
+by this update. Follow the PostgreSQL gates below, coordinate the paused
+auto-upgrades, and verify all four application versions, auth, playback/seek,
+download lifecycle and event/restart recovery after an authorized switch.
+No deployment or runtime compatibility is established by these pins.
 
 ## Repository update — PostgreSQL 17.12
 

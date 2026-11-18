@@ -31,9 +31,20 @@ TypeType's public TLS/auth ingress remains here and relays to Bandit; the
 completed cold cutover, user-reported functionality and auto-upgrade pause are documented in
 [`../../docs/typetype.md`](../../docs/typetype.md).
 
-Network Optimizer and its companion speed-test image are pinned to 2.11.4.
-Both GHCR index digests were independently verified before this pin update.
-The [2.11.4 release](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.4)
+Network Optimizer and its companion speed-test image are pinned to 2.11.5.
+Both GHCR index digests and Linux/amd64 manifest/configuration checks were
+independently verified on 2026-11-18. The
+[2.11.5 release](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.5)
+adds Path Map and fixes monitoring, Change Control, SQM and audit behavior.
+Release-tag container configuration is unchanged; startup adds nullable route
+history columns to persisted state. Back up and verify recovery before deployment.
+Previously acknowledged **Threat: Actively Targeted Port Forward** findings
+must be acknowledged once more after upgrading. The optional On-Site/On-Gateway
+Agent update mitigates Live Traffic out-of-memory failures on EFG/UDM-Beast;
+it is not included here. Review affected AP Group WLANs created by earlier
+Change Control versions: upstream requires manually choosing Group under
+Broadcasting APs in UniFi. Any live corrections require separate authorization.
+The preceding [2.11.4 release](https://github.com/Ozark-Connect/NetworkOptimizer/releases/tag/v2.11.4)
 fixes gateway public-block-list policies, traceroutes, invalid RTT samples and
 Wi-Fi recommendations. Already persisted bad RTT values remain; upgrading does
 not repair them. If gateway Automatic Blocking is enabled, existing UniFi
