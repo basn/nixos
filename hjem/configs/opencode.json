@@ -11,13 +11,13 @@
         "gpt-6.1-terra": {
           "options": {
             "reasoningEffort": "low",
-            "textVerbosity": "low"
+            "textVerbosity": "high"
           }
         },
         "gpt-6-luna": {
           "options": {
             "reasoningEffort": "none",
-            "textVerbosity": "low"
+            "textVerbosity": "high"
           }
         }
       }
@@ -73,12 +73,12 @@
     "plan": {
       "model": "openai/gpt-6.1-terra",
       "reasoningEffort": "medium",
-      "textVerbosity": "low"
+      "textVerbosity": "high"
     },
     "build": {
       "model": "openai/gpt-6.1-terra",
       "reasoningEffort": "low",
-      "textVerbosity": "low"
+      "textVerbosity": "high"
     },
     "astra-orchestrator": {
       "description": "Coordinates repository changes: defines scope and acceptance criteria, and delegates implementation and repository research.",

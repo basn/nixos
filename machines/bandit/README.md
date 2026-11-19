@@ -14,10 +14,48 @@ Unpackerr, Immich, PinePods, Attic, rclone, and Nginx.
   Nginx. TypeType's seven containers run here after the authorized migration;
   see [`../../docs/typetype.md`](../../docs/typetype.md) for validation and the
   temporary auto-upgrade pause.
-- Automation: the host chassis-fan service.
+- Automation: ESPHome Device Builder and the host chassis-fan service.
 - Local inference: CUDA-backed `llama-server` serves Gemma 4 12B IT Q8_0
   (`unsloth/gemma-4-12b-it-GGUF`, `gemma-4-12b-it-Q8_0.gguf`)
   as `gemma-4-12b-local` on TCP/8080.
+
+## ESPHome Device Builder
+
+`podman-esphome.service` starts the official, digest-pinned ESPHome image at
+boot. Podman publishes the dashboard only on Bandit's `127.0.0.1:6052` and
+`192.168.180.10:6052`, without adding a global firewall rule or Nginx route.
+Use <http://192.168.180.10:6052/> only from the trusted LAN: it is plain HTTP
+with no login, and anyone who can reach the address can use the dashboard.
+Do not forward this port to untrusted networks.
+
+For encrypted access, use your usual Bandit SSH account and hostname:
+
+```sh
+ssh -NT -o ExitOnForwardFailure=yes -L 127.0.0.1:6052:127.0.0.1:6052 bandit
+```
+
+Keep the tunnel running and open <http://127.0.0.1:6052/>. Processes running
+on Bandit can also reach the loopback address directly.
+
+Device YAML and `secrets.yaml` live in the container's `/config`, backed by
+root-owned `/var/lib/esphome` (mode `0700`). Back it up privately before image
+upgrades. The container has no USB passthrough: flash new devices over USB
+from your workstation, then use OTA from the dashboard. The Podman bridge
+does not provide LAN mDNS discovery; use a reachable IP in `use_address` (or
+`manual_ip`) for OTA if `.local` resolution fails.
+
+After deployment, `systemctl is-active podman-esphome` should report `active`
+and `sudo podman port esphome 6052/tcp` should report only `127.0.0.1:6052`
+and `192.168.180.10:6052`.
+
+### Remote build receiver
+
+Device Builder 1.28.1 uses TCP 6055 for its Noise WebSocket peer link. Podman
+publishes it only at `192.168.180.10:6055`; this is not another dashboard
+port. The Build Server setting is enabled by default in the standalone image.
+Keep both ports on trusted networks, and approve pairing in Device Builder
+only after verifying the peer's identity. No firewall rule is managed here.
+`sudo podman port esphome 6055/tcp` should report only `192.168.180.10:6055`.
 
 ## Local inference networking
 
