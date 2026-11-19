@@ -48,6 +48,15 @@ After deployment, `systemctl is-active podman-esphome` should report `active`
 and `sudo podman port esphome 6052/tcp` should report only `127.0.0.1:6052`
 and `192.168.180.10:6052`.
 
+### Remote build receiver
+
+Device Builder 1.28.1 uses TCP 6055 for its Noise WebSocket peer link. Podman
+publishes it only at `192.168.180.10:6055`; this is not another dashboard
+port. The Build Server setting is enabled by default in the standalone image.
+Keep both ports on trusted networks, and approve pairing in Device Builder
+only after verifying the peer's identity. No firewall rule is managed here.
+`sudo podman port esphome 6055/tcp` should report only `192.168.180.10:6055`.
+
 ## Local inference networking
 
 `llama-server` listens on `0.0.0.0:8080`, and the host firewall permits
