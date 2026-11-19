@@ -8,7 +8,7 @@ let
   networkName = "pinepods";
   pinepodsImage = "docker.io/madeofpendletonwool/pinepods:0.9.2@sha256:a0463a3a2d7762ba198f94c6aee8856feb0393594792ad0466ae4c170e4bb86c";
   postgresImage = "docker.io/library/postgres:18.7-alpine@sha256:b6972e1115a4ff8eba5d7f7d19184926d1e16d7d1136ae1e1a7ebf286da0f015";
-  valkeyImage = "docker.io/valkey/valkey:8.1.11-alpine@sha256:2602ace2be6569bc2bbb06f873776516ab9089821525be34f4305c67eb9db02a";
+  valkeyImage = "docker.io/valkey/valkey:8.1.12-alpine@sha256:9971099af41c36e887aabdfe22b80c0fe45df949163dfc9cb434febc57cfc3fc";
 
   # Work around Podman's immediate healthcheck failing its transient systemd
   # unit during startup, causing NixOS activation to fail despite the image's

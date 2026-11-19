@@ -1,7 +1,7 @@
 # PinePods
 
 PinePods 0.9.2 is configured on `bandit` as three rootful Podman containers: PinePods,
-PostgreSQL 18.7, and non-persistent Valkey 8.1.11. The images are version and
+PostgreSQL 18.7, and non-persistent Valkey 8.1.12. The images are version and
 multi-architecture manifest digest pinned in
 `machines/bandit/services/pinepods.nix`. PostgreSQL and Valkey are on the
 private `pinepods` Podman network and publish no host ports.
@@ -9,17 +9,16 @@ private `pinepods` Podman network and publish no host ports.
 The PostgreSQL 18.7-alpine pin was verified on 2026-11-15 against the official
 [PostgreSQL](https://hub.docker.com/_/postgres) Docker Hub registry: the index
 digest matches a locally calculated SHA-256 and includes a verified linux/amd64
-manifest/configuration. The Alpine variant, PGDATA and UID/GID remain unchanged. The
-Valkey pin was refreshed on 2026-10-27 from the official
-[Valkey](https://hub.docker.com/r/valkey/valkey) repository. Valkey 8.1.11 is a
-security update that also contains standalone-relevant crash and correctness
-fixes. Its cluster Pub/Sub overflow advisory, GHSA-f4q9-j22m-xqq9, does not
-apply to this standalone configuration. The digest pins the multi-architecture
-manifest while retaining the readable tag. PinePods 0.9.2 was confirmed as the
-latest stable GitHub release on 2026-11-05, and its tag was verified against
-Docker Hub's registry manifest endpoint; the returned digest matched a locally
-calculated SHA-256 of the multi-architecture index, which includes linux/amd64
-and linux/arm64.
+manifest/configuration. The Alpine variant, PGDATA and UID/GID remain unchanged.
+The Valkey 8.1.12-alpine pin was verified on 2026-11-19 against the official
+[Valkey](https://hub.docker.com/r/valkey/valkey) Docker Hub repository: the index
+digest matches a locally calculated SHA-256 and includes linux/amd64 for Bandit.
+The [8.1.12 release](https://github.com/valkey-io/valkey/releases/tag/8.1.12)
+fixes CVE-2026-130822 and includes other crash and correctness fixes.
+PinePods 0.9.2 was confirmed as the latest stable GitHub release on 2026-11-05,
+and its tag was verified against Docker Hub's registry manifest endpoint. The
+returned digest matched a locally calculated SHA-256 of the multi-architecture
+index, which includes linux/amd64 and linux/arm64.
 
 ## PostgreSQL 18.7 maintenance gate
 
