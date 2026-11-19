@@ -215,6 +215,19 @@
       smartmontools
     ];
   };
+  virtualisation.oci-containers.containers.esphome = {
+    image = "ghcr.io/esphome/esphome:2026.11.0@sha256:6351ae811202064bb3eb49dde982609b47acd523103a66d7b9c5c1431beea055";
+    autoStart = true;
+    ports = [
+      "127.0.0.1:6052:6052"
+      "192.168.180.10:6052:6052"
+    ];
+    volumes = [ "/var/lib/esphome:/config" ];
+  };
+  systemd.services.podman-esphome.serviceConfig = {
+    StateDirectory = "esphome";
+    StateDirectoryMode = "0700";
+  };
   systemd.services.bandit-chassis-fans = {
     description = "Control chassis fan duty from hard drive temperatures";
     after = [ "systemd-modules-load.service" ];
