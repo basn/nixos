@@ -13,5 +13,8 @@
     "scrollbar": false,
     "thinking": "show"
   },
+  "mini": {
+    "tools": "show"
+  },
   "animations": true
 }
