@@ -15,4 +15,4 @@ size = 24
 follows_focus = false
 
 [input.focus]
-follows_mouse = true
+follows_mouse = "sloppy"
