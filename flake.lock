@@ -252,11 +252,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794970964,
-        "narHash": "sha256-wTZL65urkh6P1iYBZKEnmWGwzQoLCX8ye8V9iveye9M=",
+        "lastModified": 1795054265,
+        "narHash": "sha256-IjFbnKzAkaG+tiZxwpP5CfTYVNxKKYSMioLynWAaGd0=",
         "owner": "feel-co",
         "repo": "hjem",
-        "rev": "4725210df40dcf3673afe21453a3b0950bc4dd58",
+        "rev": "2a28f37d253ea3866f85eabe482c68a84fc32ed5",
         "type": "github"
       },
       "original": {
@@ -390,11 +390,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1794750194,
-        "narHash": "sha256-c6ZxSsG1c2luSrbESFfp9Jq2pSVhGst2to4aIzt2Nes=",
+        "lastModified": 1795085501,
+        "narHash": "sha256-S5keGWzaKpuXo9MNoIC2FfTIuTyTnx8P4NhYJMEsTLI=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "1a08097fc1ed85575db39763b2c4a5d8970a37ba",
+        "rev": "0bb8272318b4ca41bf0edc6224df3e3e3046b70d",
         "type": "github"
       },
       "original": {
@@ -406,11 +406,11 @@
     },
     "nixpkgs-unstable-small": {
       "locked": {
-        "lastModified": 1795016832,
-        "narHash": "sha256-YscEC27N0SJgyzX4zOucKGkSTWUeH//uBrSKWxVLfwc=",
+        "lastModified": 1795128620,
+        "narHash": "sha256-2M90DHILU0wimnGojKcfiM0moSP9bPgpwtakbGem/p0=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "d00708e733dc47417b440d7537b0349f1ee66e22",
+        "rev": "c202db0c6a23bcde85ac76a96d49fe52d3d7dfd9",
         "type": "github"
       },
       "original": {
@@ -451,11 +451,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1795017444,
-        "narHash": "sha256-zAW6zDvAWMptz3WwRl0jX9khtVsgKTDbm7POQqIgYc4=",
+        "lastModified": 1795128972,
+        "narHash": "sha256-o7DhBMfLPnI/BP3zNOKCAwI8OfTuQDoCKONj75hy9Mk=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "1e6cf0d7cf5f5354d1bfd7105813dddb527851d4",
+        "rev": "cdeccfad08168359fa2f89e7dae6de3b10b7bfa9",
         "type": "github"
       },
       "original": {
