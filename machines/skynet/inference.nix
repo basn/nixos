@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 let
-  revision = "a099dee70ccfcd8d5dda56aaa0b60cb8ecadabc9";
+  model = "Qwen/Qwen3.8-Flash-Next-FP8";
+  revision = "7fb48d708ca6cd8eeed8f4db0433be18af96984f";
+  checkpoint = "/var/lib/skynet-qwen38-fp8/${revision}";
 in
 {
   sops.secrets = {
@@ -71,18 +73,19 @@ in
       image = "docker.io/vllm/vllm-openai:v0.34.0@sha256:20fdb089454afbb324efa4110a2c025ff7b27cc1a086e07aa580b18df8ad1ce1";
       networks = [ "none" ];
       environment = {
-        HF_HOME = "/cache";
+        HF_HOME = "/tmp/hf";
         HF_HUB_OFFLINE = "1";
         TRANSFORMERS_OFFLINE = "1";
         HF_HUB_DISABLE_TELEMETRY = "1";
         VLLM_NO_USAGE_STATS = "1";
+        VLLM_USE_RUST_FRONTEND = "0";
         VLLM_HOST_IP = "127.0.0.1";
         NCCL_SOCKET_IFNAME = "=lo";
         GLOO_SOCKET_IFNAME = "lo";
       };
       environmentFiles = [ config.sops.templates.inference-env.path ];
       volumes = [
-        "/var/lib/skynet-inference:/cache"
+        "${checkpoint}/checkpoint:/model:ro"
         "/run/skynet-inference/api:/run/inference"
       ];
       devices = [ "nvidia.com/gpu=all" ];
@@ -90,21 +93,26 @@ in
         "--ipc=private"
         "--shm-size=16g"
         "--ulimit=memlock=-1:-1"
+        "--memory=320g"
+        "--memory-swap=320g"
         "--umask=0007"
       ];
       cmd = [
-        "Qwen/Qwen3.5-122B-A10B-FP8"
-        "--revision=${revision}"
-        "--tokenizer-revision=${revision}"
+        "/model"
+        "--served-model-name=${model}"
         "--load-format=safetensors"
         "--uds=/run/inference/vllm.sock"
         "--tensor-parallel-size=2"
         "--distributed-executor-backend=mp"
-        "--max-model-len=32768"
+        "--max-model-len=262144"
         "--max-num-seqs=4"
-        # Retain the pre-0.34 base size; hybrid-cache alignment may increase it.
-        "--block-size=16"
-        "--gpu-memory-utilization=0.85"
+        ''--engram-config={"cpu_offload":true,"disk_offload":false,"dp_shared_memory":false}''
+        "--moe-backend=triton"
+        "--kv-cache-dtype=fp8"
+        "--attention-config.indexer_kv_dtype=fp8"
+        "--gpu-memory-utilization=0.88"
+        "--disable-prefix-caching"
+        "--language-model-only"
         "--reasoning-parser=qwen3"
         "--enable-auto-tool-choice"
         "--tool-call-parser=qwen3_coder"
@@ -117,6 +125,8 @@ in
       key=${config.sops.secrets.inference-api-key.path}
       test -r "$key" && test "$(${pkgs.coreutils}/bin/wc -c < "$key")" -eq 64 &&
         ${pkgs.gnugrep}/bin/grep -qxE '[0-9a-f]{64}' "$key" || exit 1
+      test -s ${checkpoint}/checkpoint/model.safetensors.index.json &&
+        ${pkgs.gnugrep}/bin/grep -Fq '"revision": "${revision}"' ${checkpoint}/verified.json || exit 1
       ${pkgs.coreutils}/bin/install -d -m 2750 -o root -g ${config.services.nginx.group} /run/skynet-inference/api
     '';
     # Daemonless Podman does not inherit the toolkit's podman.service ordering.

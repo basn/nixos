@@ -11,7 +11,8 @@
   "session": {
     "sidebar": "auto",
     "scrollbar": false,
-    "thinking": "show"
+    "thinking": "show",
+    "grouping": "none"
   },
   "mini": {
     "tools": "show"
