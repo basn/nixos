@@ -25,6 +25,9 @@
   },
   "providers": {
     "openai": {
+      "settings": {
+        "textVerbosity": "high"
+      },
       "models": {
         "gpt-6.2-astra": {
           "modelID": "gpt-6.2-astra"
