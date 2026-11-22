@@ -29,8 +29,8 @@ a preferred mode or identity may need an explicit output rule.
 
 The existing Swedish layout with dead keys is retained for Plasma, Umbriel, and
 the greeter; battlestation uses `nodeadkeys`. Shared media bindings have
-`playerctl` available. Battlestation's greeter pointer-speed and lockscreen
-Escape-to-power-off patches are intentionally not copied.
+`playerctl` available. Battlestation's lockscreen Escape-to-power-off patch is
+intentionally not copied.
 
 After deployment, test both login sessions, locking/unlocking, suspend/resume,
 touchpad behavior, media keys, external-display hotplug, and Bootvine's ZFS
