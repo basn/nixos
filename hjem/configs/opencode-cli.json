@@ -12,6 +12,7 @@
     "sidebar": "auto",
     "scrollbar": false,
     "thinking": "show",
+    "verbosity": "high",
     "grouping": "none"
   },
   "mini": {
