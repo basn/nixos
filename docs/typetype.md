@@ -25,27 +25,30 @@ destination. The following preparation/checklist sections describe the plan.
 - No TypeType refresh hook or new Bandit refresh service/timer is included.
   Services' existing network-optimizer refresh implementation is unchanged.
 
-## Repository update — TypeType 1.18.0
+## Repository update — TypeType 1.19.1
 
-Bandit's four application images move together from 1.17.1 to
-[1.18.0](https://github.com/TypeType-Video/TypeType/releases/tag/v1.18.0).
-All four tag digests and Linux/amd64 manifest/configuration checks were
-independently registry-verified on 2026-11-18. PostgreSQL, Dragonfly and Garage pins
-are unchanged. Optional Twitch/Live is not added; the classic player stays default.
+Bandit's four application images move together from 1.18.0 to
+[1.19.1](https://github.com/TypeType-Video/TypeType/releases/tag/v1.19.1).
+All four tag digests and Linux/amd64 manifests and configs were verified against
+GHCR on 2026-11-23. PostgreSQL, Dragonfly and Garage pins are unchanged, and
+optional Twitch/Live is not enabled. Video.js is now the default for users who
+haven't selected a player; explicit classic-player selections are preserved.
 
-Release-tag Compose, component environment handling and nginx templates require
-no changes to the existing auth, `/api/`, `/sabr/`, `/streams/`, `/proxy` and
-version routes. Remote login remains disabled; the downloader still requires
+The tagged Compose files, example environments and nginx templates introduce no
+new requirements for the existing auth, `/api/`, `/sabr/`, `/streams/`, `/proxy`
+or version routes. Remote login remains disabled; the downloader still requires
 the existing `S3_ACCESS_KEY`/`S3_SECRET_KEY` aliases. Storage guards are unchanged.
-The new `/api/server/events` stream and `/api/admin/server/notice` routes use the
-existing API relay. Server events send 15-second heartbeats and request unbuffered
-responses; the container and Bandit relays disable buffering, but Services' public
-ingress does not explicitly do so. Verify prompt authenticated event delivery and
-restart recovery through the full public path; buffering/header propagation may
-need a separately scoped ingress adjustment. Do not bypass Authentik to test it.
+The `/api/server/events` stream and `/api/admin/server/notice` routes introduced
+in 1.18.0 use the existing API relay. Server events send 15-second heartbeats and
+request unbuffered responses; the container and Bandit relays disable buffering,
+but Services' public ingress does not explicitly do so. Verify prompt
+authenticated event delivery and restart recovery through the full public path;
+buffering/header propagation may need a separately scoped ingress adjustment.
+Do not bypass Authentik to test it.
 
-Server startup adds focus/Twitch tables and settings columns, including
-`player_engine` defaulting to `vidstack`; downloader migrations are unchanged.
+Server startup adds columns for Focus, collection metadata and user settings,
+and changes the `player_engine` column default to `videojs`. Upgrades from
+before 1.18.0 also add Focus/Twitch tables. Downloader migrations are unchanged.
 Before coordinated deployment, obtain fresh recoverable backups of **both
 `typetype` and `typetype_downloader`**, roles/globals and consistent Garage
 metadata/objects, and test restoration. Drain Dragonfly's nonpersistent queues
