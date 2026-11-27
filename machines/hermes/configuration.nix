@@ -590,11 +590,9 @@ in
     oci-containers = {
       backend = "docker";
       containers = {
-        # Firecrawl's official Compose stack publishes these interdependent
-        # images separately; pin the registry snapshot together (2026-11-08).
-        # API 2.11.704 is build 9965df2b1d4e, not GitHub release v2.11.0.
+        # See the README for the verified registry snapshot and API build SHA.
         firecrawl-redis = {
-          image = "docker.io/library/redis:alpine@sha256:ba6e394f6acc2a695ef1b6944f161b9ca813711739be68319fa0db3470673f1d";
+          image = "docker.io/library/redis:8.12.0-alpine@sha256:5af80107c1eeecb484a2269b80a26d12bfa6521787da4663bd9f19f60a163483";
           extraOptions = [
             "--network=host"
             "--memory=256m"
@@ -642,7 +640,7 @@ in
           ];
         };
         firecrawl-playwright = {
-          image = "ghcr.io/firecrawl/playwright-service:sha-37a85335cdd6@sha256:eacaf2c256a6ff7fd1869e470d2969e97a037ff6c75ac01d38784d138a33f8eb";
+          image = "ghcr.io/firecrawl/playwright-service:sha-8b950c45c8ca@sha256:227ce3d8059173925a5a0697c63a1e947662cca934a609151651f578774edd5d";
           extraOptions = [
             "--network=host"
             "--memory=1536m"
@@ -659,7 +657,7 @@ in
           };
         };
         firecrawl-api = {
-          image = "ghcr.io/firecrawl/firecrawl:2.11.704@sha256:6db7298f2aca5d98d294e90898172c33a3374c1994971c446258851abfcdf941";
+          image = "ghcr.io/firecrawl/firecrawl:2.11.872@sha256:3efd1edfb6309fac0251cd9c5a13fbe7719dd0d7d5c4b456568009b0534ff6d8";
           dependsOn = [
             "firecrawl-redis"
             "firecrawl-rabbitmq"

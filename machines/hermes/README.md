@@ -126,28 +126,24 @@ build, host activation, or proof that the running service loaded this patch.
 
 ## Firecrawl image snapshot
 
-The registry snapshot checked on 2026-11-08 pins API `2.11.704` (build
-`9965df2b1d4e2bef848feee475b61124cea7902d`), Playwright `sha-37a85335cdd6`,
-and NuQ PostgreSQL `sha-a7a63b4bfabf`, each with its multi-architecture digest
-in `configuration.nix`. The API and Playwright tag digests were reverified
-against GHCR; NuQ PostgreSQL is unchanged.
-API registry versions are published independently of GitHub releases: the
-[latest GitHub release, v2.11.0](https://github.com/firecrawl/firecrawl/releases/tag/v2.11.0),
-is not this image snapshot. The upstream
-[image publishing workflow](https://github.com/firecrawl/firecrawl/blob/9965df2b1d4e2bef848feee475b61124cea7902d/.github/workflows/deploy-image.yml)
-records the API build SHA and publishes versioned manifests from `main`.
+The registry snapshot checked on 2026-11-27 pins the Firecrawl API at `2.11.872`
+(build `cb8e1c09106eaa600dafad67806fbde5e0a708a8`), Playwright at
+`sha-8b950c45c8ca`, and Redis at `8.12.0-alpine` (up from 8.10.2). The
+multi-architecture digests in `configuration.nix` were verified against GHCR
+for the API and Playwright and Docker Hub for Redis. The API image version is
+published [from `main`](https://github.com/firecrawl/firecrawl/blob/cb8e1c09106eaa600dafad67806fbde5e0a708a8/.github/workflows/deploy-image.yml)
+independently of the [v2.11.0 GitHub release](https://github.com/firecrawl/firecrawl/releases/tag/v2.11.0).
 
-This retains the PostgreSQL queue backend, PostgreSQL 17.11, Redis/RabbitMQ
-pins, persistent storage, secrets, networking, and resource limits; it does not
-adopt upstream's experimental FoundationDB backend. The API harness and NuQ
-initialization SQL and Compose configuration are unchanged from the previous API
-build. The [API changes](https://github.com/firecrawl/firecrawl/compare/5ca5e53bde538864e0ddcf359992583f381ea119...9965df2b1d4e2bef848feee475b61124cea7902d)
-enable TLS certificate verification by default; scraping targets with invalid or
-self-signed certificates may now fail. Certificate verification remains enabled.
-A NixOS build
-does not pull or start these images or test existing database state. After a
-separately approved deployment, verify container startup and a scrape/crawl
-against the existing data before treating the update as runtime-validated.
+NuQ PostgreSQL `sha-a7a63b4bfabf` (PostgreSQL 17.11) and RabbitMQ `3-management`
+retain their existing pins. The PostgreSQL queue backend, storage, secrets,
+networking, resource limits, and Hermes client configuration are unchanged.
+The updated [API harness](https://github.com/firecrawl/firecrawl/blob/cb8e1c09106eaa600dafad67806fbde5e0a708a8/apps/api/src/harness.ts)
+starts a dedicated extract worker only if its role is installed. Hermes's
+`web_extract` calls Firecrawl's scrape endpoint, not its extract endpoint.
+
+A NixOS build does not pull or start these images or test existing data. After
+a separately approved deployment, verify container startup with the existing
+volumes, then test a scrape through Hermes and a queued crawl.
 
 ## Desktop profile
 
