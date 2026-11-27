@@ -16,8 +16,9 @@ let
   );
   environment = {
     DAYZWEB_ARCHIVE_CATALOG = "/var/lib/dayzweb/published-archives/catalog.json";
-    DAYZWEB_DATABASE = "/var/lib/dayzweb/dayzweb.sqlite3";
-    DAYZWEB_SERVER_ID = "1ed9f69d-4ee3-6dac-b18b-ea5e938a80e2";
+    DAYZWEB_DATABASE = "/var/lib/dayzweb/dayzweb-cherno2.sqlite3";
+    DAYZWEB_SERVER_ID = "1ee48bfd-b81f-6f78-b586-ea5e938a80e2";
+    DAYZWEB_POPULATION_SERVER_ID = config.services.dayzwebSplit.population.serverId;
     DAYZWEB_ADMIN_USERNAME = "basn";
     DAYZWEB_TIMEZONE = "Europe/Stockholm";
     DAYZWEB_PUBLIC_ORIGIN = "https://dayz.basn.se";
@@ -92,6 +93,7 @@ in
     sourcePath = "/srv/dayzweb/current";
     user = "dayzweb";
     netbirdUnits = [ "netbird.service" ];
+    population.serverId = "am-cherno2";
     ingest = {
       enable = true;
       listenAddress = "100.86.89.177";

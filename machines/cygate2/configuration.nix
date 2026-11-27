@@ -32,15 +32,15 @@
       enable = true;
       onCalendar = "*-*-* *:05:00";
       ingestUrl = "http://services.netbird.basn.se:18111";
-      serverId = "1ed9f69d-4ee3-6dac-b18b-ea5e938a80e2";
+      serverId = "1ee48bfd-b81f-6f78-b586-ea5e938a80e2";
       detailConcurrency = 8;
     };
     population = {
       enable = true;
       timerEnable = true;
       ingestUrl = "http://services.netbird.basn.se:18111";
-      serverId = "am-cherno1";
-      address = "91.134.31.223:27017";
+      serverId = "am-cherno2";
+      address = "91.134.31.222:27016";
       intervalSeconds = 120;
     };
     steam = {

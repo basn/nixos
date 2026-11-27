@@ -119,7 +119,7 @@ in
       };
     };
     population = {
-      enable = lib.mkEnableOption "the independent AM-Cherno1 population monitor";
+      enable = lib.mkEnableOption "the independent DayZWeb population monitor";
       timerEnable = lib.mkEnableOption "the persistent DayZWeb population timer";
       ingestUrl = lib.mkOption {
         type = lib.types.str;
@@ -326,7 +326,7 @@ in
 
     (lib.mkIf cfg.population.enable {
       systemd.services.dayzweb-population-collector = {
-        description = "DayZWeb AM-Cherno1 population sample";
+        description = "DayZWeb ${cfg.population.serverId} population sample";
         after = [ "network-online.target" ] ++ cfg.netbirdUnits;
         wants = [ "network-online.target" ];
         requires = cfg.netbirdUnits;

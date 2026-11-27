@@ -5,6 +5,60 @@ This runbook stages the same tested DayZWeb revision on `services` and
 private ingest API and the new worker. Repository validation does not authorize
 these live operations.
 
+## Chernarus 2 cutover (existing split deployment)
+
+The active target is `1ee48bfd-b81f-6f78-b586-ea5e938a80e2`, with population
+identity `am-cherno2` at `91.134.31.222:27016`. Web, ingest and maintenance share
+`/var/lib/dayzweb/dayzweb-cherno2.sqlite3` on `services`. This separate path is
+for the server change, not for a wipe: reuse the verified Chernarus 2 database
+across its wipes. Do not seed it with the Chernarus 1 database, roster, watch
+state or pending jobs.
+
+Use the split-deployment prerequisites and switchover below with these changes:
+
+1. Recheck effective units and overrides on both hosts. Confirm the target path
+   and SQLite sidecars are absent, or that an existing target is verified
+   Chernarus 2 state; stop if its provenance is unclear. Verify the dataset
+   mount and write access for `dayzweb`, credentials (metadata only), NetBird
+   policy and DNS, and Chernarus 2 Aftermath and population query reachability.
+   Stage the same compatible, tested app revision on both hosts rather than
+   using the historical initial-split release below. The inspected app still
+   hard-codes Chernarus 1 in the live population heading; stage a corrected
+   release before switching the public site.
+2. Record both system and app generations. Pause auto-upgrade and hold all
+   DayZWeb timers across both switches; wait for or stop active writers and
+   verify the legacy collector and any manual or external producers are off.
+   Ingest checks population identity, but scoreboard jobs carry no server ID:
+   an old worker must not reach the new ingest. Pending scoreboard jobs and
+   staged results in the old SQLite database must stay there. The configured
+   worker has no local disk spool; inventory any operator-managed spool or
+   replay jobs and keep them attached to the old target only.
+3. With all writers stopped, take verified SQLite backups of the old database and
+   any existing Chernarus 2 database, and preserve the catalog and its archive
+   files. Keep an independent recovery copy: `tank/dayzweb` is not in the
+   services host's ZnapZend config. Update any external backup and restore jobs
+   to cover both database paths and the catalog/archives. Verify restores on
+   scratch paths; never restore one server's data over the other.
+4. Switch `services` first with producers still held, confirm the three local
+   services use the same new database and ingress is healthy, then switch
+   `nixos-sov2`. Confirm the new worker UUID and population identity/address
+   before manually running one cycle of each collector. Confirm a published
+   Chernarus 2 scoreboard and a successful population observation in the web UI
+   (a query failure may still produce a successful oneshot exit). Then resume
+   the intended timers and auto-upgrade. Roll back with
+   producers held again; restore both hosts' matching generations/app releases
+   and the old DB path without overwriting either database. A DB restore is not
+   needed just to switch back to the untouched old path.
+
+Keep the existing archive catalog and databases intact. Review its entries for
+clear server/wipe labels; to publish additional old history, register only an
+immutable, verified SQLite backup with appropriate bounds, never either live
+database. The inspected app filters historic population by the **live** identity,
+so Chernarus 1 population will no longer display there under `am-cherno2` even
+though its rows are preserved. If historic population must remain visible at
+cutover, first stage app support for per-archive population identity and verify
+the catalog mappings. Do not relabel or copy rows to work around this.
+
 ## One-time prerequisites
 
 1. Create `secrets/dayzweb-ingest-token.yaml` with SOPS. Its YAML key must be
